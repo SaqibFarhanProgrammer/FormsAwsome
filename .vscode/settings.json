@@ -1,0 +1,25 @@
+{
+  // Code likhte waqt inline suggestions/autocomplete ON karne ke liye
+  "editor.inlineSuggest.enabled": true,
+  "editor.quickSuggestions": {
+    "other": "on",
+    "comments": "on",
+    "strings": "on"
+  },
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.tabCompletion": "on",
+
+  // Copilot automatic code completion
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": true,
+    "markdown": true,
+    "scminput": true
+  },
+
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".vscode/commit-instructions.md"
+    }
+  ]
+}

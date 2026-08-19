@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -7,10 +7,13 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const InterFont = Inter({
   subsets: ["latin"],
+  weight: ["100", "400", "500", "600", "800"],
+  variable: "--font-inter",
 });
+
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,7 +24,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable}  ${InterFont.variable} font-inter  h-full antialiased`}
+      cz-shortcut-listen="true"
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
