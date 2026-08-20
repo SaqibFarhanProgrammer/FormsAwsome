@@ -8,6 +8,11 @@ export type SubmissionMeta = {
 export type SubmissionType = {
   formId: mongoose.Types.ObjectId | string; // Allow string for flexibility
   formVersion: number;
-  data: Record<string, any>; // field.id → value
+  data: [
+    {
+      field_id: string;
+      value: any;
+    },
+  ];
   meta: SubmissionMeta;
 };

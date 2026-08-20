@@ -4,17 +4,13 @@ import { Types } from "mongoose";
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
-const ACCESS_TOKEN_EXPIRY = "15m"; // short lived
+const ACCESS_TOKEN_EXPIRY = "5h"; // short lived
 const REFRESH_TOKEN_EXPIRY = "7d"; // long lived
 
 export interface TokenPayload {
   userId: string;
   email: string;
 }
-
-// ======================
-// Generate Tokens
-// ======================
 
 export const generateAccessToken = (payload: TokenPayload): string => {
   return jwt.sign(payload, ACCESS_TOKEN_SECRET, {
@@ -28,10 +24,6 @@ export const generateRefreshToken = (payload: TokenPayload): string => {
   });
 };
 
-// ======================
-// Verify Tokens
-// ======================
-
 export const verifyAccessToken = (token: string): TokenPayload => {
   return jwt.verify(token, ACCESS_TOKEN_SECRET) as TokenPayload;
 };
@@ -39,10 +31,6 @@ export const verifyAccessToken = (token: string): TokenPayload => {
 export const verifyRefreshToken = (token: string): TokenPayload => {
   return jwt.verify(token, REFRESH_TOKEN_SECRET) as TokenPayload;
 };
-
-// ======================
-// Generate Both Tokens Together
-// ======================
 
 export const generateTokens = (userId: Types.ObjectId | string, email: string) => {
   const payload: TokenPayload = {
