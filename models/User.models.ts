@@ -1,27 +1,39 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
+export type UserTypes = {
+  _id: mongoose.Types.ObjectId | string;
+  Name: string;
+  Email: string;
+  Password: string;
+  Image?: string;
+  RefreshToken?: string;
+  RefreshTokenExpiry?: Date;
+  createdAt: Date | string;
+};
+
+const userSchema = new mongoose.Schema<UserTypes>(
   {
-    name: {
+    Name: {
       type: String,
       required: true,
     },
-    email: {
+    Email: {
       type: String,
       required: true,
       unique: true,
     },
-    password: {
+    Password: {
       type: String,
       required: true,
     },
-    image: {
+    Image: {
+      type: String,
+      default: "https://i.pinimg.com/736x/1a/81/7a/1a817a95a42d8c43031378d122a05ffe.jpg",
+    },
+    RefreshToken: {
       type: String,
     },
-    refreshToken: {
-      type: String,
-    },
-    refreshTokenExpiry: {
+    RefreshTokenExpiry: {
       type: Date,
     },
   },
@@ -29,3 +41,5 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+export const User = mongoose.models.User || mongoose.model<UserTypes>("User", userSchema);
