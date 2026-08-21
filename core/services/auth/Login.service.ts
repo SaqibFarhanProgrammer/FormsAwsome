@@ -34,7 +34,7 @@ export async function LoginUserService(request: NextRequest) {
   const cookieStore = await cookies();
   cookieStore.set("accessToken", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24, // 1 day
@@ -42,7 +42,7 @@ export async function LoginUserService(request: NextRequest) {
 
   cookieStore.set("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 7, // 1 day
