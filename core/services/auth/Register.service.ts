@@ -57,7 +57,6 @@ export async function RegisterUserService(request: NextRequest) {
     path: "/",
   });
 
-  // Sirf data return karo
   return {
     user: {
       id: user._id,

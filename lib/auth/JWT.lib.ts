@@ -4,8 +4,8 @@ import { Types } from "mongoose";
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
-const ACCESS_TOKEN_EXPIRY = "5h"; // short lived
-const REFRESH_TOKEN_EXPIRY = "7d"; // long lived
+export const ACCESS_TOKEN_EXPIRY = "1d"; // short lived
+export const REFRESH_TOKEN_EXPIRY = "7d"; // long lived
 
 export interface TokenPayload {
   userId: string;

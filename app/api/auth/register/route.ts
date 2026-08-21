@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RegisterUserService } from "@/core/services/auth/Register.service";
 import { AppError } from "@/lib/auth/AppError";
+import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,25 +17,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 },
     );
-  } catch (error: unknown) {
-    console.error("REGISTER USER ERROR:", error);
-
-    if (error instanceof AppError) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: error.message,
-        },
-        { status: error.statusCode },
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Internal Server Error",
-      },
-      { status: 500 },
-    );
+  } catch (error: any) {
+    CatchErrorFunctionForRoute(error, "REGISTER USER ERROR");
   }
 }
