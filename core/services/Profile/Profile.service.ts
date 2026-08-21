@@ -25,13 +25,13 @@ export async function GetProfileService(request: NextRequest) {
   const userId = payload.userId;
   const cacheKey = `user:${userId}`;
 
-  // Check Redis cache
   const cachedUser = await GetDataFromRedis(cacheKey);
   if (cachedUser) {
-    return JSON.parse(cachedUser); // ← important
+    console.log("from cached");
+
+    return JSON.parse(cachedUser);
   }
 
-  // Get from DB
   await connectDB();
   const user = await User.findById(userId).select("-passwordHash -refreshToken");
 
@@ -45,12 +45,13 @@ export async function GetProfileService(request: NextRequest) {
     email: user.email,
   };
 
-  // Store in Redis (24 hours TTL) - string me convert karo
   await SetDataToRedisWithTTL(
     cacheKey,
-    JSON.stringify(profileData), // ← important
-    86400,
+    JSON.stringify(profileData),
+    3600, // 1 hr
   );
+
+  console.log("from DB");
 
   return profileData;
 }
