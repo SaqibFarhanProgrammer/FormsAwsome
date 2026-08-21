@@ -3,7 +3,7 @@ import { AppError } from "@/lib/auth/AppError";
 import { comparePassword } from "@/utils/CatchErrorFunction";
 import { connectDB } from "@/core/DB/ConnectDB";
 import { User } from "@/models/User.models";
-import { generateAccessToken, generateTokens, verifyRefreshToken } from "@/lib/auth/JWT.lib";
+import { generateTokens } from "@/lib/auth/JWT.lib";
 import { cookies } from "next/headers";
 
 export async function LoginUserService(request: NextRequest) {

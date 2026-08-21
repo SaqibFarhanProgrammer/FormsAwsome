@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
         message: "User logged in successfully",
         data,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return await CatchErrorFunctionForRoute(error, "LOGIN USER ERROR");
