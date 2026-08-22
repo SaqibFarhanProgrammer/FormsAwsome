@@ -45,7 +45,7 @@ export async function LoginUserService(request: NextRequest) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 1 day
+    maxAge: 60 * 60 * 24 * 7, 
   });
 
   return {

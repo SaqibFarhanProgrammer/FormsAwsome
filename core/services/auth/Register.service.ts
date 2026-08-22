@@ -48,6 +48,7 @@ export async function RegisterUserService(request: NextRequest) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
+    maxAge: 60 * 60 * 24, // 1 day
   });
 
   cookieStore.set("refreshToken", refreshToken, {
@@ -55,6 +56,7 @@ export async function RegisterUserService(request: NextRequest) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
+    maxAge: 60 * 60 * 24 * 7, // 1 day
   });
 
   return {

@@ -1,38 +1,41 @@
-// import { cookies } from "next/headers";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { NextRequest, NextResponse } from "next/server";
+import { generateAccessToken, verifyRefreshToken } from "./lib/auth/JWT.lib";
 
-// import { generateAccessToken, verifyRefreshToken } from "./lib/auth/JWT.lib";
-// import { NextRequest, NextResponse } from "next/server";
+export async function proxy(req: NextRequest) {
+  const cookieStore = await cookies();
+  const inCommingAccessToken = cookieStore.get("accessToken")?.value;
 
-// export async function proxy(request: NextRequest) {
-//   const CookieStore = await cookies();
+  const routes = ["/dashboard", "/profile"];
 
-//   const inCommingAccessToken = CookieStore.get("accessToken");
+  if (!inCommingAccessToken) {
+    const inCommingRefreshToken = cookieStore.get("refreshToken")?.value;
 
-//   if (!inCommingAccessToken) {
-//     const inCommingRefreshToken = CookieStore.get("refreshToken");
+    routes.some((route) => {
+      if (!inCommingRefreshToken && req.url.startsWith(route)) {
+        return NextResponse.json(new URL("/auth/login"));
+      }
+    });
 
-//     console.log(inCommingRefreshToken);
+    const verifedRefreshToken = verifyRefreshToken(inCommingRefreshToken);
 
-//     if (!inCommingRefreshToken) {
-//       return NextResponse.redirect(new URL("/home", request.url));
-//     }
+    if (!verifedRefreshToken) {
+      return NextResponse.json(new URL("/auth/login"));
+    }
 
-//     const payload = verifyRefreshToken(inCommingRefreshToken);
+    const newAccessTOken = generateAccessToken(verifedRefreshToken);
 
-//     if (payload.userId) {
-//       const newAccessToken = generateAccessToken(payload);
+    cookieStore.set("accessToken", newAccessTOken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24, // 1 day
+    });
+  }
+}
 
-//       CookieStore.set("accessToken", newAccessToken, {
-//         httpOnly: true,
-//         secure: true,
-//         sameSite: "lax",
-//         path: "/",
-//         maxAge: 60 * 60 * 24, // 1 day
-//       });
-//     }
-//   }
-// }
-
-// export const config = {
-//   matcher: ["/dashboard/:path*"],
-// };
+export const config = {
+  macther: ["/dashboard/path*"],
+};
