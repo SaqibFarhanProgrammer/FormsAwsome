@@ -12,6 +12,7 @@ import {
   SetDataToRedisWithTTL,
 } from "@/lib/redis/redis";
 import { Submission } from "@/features/submissions/models/Submition.models";
+import { FormState } from "@/features/form-builder/types/Form-builder.types";
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
@@ -365,4 +366,47 @@ export async function deleteFormService(
     slug,
     action,
   };
+}
+
+
+
+
+export async function getPublicFormService(slug: string) {
+  if (!slug) {
+    throw new AppError("Slug is required", 400);
+  }
+
+  const cacheKey = `public:form:${slug}`;
+  const cacheExists = await IsDataExitsInRedis(cacheKey);
+  
+  if (cacheExists) {
+    const cachedForm = await GetDataFromRedis(cacheKey);
+    if (cachedForm) {
+      return JSON.parse(cachedForm);
+    }
+  }
+
+  await connectDB();
+  const form = await Form.findOne({ 
+    slug,
+    state: FormState.PUBLISHED 
+  });
+
+  if (!form) {
+    throw new AppError("Form not found or not published", 404);
+  }
+
+  const formData = {
+    id: form._id,
+    title: form.title,
+    description: form.description,
+    slug: form.slug,
+    fields: form.fields,
+    settings: form.settings,
+  };
+
+  // Cache for 1 hour
+  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formData), 3600 * 5);
+
+  return formData;
 }
