@@ -3,10 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
 import { getPublicFormService } from "@/core/services/Form/Forms.service";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
     const data = await getPublicFormService(slug);
@@ -16,7 +13,7 @@ export async function GET(
         message: "Form retrieved successfully",
         data,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return CatchErrorFunctionForRoute(error, "GET PUBLIC FORM ERROR");

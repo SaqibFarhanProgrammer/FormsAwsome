@@ -368,9 +368,6 @@ export async function deleteFormService(
   };
 }
 
-
-
-
 export async function getPublicFormService(slug: string) {
   if (!slug) {
     throw new AppError("Slug is required", 400);
@@ -378,7 +375,7 @@ export async function getPublicFormService(slug: string) {
 
   const cacheKey = `public:form:${slug}`;
   const cacheExists = await IsDataExitsInRedis(cacheKey);
-  
+
   if (cacheExists) {
     const cachedForm = await GetDataFromRedis(cacheKey);
     if (cachedForm) {
@@ -387,9 +384,9 @@ export async function getPublicFormService(slug: string) {
   }
 
   await connectDB();
-  const form = await Form.findOne({ 
+  const form = await Form.findOne({
     slug,
-    state: FormState.PUBLISHED 
+    state: FormState.PUBLISHED,
   });
 
   if (!form) {

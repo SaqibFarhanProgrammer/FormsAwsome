@@ -10,7 +10,6 @@ export async function PATCH(request: NextRequest) {
       {
         success: true,
         data,
-        
       },
       { status: 200 },
     );
