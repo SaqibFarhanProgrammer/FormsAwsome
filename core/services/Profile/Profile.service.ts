@@ -7,7 +7,7 @@ import { verifyAccessToken } from "@/lib/auth/JWT.lib";
 import { cookies } from "next/headers";
 import { GetDataFromRedis, SetDataToRedisWithTTL } from "@/lib/redis/redis";
 
-export async function GetProfileService(request: NextRequest) {
+export async function GetProfileService() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
@@ -34,6 +34,7 @@ export async function GetProfileService(request: NextRequest) {
 
   await connectDB();
   const user = await User.findById(userId).select("-passwordHash -refreshToken");
+  console.log(user);
 
   if (!user) {
     throw new AppError("User not found", 404);
@@ -43,6 +44,7 @@ export async function GetProfileService(request: NextRequest) {
     id: user._id,
     name: user.name,
     email: user.email,
+    image: user.image,
   };
 
   await SetDataToRedisWithTTL(

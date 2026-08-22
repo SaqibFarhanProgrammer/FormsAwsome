@@ -80,3 +80,13 @@ export async function IsDataExitsInRedis(key: string): Promise<boolean> {
     throw new AppError("Error while checking data existence in Redis", 500);
   }
 }
+
+export async function DeleteDataFromRedis(key: string) {
+  try {
+    const redis = await ConnectionToRedis();
+    await redis.del(key);
+  } catch (error) {
+    console.error("Error while checking data existence in Redis:", error);
+    throw new AppError("Error while checking data existence in Redis", 500);
+  }
+}

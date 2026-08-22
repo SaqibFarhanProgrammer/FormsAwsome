@@ -15,11 +15,11 @@ export type FieldType =
   | "rating"
   | "date"
   | "multiple_choice"
-  | "date_picker"
   | "file_upload_image"
   | "file_upload_pdf"
   | "slider"
-  | "URL";
+  | "URL"
+  | "image";
 
 export type FieldOption = {
   label: string;
