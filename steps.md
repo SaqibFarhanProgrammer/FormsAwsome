@@ -86,7 +86,7 @@
 4. Update Form
 5. Delete/Archive Form
 
-# This Steps Are Completed 
+# This Steps Are Completed
 
 **Haan, ab Frontend side pe move kar sakte hain.**
 
@@ -95,12 +95,14 @@ Lekin **seedha Drag & Drop builder mat banana**.
 ### Sahi Order (Frontend ke liye):
 
 **Phase 1: Basic UI (Pehle yeh)**
+
 1. Auth pages (Login + Register)
 2. Dashboard layout (Sidebar + Header)
 3. Forms List page (saare forms dikhao)
 4. Create Form (simple title/description se)
 
 **Phase 2: Form Builder UI**
+
 - Drag & Drop canvas
 - Field palette
 - Properties panel
@@ -115,6 +117,7 @@ Lekin **seedha Drag & Drop builder mat banana**.
 Pehle **Auth pages + Dashboard layout + Forms List** banao.
 
 Isse:
+
 - App useable lagegi
 - Tumhe flow clear hoga
 - Builder banate waqt context pata hoga

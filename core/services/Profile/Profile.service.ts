@@ -1,5 +1,4 @@
 // core/services/auth/Profile.service.ts
-import { NextRequest } from "next/server";
 import { AppError } from "@/lib/auth/AppError";
 import { connectDB } from "@/core/DB/ConnectDB";
 import { User } from "@/models/User.models";
