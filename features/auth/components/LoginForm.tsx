@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
 import * as z from "zod";
 import Link from "next/link";
 
@@ -28,6 +29,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [AppError, setAppError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -40,10 +42,23 @@ export function LoginForm() {
 
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
+    setAppError("");
+
     try {
-      console.log("Login data:", data);
-    } catch (error) {
-      console.error(error);
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setAppError("Invalid email or password");
+        return;
+      }
+
+      window.location.href = "/dashboard";
+    } catch {
+      setAppError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }

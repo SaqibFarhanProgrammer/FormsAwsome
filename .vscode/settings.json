@@ -1,5 +1,4 @@
 {
-  // Code likhte waqt inline suggestions/autocomplete ON karne ke liye
   "editor.inlineSuggest.enabled": true,
   "editor.quickSuggestions": {
     "other": "on",
@@ -15,11 +14,5 @@
     "plaintext": true,
     "markdown": true,
     "scminput": true
-  },
-
-  "github.copilot.chat.commitMessageGeneration.instructions": [
-    {
-      "file": ".vscode/commit-instructions.md"
-    }
-  ]
+  }
 }

@@ -5,6 +5,8 @@ export type UserType = {
   email: string;
   passwordHash: string;
   image?: string;
+  emailVerified: boolean;
+
   refreshToken?: string;
   refreshTokenExpiry?: Date;
 };
@@ -33,6 +35,11 @@ const userSchema = new mongoose.Schema<UserType>(
     refreshToken: {
       type: String,
       default: null,
+    },
+    emailVerified: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
     refreshTokenExpiry: {
       type: Date,
