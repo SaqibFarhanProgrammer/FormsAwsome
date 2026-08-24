@@ -9,7 +9,7 @@ function LeftPanel() {
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-6">
           <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur-sm">
-            <svg  
+            <svg
               width="18"
               height="18"
               viewBox="0 0 24 24"
