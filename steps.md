@@ -111,22 +111,32 @@ Lekin **seedha Drag & Drop builder mat banana**.
 
 ---
 
-### Abhi kya start karein?
+# 🚀 NextAuth Setup Guide - FormsAwsome
 
-**Recommended:**  
-Pehle **Auth pages + Dashboard layout + Forms List** banao.
-
-Isse:
-
-- App useable lagegi
-- Tumhe flow clear hoga
-- Builder banate waqt context pata hoga
+Complete step-by-step implementation guide for Credentials + Google + GitHub Authentication with Custom Access/Refresh Tokens.
 
 ---
 
-**Bolo:**
+## 🟢 Phase 1: Environment Variables Setup
 
-1. Auth pages (Login/Register) se start karein?
-2. Ya seedha Dashboard + Forms List se?
+Root directory mein `.env.local` file create/check karo aur ye keys set karo:
 
-Kis se start karna hai?
+```env
+# NextAuth Configuration
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_super_secret_nextauth_key_here
+
+# MongoDB Connection
+MONGODB_URI=your_mongodb_connection_string
+
+# OAuth Providers
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+# Custom JWT Tokens Secret
+JWT_ACCESS_SECRET=your_jwt_access_secret_key
+JWT_REFRESH_SECRET=your_jwt_refresh_secret_key
+```

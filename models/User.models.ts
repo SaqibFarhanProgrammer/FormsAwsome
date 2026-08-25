@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export type UserType = {
   name: string;
   email: string;
-  passwordHash: string;
+  passwordHash: string | null;
   image?: string;
   emailVerified: boolean;
 
@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema<UserType>(
     passwordHash: {
       type: String,
       required: true,
+      default: null,
     },
     image: {
       type: String,

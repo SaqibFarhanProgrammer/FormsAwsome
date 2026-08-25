@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
+import axios from "axios";
 import * as z from "zod";
 import Link from "next/link";
 
@@ -14,9 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 import { Eye, EyeOff } from "lucide-react";
-import { GithubAuthButton, GoogleAuthButon } from "./RegisterForm";
+import { GoogleAuthButton } from "./RegisterForm";
+import { useRouter } from "next/navigation";
 
-// ─── Validation Schema ───
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
   password: z
@@ -29,8 +29,9 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [AppError, setAppError] = useState("");
+  const [appError, setAppError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -45,20 +46,18 @@ export function LoginForm() {
     setAppError("");
 
     try {
-      const result = await signIn("credentials", {
+      const response = await axios.post("/api/auth/login", {
         email: data.email,
         password: data.password,
-        redirect: false,
       });
 
-      if (result?.error) {
-        setAppError("Invalid email or password");
-        return;
+      if (response.status === 200) {
+        router.push("/");
       }
-
-      window.location.href = "/dashboard";
-    } catch {
-      setAppError("Something went wrong. Please try again.");
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || "Invalid email or password. Please try again.";
+      setAppError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -75,8 +74,7 @@ export function LoginForm() {
         </div>
 
         <div className="mb-5 grid grid-cols-2 gap-3">
-          <GoogleAuthButon />
-          <GithubAuthButton />
+          <GoogleAuthButton />
         </div>
 
         <div className="mb-6 flex items-center gap-3">
@@ -84,6 +82,12 @@ export function LoginForm() {
           <span className="text-xs font-medium text-white/40">Or</span>
           <div className="h-px flex-1 bg-white/[0.08]" />
         </div>
+
+        {appError && (
+          <div className="mb-4 rounded-lg bg-red-500/10 p-3 text-center text-xs text-red-400 border border-red-500/20">
+            {appError}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1.5">
@@ -139,7 +143,7 @@ export function LoginForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="mt-2 h-11 w-full rounded-lg  text-sm font-semibold active:scale-[0.98]"
+            className="mt-2 h-11 w-full rounded-lg text-sm font-semibold active:scale-[0.98]"
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>

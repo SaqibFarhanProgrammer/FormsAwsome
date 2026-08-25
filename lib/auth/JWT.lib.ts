@@ -8,12 +8,15 @@ export const ACCESS_TOKEN_EXPIRY = "1d"; // short lived
 export const REFRESH_TOKEN_EXPIRY = "7d"; // long lived
 
 export interface TokenPayload {
-  userId: string;
+  userId: string | any;
   email: string;
 }
 
-export const generateAccessToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, ACCESS_TOKEN_SECRET, {
+export const generateAccessToken = (payload: any) => {
+  // Purani exp aur iat properties ko destructure karke alag kar dein
+  const { exp, iat, nbf, ...cleanPayload } = payload;
+
+  return jwt.sign(cleanPayload, ACCESS_TOKEN_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRY,
   });
 };
