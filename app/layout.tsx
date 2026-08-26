@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Inter } from "next/font/google";
 import "./globals.css";
+import RunNodemailer from "@/features/NodeMailer/Nodemailer.config";
+import SendVerificationEmail from "@/features/NodeMailer/Nodemailer.config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

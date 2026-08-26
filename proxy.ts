@@ -7,6 +7,12 @@ export async function proxy(req: NextRequest) {
   const inCommingAccessToken = cookieStore.get("accessToken")?.value;
 
   const routes = ["/dashboard", "/profile"];
+  const authRoutes = ["/auth/login", "/auth/register"];
+
+  if (inCommingAccessToken && authRoutes.some((route) => req.nextUrl.pathname.startsWith(route))) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
   const isProtectedRoute = routes.some((route) => req.nextUrl.pathname.startsWith(route));
 
   if (!inCommingAccessToken) {
@@ -51,5 +57,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*"], // Fixed typo 'macther'
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/auth/:path*"], // Fixed typo 'macther'
 };
