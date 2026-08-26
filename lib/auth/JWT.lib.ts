@@ -3,13 +3,21 @@ import { Types } from "mongoose";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
+const VERIFICATION_TOKEN_SECRET =
+  process.env.VERIFICATION_TOKEN_SECRET || process.env.JWT_SECRET || "verification-secret-key";
 
 export const ACCESS_TOKEN_EXPIRY = "1d"; // short lived
 export const REFRESH_TOKEN_EXPIRY = "7d"; // long lived
+export const VERIFICATION_TOKEN_EXPIRY = "15m"; // 15 minutes for email verification
 
 export interface TokenPayload {
   userId: string | any;
   email: string;
+}
+
+export interface VerificationTokenPayload {
+  email: string;
+  name?: string;
 }
 
 export const generateAccessToken = (payload: any) => {
@@ -45,4 +53,25 @@ export const generateTokens = (userId: Types.ObjectId | string, email: string) =
   const refreshToken = generateRefreshToken(payload);
 
   return { accessToken, refreshToken };
+};
+
+/**
+ * Generate a verification token for email verification (contains email and name)
+ */
+export const generateVerificationToken = (email: string, name?: string): string => {
+  const payload: VerificationTokenPayload = {
+    email,
+    ...(name && { name }),
+  };
+
+  return jwt.sign(payload, VERIFICATION_TOKEN_SECRET, {
+    expiresIn: VERIFICATION_TOKEN_EXPIRY,
+  });
+};
+
+/**
+ * Verify a verification token
+ */
+export const verifyVerificationToken = (token: string): VerificationTokenPayload => {
+  return jwt.verify(token, VERIFICATION_TOKEN_SECRET) as VerificationTokenPayload;
 };

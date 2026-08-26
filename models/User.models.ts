@@ -42,6 +42,7 @@ const userSchema = new mongoose.Schema<UserType>(
       required: true,
       default: false,
     },
+
     refreshTokenExpiry: {
       type: Date,
       default: null,

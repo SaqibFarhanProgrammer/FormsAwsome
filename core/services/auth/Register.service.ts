@@ -5,8 +5,10 @@ import { AppError } from "@/lib/auth/AppError";
 import { hashPassword } from "@/utils/CatchErrorFunction"; // apna path
 import { connectDB } from "@/core/DB/ConnectDB";
 import { User } from "@/models/User.models";
-import { generateTokens } from "@/lib/auth/JWT.lib";
-import { cookies } from "next/headers";
+import { generateVerificationToken } from "@/lib/auth/JWT.lib";
+import { generateVerificationCode } from "@/lib/auth/VerificationCode.lib";
+import { SetDataToRedisWithTTL } from "@/lib/redis/redis";
+import SendVerificationEmail from "@/features/NodeMailer/Nodemailer.config";
 
 export async function RegisterUserService(request: NextRequest) {
   const body = await request.json();
@@ -35,35 +37,32 @@ export async function RegisterUserService(request: NextRequest) {
     passwordHash,
   });
 
-  const { accessToken, refreshToken } = generateTokens(user._id, user.email);
+  // Generate verification code and store it in Redis (10 minutes TTL)
+  const verificationCode = generateVerificationCode();
+  const redisKey = `verification:${user.email}`;
+  await SetDataToRedisWithTTL(redisKey, verificationCode, 600); // 600 seconds = 10 minutes
 
-  user.refreshToken = refreshToken;
-  await user.save();
+  // Generate verification token (JWT)
+  const verificationToken = generateVerificationToken(user.email, user.name);
 
-  // Cookies set karo
-  const cookieStore = await cookies();
-
-  cookieStore.set("accessToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24, // 1 day
+  // Send verification email
+  await SendVerificationEmail({
+    code: verificationCode,
+    email: user.email,
+    name: user.name,
   });
 
-  cookieStore.set("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 1 day
-  });
+  const encodedEmail = encodeURIComponent(user.email);
+  const verifyUrl = `/auth/verify-email?email=${encodedEmail}&token=${verificationToken}`;
 
   return {
+    message: "User registered successfully. Verification email sent.",
+    verifyUrl,
     user: {
       id: user._id,
       name: user.name,
       email: user.email,
+      emailVerified: false,
     },
   };
 }

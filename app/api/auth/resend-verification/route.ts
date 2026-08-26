@@ -1,0 +1,58 @@
+// app/api/auth/resend-verification/route.ts
+
+import { NextRequest, NextResponse } from "next/server";
+import { AppError } from "@/lib/auth/AppError";
+import { connectDB } from "@/core/DB/ConnectDB";
+import { User } from "@/models/User.models";
+import { SetDataToRedisWithTTL } from "@/lib/redis/redis";
+import { generateVerificationToken } from "@/lib/auth/JWT.lib";
+import { generateVerificationCode } from "@/lib/auth/VerificationCode.lib";
+import SendVerificationEmail from "@/features/NodeMailer/Nodemailer.config";
+import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { email } = body;
+
+    if (!email) {
+      throw new AppError("Email is required", 400);
+    }
+
+    await connectDB();
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    if (user.emailVerified) {
+      throw new AppError("Email is already verified", 400);
+    }
+
+    const verificationCode = generateVerificationCode();
+    const redisKey = `verification:${user.email}`;
+    await SetDataToRedisWithTTL(redisKey, verificationCode, 600); // 600 seconds = 10 minutes
+    const verificationToken = generateVerificationToken(user.email, user.name);
+
+    await SendVerificationEmail({
+      code: verificationCode,
+      email: user.email,
+      name: user.name,
+    });
+
+    const encodedEmail = encodeURIComponent(user.email);
+    const verifyUrl = `/auth/verify-email?email=${encodedEmail}&token=${verificationToken}`;
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Verification email sent. Please check your inbox.",
+        verifyUrl,
+      },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    CatchErrorFunctionForRoute(error, "RESEND VERIFICATION EMAIL ERROR");
+  }
+}

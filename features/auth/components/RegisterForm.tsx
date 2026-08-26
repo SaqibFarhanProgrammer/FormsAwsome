@@ -1,4 +1,3 @@
-// components/auth/register-form.tsx
 "use client";
 
 import { useState } from "react";
@@ -16,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { GoogleIcon } from "@/components/icons/Icons";
 
-// ─── Validation Schema ───
 const registerSchema = z
   .object({
     firstName: z
@@ -78,19 +76,27 @@ export function RegisterForm() {
     setError(null);
 
     try {
-      // 1. Register user
-      await axios.post("/api/auth/register", {
+      const response = await axios.post("/api/auth/register", {
         name: `${data.firstName} ${data.lastName}`,
         email: data.email,
         password: data.password,
       });
 
-      router.push("/dashboard");
-      router.refresh();
+      console.log("Register response:", response.data);
+
+      const verifyUrl = response.data?.data?.verifyUrl;
+      if (verifyUrl) {
+        console.log("Redirecting to:", verifyUrl);
+        router.push(verifyUrl);
+      } else {
+        console.log("No verifyUrl found, redirecting to dashboard");
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       const message =
         err.response?.data?.message || err.message || "Something went wrong. Please try again.";
       setError(message);
+      console.error("Registration error:", err);
     } finally {
       setIsLoading(false);
     }

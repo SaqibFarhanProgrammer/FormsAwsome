@@ -1,5 +1,5 @@
 // app/api/auth/profile/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { GetProfileService } from "@/core/services/Profile/Profile.service";
 import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
 
