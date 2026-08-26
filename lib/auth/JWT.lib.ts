@@ -21,7 +21,6 @@ export interface VerificationTokenPayload {
 }
 
 export const generateAccessToken = (payload: any) => {
-  // Purani exp aur iat properties ko destructure karke alag kar dein
   const { exp, iat, nbf, ...cleanPayload } = payload;
 
   return jwt.sign(cleanPayload, ACCESS_TOKEN_SECRET, {
