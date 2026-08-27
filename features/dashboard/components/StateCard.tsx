@@ -1,64 +1,61 @@
-import { FileText, Users, Eye, TrendingUp } from "lucide-react";
+"use client";
 
-const stats = [
-  {
-    label: "Total Forms",
-    value: "24",
-    icon: FileText,
-    trend: "+3 this week",
-    trendUp: true,
-  },
-  {
-    label: "Total Submissions",
-    value: "1,284",
-    icon: Users,
-    trend: "+128 today",
-    trendUp: true,
-  },
-  {
-    label: "Total Views",
-    value: "8,492",
-    icon: Eye,
-    trend: "+12% this month",
-    trendUp: true,
-  },
-  {
-    label: "Conversion Rate",
-    value: "15.1%",
-    icon: TrendingUp,
-    trend: "+2.4% vs last month",
-    trendUp: true,
-  },
+import { cn } from "@/lib/utils";
+
+interface StatItem {
+  value: string;
+  trend: string;
+  label: string;
+}
+
+const stats: StatItem[] = [
+  { value: "232", trend: "(420 New)", label: "Total Users" },
+  { value: "87", trend: "(31 New)", label: "Total Agents" },
+  { value: "22", trend: "(2 New)", label: "Total Categories" },
+  { value: "18", trend: "(6 Recent)", label: "Total Articles" },
+  { value: "3.8k", trend: "(1237 New)", label: "Total Subscriber" },
 ];
 
-export function StatsCards() {
+interface StatsCardsProps {
+  className?: string;
+}
+
+export function StatsCards({ className }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((stat) => {
-        const Icon = stat.icon;
-        return (
-          <div
-            key={stat.label}
-            className="rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  {stat.label}
-                </p>
-                <p className="text-2xl font-bold mt-1">{stat.value}</p>
+    <div
+      className={cn("relative rounded-2xl -hue-rotate-320 sa overflow-hidden p-6 sm:p-8", className)}
+      style={{
+        backgroundImage:
+          "url('https://i.pinimg.com/736x/1a/94/a7/1a94a7d985a92ef368a251b90fabcc96.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
+
+      <div className="relative z-10">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-foreground">Quick Overview</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            This is all over platform stats generated
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-xl border border-white/50 bg-white/40 backdrop-blur-xl p-4 shadow-lg hover:shadow-xl transition-all hover:bg-white/55 cursor-default"
+            >
+              <div className="flex items-baseline gap-1.5 flex-wrap">
+                <span className="text-xl sm:text-2xl font-bold text-foreground">{stat.value}</span>
+                <span className="text-[10px] font-medium text-emerald-600">{stat.trend}</span>
               </div>
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                <Icon size={20} />
-              </div>
+              <p className="text-xs text-muted-foreground mt-1.5">{stat.label}</p>
             </div>
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
-              <TrendingUp size={14} />
-              <span>{stat.trend}</span>
-            </div>
-          </div>
-        );
-      })}
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, Plus, ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { RefreshCw, ArrowUpDown, Clock, CheckSquare, Globe, Bell, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function TopBar() {
@@ -19,76 +19,67 @@ export function TopBar() {
   }, []);
 
   return (
-    <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6 shrink-0">
-      <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
+    <header className="flex items-center mx-6 gap-3 shrink-0 py-2">
+      <div className="flex-1 min-w-0 rounded-2xl border border-border bg-card px-5 py-3.5 shadow-sm">
+        <p className="text-sm font-semibold text-foreground truncate">Good Morning, John</p>
+        <p className="text-xs text-muted-foreground mt-0.5 truncate">
+          Your latest system updates here
+        </p>
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* Search */}
-        <div className="relative hidden md:block">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-          />
-          <input
-            type="text"
-            placeholder="Search forms..."
-            className="h-9 w-64 rounded-lg border border-input bg-background pl-9 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background transition-all"
-          />
+      <div className="rounded-2xl border border-border bg-card px-4 py-3.5 shadow-sm flex items-center gap-3 shrink-0">
+        <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+          <RefreshCw size={18} className="text-muted-foreground" />
         </div>
+        <div>
+          <p className="text-sm font-medium text-foreground">Cron run</p>
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+            Just now
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          </p>
+        </div>
+      </div>
 
-        {/* Create New */}
-        <button className="hidden sm:flex items-center gap-2 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
-          <Plus size={16} />
-          Create New Form
+      <div className="rounded-2xl border border-border bg-card px-4 py-3.5     shadow-sm flex items-center gap-3 shrink-0 cursor-pointer hover:bg-accent/50 transition-colors">
+        <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+          <ArrowUpDown size={18} className="text-muted-foreground" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div>
+            <p className="text-sm font-medium text-foreground">Sort By</p>
+            <p className="text-xs text-muted-foreground">All-Time</p>
+          </div>
+          <ChevronDown size={14} className="text-muted-foreground" />
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card px-4 py-4 shadow-sm flex items-center gap-2 shrink-0">
+        <button className="relative p-1.5 rounded-lg hover:bg-accent transition-colors">
+          <Clock size={20} className="text-muted-foreground" />
+          <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-red-500 border-2 border-card" />
         </button>
+        <button className="relative p-1.5 rounded-lg hover:bg-accent transition-colors">
+          <CheckSquare size={20} className="text-muted-foreground" />
+        </button>
+      </div>
 
-        {/* Profile Dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-accent transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
-              JD
-            </div>
-            <ChevronDown
-              size={14}
-              className={cn(
-                "text-muted-foreground transition-transform",
-                dropdownOpen && "rotate-180"
-              )}
+      <div className="rounded-2xl border border-border bg-card px-4 py-3.5 shadow-sm flex items-center gap-3 shrink-0">
+        <button className="relative p-1.5 rounded-lg hover:bg-accent transition-colors">
+          <Bell size={20} className="text-muted-foreground" />
+          <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-red-500 border-2 border-card" />
+        </button>
+        <div className="flex items-center gap-2.5 pl-1">
+          <div className="w-9 h-9 rounded-full bg-muted overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+              alt="John"
+              className="w-full h-full object-cover"
             />
-          </button>
-
-          {dropdownOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-border bg-popover shadow-lg p-1.5 z-50">
-              <div className="px-3 py-2 border-b border-border mb-1">
-                <p className="text-sm font-semibold">John Doe</p>
-                <p className="text-xs text-muted-foreground">john@example.com</p>
-              </div>
-              <a
-                href="/dashboard/profile"
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-popover-foreground hover:bg-accent transition-colors"
-              >
-                <User size={16} />
-                Profile
-              </a>
-              <a
-                href="/dashboard/settings"
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-popover-foreground hover:bg-accent transition-colors"
-              >
-                <Settings size={16} />
-                Settings
-              </a>
-              <div className="border-t border-border my-1" />
-              <button className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-colors">
-                <LogOut size={16} />
-                Logout
-              </button>
-            </div>
-          )}
+          </div>
+          <div className="hidden sm:block">
+            <p className="text-sm font-semibold text-foreground">John Smith</p>
+            <p className="text-xs text-muted-foreground">@admin</p>
+          </div>
         </div>
       </div>
     </header>

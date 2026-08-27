@@ -40,7 +40,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         collapsed ? "w-18" : "w-64",
       )}
     >
-      {/* Logo */}
       <div
         className={cn(
           "flex h-16 items-center border-b border-sidebar-border",
@@ -48,7 +47,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         )}
       >
         {!collapsed && (
-          <span className="text-lg bg-[#432DD7] font-semibold tracking-tight">FormBuilder</span>
+          <span className="text-lg  text-[#432DD7] font-semibold tracking-tight">FormBuilder</span>
         )}
         <Tooltip>
           <TooltipTrigger
@@ -69,7 +68,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </Tooltip>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -99,7 +97,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         })}
       </nav>
 
-      {/* Footer: User Mini Profile */}
       <div className="p-4 border-t border-sidebar-border">
         <div className="flex items-center gap-3 px-2">
           <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">

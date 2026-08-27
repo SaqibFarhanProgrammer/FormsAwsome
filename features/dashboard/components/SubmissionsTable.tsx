@@ -61,7 +61,7 @@ export function SubmissionsTable() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border bg-muted/50">
+              <tr className="border-b border-border bg-[#E9E7FA]">
                 <th className="h-11 px-4 text-left font-medium text-muted-foreground">
                   Form
                 </th>
@@ -116,7 +116,6 @@ export function SubmissionsTable() {
             </tbody>
           </table>
         </div>
-        {/* Pagination */}
         <div className="flex items-center justify-between px-4 py-3 border-t border-border">
           <p className="text-xs text-muted-foreground">
             Showing 1-5 of 1,284 submissions
