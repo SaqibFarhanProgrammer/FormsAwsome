@@ -72,7 +72,14 @@ export function LoginForm() {
       });
 
       if (response.status === 200) {
-        router.push("/");
+        const loginData = response.data?.data;
+
+        if (loginData?.requiresVerification && loginData.verifyUrl) {
+          router.push(loginData.verifyUrl);
+          return;
+        }
+
+        router.push(loginData?.redirectUrl || "/dashboard");
       }
     } catch (error: any) {
       const errorMessage =
@@ -85,105 +92,96 @@ export function LoginForm() {
 
   return (
     <div className="w-full max-w-[420px]">
-          {/* Logo */}
-          <div className="mb-8 flex items-center justify-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#432DD7]">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M8 12h8" />
-                <path d="M12 8v8" />
-              </svg>
-            </div>
-            <span className="text-lg font-semibold text-[#432DD7]">FormsAwesome</span>
-          </div>
-
-          {/* Heading */}
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight text-[#1a1a1a]">
-              Welcome Back!
-            </h1>
-          </div>
-
-          {appError && (
-            <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-3">
-              <p className="text-xs text-red-600">{appError}</p>
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-[#333]">Email</Label>
-              <Input
-                type="email"
-                placeholder="johndoe@gmail.com"
-                {...register("email")}
-                className="h-11 rounded-xl border-[#E5E5E5] bg-white px-4 text-sm text-[#1a1a1a] placeholder:text-[#999] focus-visible:border-[#432DD7] focus-visible:ring-[#432DD7]/20"
-              />
-              {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-[#333]">Password</Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="********"
-                  {...register("password")}
-                  className="h-11 rounded-xl border-[#E5E5E5] bg-white px-4 pr-10 text-sm text-[#1a1a1a] placeholder:text-[#999] focus-visible:border-[#432DD7] focus-visible:ring-[#432DD7]/20"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] transition-colors hover:text-[#666]"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
-            </div>
-
-         
-        
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="mt-4 h-12 w-full rounded-full text-sm font-semibold text-white active:scale-[0.98]"
-            >
-              {isLoading ? "Signing in..." : "Sign In"}
-            </Button>
-
-            {/* Social Buttons */}
-            <div className="gap-3">
-              <Button
-                variant="outline"
-                className="h-11 gap-2 w-full rounded-full border-[#E5E5E5] bg-[#f7ebff] text-sm font-medium text-[#333] hover:bg-gray-50"
-              >
-                <GoogleIcon />
-                Sign in with Google
-              </Button>
-            </div>
-          </form>
-
-          {/* Sign Up Link */}
-          <p className="mt-5 text-center text-sm text-[#666]">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/auth/register"
-              className="font-medium text-[#432DD7] transition-colors hover:underline"
-            >
-              Sign Up
-            </Link>
-          </p>
+      <div className="mb-8 flex items-center justify-center gap-2">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#432DD7]">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 12h8" />
+            <path d="M12 8v8" />
+          </svg>
         </div>
+        <span className="text-lg font-semibold text-[#432DD7]">FormsAwesome</span>
+      </div>
+
+      <div className="mb-8 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#1a1a1a]">Welcome Back!</h1>
+      </div>
+
+      {appError && (
+        <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-3">
+          <p className="text-xs text-red-600">{appError}</p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-[#333]">Email</Label>
+          <Input
+            type="email"
+            placeholder="johndoe@gmail.com"
+            {...register("email")}
+            className="h-11 rounded-xl border-[#E5E5E5] bg-white px-4 text-sm text-[#1a1a1a] placeholder:text-[#999] focus-visible:border-[#432DD7] focus-visible:ring-[#432DD7]/20"
+          />
+          {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-[#333]">Password</Label>
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder="********"
+              {...register("password")}
+              className="h-11 rounded-xl border-[#E5E5E5] bg-white px-4 pr-10 text-sm text-[#1a1a1a] placeholder:text-[#999] focus-visible:border-[#432DD7] focus-visible:ring-[#432DD7]/20"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] transition-colors hover:text-[#666]"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
+        </div>
+
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="mt-4 h-12 w-full rounded-full text-sm font-semibold text-white active:scale-[0.98]"
+        >
+          {isLoading ? "Signing in..." : "Sign In"}
+        </Button>
+
+        <div className="gap-3">
+          <Button
+            variant="outline"
+            className="h-11 gap-2 w-full rounded-full border-[#E5E5E5] bg-[#f7ebff] text-sm font-medium text-[#333] hover:bg-gray-50"
+          >
+            <GoogleIcon />
+            Sign in with Google
+          </Button>
+        </div>
+      </form>
+
+      <p className="mt-5 text-center text-sm text-[#666]">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/auth/register"
+          className="font-medium text-[#432DD7] transition-colors hover:underline"
+        >
+          Sign Up
+        </Link>
+      </p>
+    </div>
   );
 }

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function VerifyEmailPage() {
   return (
-    <main className="min-h-screen w-full bg-[#0A0A0A]">
+    <main className="min-h-screen w-full bg-[#fff]">
       <div className="flex h-screen w-full items-center justify-center px-4">
         <VerifyEmailForm />
       </div>

@@ -135,6 +135,6 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error: any) {
-    CatchErrorFunctionForRoute(error, "VERIFY EMAIL ERROR");
+    return await CatchErrorFunctionForRoute(error, "VERIFY EMAIL ERROR");
   }
 }

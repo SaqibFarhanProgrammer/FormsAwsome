@@ -124,13 +124,10 @@ export default function RegisterForm() {
 
   return (
     <main className="relative flex min-h-screen w-full overflow-hidden bg-white">
-      {/* Left Panel */}
       <LeftPanel />
 
-      {/* Right Panel — Form */}
       <div className="flex w-full flex-col items-center justify-center px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-[420px]">
-          {/* Logo */}
           <div className="mb-8 flex items-center justify-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#432DD7]">
               <svg
@@ -151,7 +148,6 @@ export default function RegisterForm() {
             <span className="text-lg font-semibold text-[#432DD7]">FormsAwesome</span>
           </div>
 
-          {/* Heading */}
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-semibold tracking-tight text-[#1a1a1a]">
               Hi! Welcome to FormsAwesome
@@ -164,7 +160,6 @@ export default function RegisterForm() {
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
@@ -257,7 +252,6 @@ export default function RegisterForm() {
               {isLoading ? "Creating account..." : "Sign up"}
             </Button>
 
-            {/* Social Buttons */}
             <div className=" gap-3">
               <Button
                 variant="outline"
@@ -269,7 +263,6 @@ export default function RegisterForm() {
             </div>
           </form>
 
-          {/* Sign In Link */}
           <p className="mt-5 text-center text-sm text-[#666]">
             Already have an account?{" "}
             <Link
