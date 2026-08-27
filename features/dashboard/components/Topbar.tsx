@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { RefreshCw, ArrowUpDown, Clock, CheckSquare, Globe, Bell, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { RefreshCw, ArrowUpDown, Clock, CheckSquare, Bell, ChevronDown } from "lucide-react";
 
 export function TopBar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);

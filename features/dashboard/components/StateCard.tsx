@@ -23,7 +23,10 @@ interface StatsCardsProps {
 export function StatsCards({ className }: StatsCardsProps) {
   return (
     <div
-      className={cn("relative rounded-2xl -hue-rotate-320 sa overflow-hidden p-6 sm:p-8", className)}
+      className={cn(
+        "relative rounded-2xl -hue-rotate-320 sa overflow-hidden p-6 sm:p-8",
+        className,
+      )}
       style={{
         backgroundImage:
           "url('https://i.pinimg.com/736x/1a/94/a7/1a94a7d985a92ef368a251b90fabcc96.jpg')",
@@ -35,17 +38,15 @@ export function StatsCards({ className }: StatsCardsProps) {
 
       <div className="relative z-10">
         <div className="mb-5">
-          <h2 className="text-lg font-bold text-foreground">Quick Overview</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            This is all over platform stats generated
-          </p>
+          <h2 className="text-lg font-bold text-white">Quick Overview</h2>
+          <p className="text-xs text-white mt-0.5">This is all over platform stats generated</p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-xl border border-white/50 bg-white/40 backdrop-blur-xl p-4 shadow-lg hover:shadow-xl transition-all hover:bg-white/55 cursor-default"
+              className="rounded-xl border border-white/50 bg-white  p-4 shadow-lg hover:shadow-xl transition-all  cursor-default"
             >
               <div className="flex items-baseline gap-1.5 flex-wrap">
                 <span className="text-xl sm:text-2xl font-bold text-foreground">{stat.value}</span>
