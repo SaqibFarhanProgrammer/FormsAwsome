@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 const activities = [
   {
     icon: Plus,
-    iconBg: "bg-primary/10",
+    iconBg: "",
     iconColor: "text-primary",
     text: 'Created new form "Customer Feedback Survey"',
     time: "2 hours ago",

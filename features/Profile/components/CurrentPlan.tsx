@@ -15,7 +15,7 @@ export function CurrentPlan() {
       </div>
       <div className="p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl  flex items-center justify-center">
             <Trophy size={20} className="text-primary" />
           </div>
           <div>

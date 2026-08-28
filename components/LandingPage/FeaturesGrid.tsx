@@ -55,7 +55,7 @@ export function FeaturesGrid() {
                 key={feature.title}
                 className="rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-shadow group"
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                <div className="w-12 h-12 rounded-xl  flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                   <Icon size={22} className="text-primary group-hover:text-primary-foreground" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>

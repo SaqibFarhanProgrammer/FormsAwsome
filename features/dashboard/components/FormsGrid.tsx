@@ -104,7 +104,7 @@ export function FormsGrid() {
             className="rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group"
           >
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+              <div className="w-10 h-10 rounded-lg  flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                 <FileText size={18} />
               </div>
               <span

@@ -15,7 +15,7 @@ export function BillingSettings() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl  flex items-center justify-center">
                 <Crown className="w-5 h-5 text-primary" />
               </div>
               <div>
@@ -23,7 +23,7 @@ export function BillingSettings() {
                 <CardDescription>Billed monthly</CardDescription>
               </div>
             </div>
-            <Badge variant="secondary" className="rounded-lg bg-primary/10 text-primary border-0">
+            <Badge variant="secondary" className="rounded-lg  text-primary border-0">
               Active
             </Badge>
           </div>
@@ -75,7 +75,7 @@ export function BillingSettings() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl  flex items-center justify-center">
                 <CreditCard className="w-5 h-5 text-primary" />
               </div>
               <div>
@@ -149,7 +149,7 @@ export function BillingSettings() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl  flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-primary" />
               </div>
               <div>

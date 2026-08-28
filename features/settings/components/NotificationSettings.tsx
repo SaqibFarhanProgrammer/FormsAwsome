@@ -77,7 +77,7 @@ export function NotificationSettings() {
       <Card className="rounded-2xl border-border">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl  flex items-center justify-center">
               <Bell className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -139,7 +139,7 @@ export function NotificationSettings() {
       <Card className="rounded-2xl border-border">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl  flex items-center justify-center">
               <Mail className="w-5 h-5 text-primary" />
             </div>
             <div>

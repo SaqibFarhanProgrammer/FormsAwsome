@@ -18,11 +18,11 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/create", label: "Create New Form", icon: Plus },
-  { href: "/dashboard/forms", label: "My Forms", icon: FileText },
-  { href: "/dashboard/submissions", label: "All Submissions", icon: Users },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  { href: "/create", label: "Create New Form", icon: Plus },
+  { href: "/all-forms", label: "My Forms", icon: FileText },
+  { href: "/submissions", label: "All Submissions", icon: Users },
+  { href: "/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 type SidebarProps = {

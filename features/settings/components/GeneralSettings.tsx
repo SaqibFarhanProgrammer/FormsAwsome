@@ -23,7 +23,7 @@ export function GeneralSettings() {
           <div className="relative mx-auto w-fit">
             <Avatar className="w-24 h-24 rounded-2xl">
               <AvatarImage src="/avatar.jpg" alt="John Doe" />
-              <AvatarFallback className="rounded-2xl text-2xl bg-primary/10 text-primary font-semibold">
+              <AvatarFallback className="rounded-2xl text-2xl  text-primary font-semibold">
                 JD
               </AvatarFallback>
             </Avatar>
