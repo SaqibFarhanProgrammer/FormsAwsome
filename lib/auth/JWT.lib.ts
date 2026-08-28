@@ -21,6 +21,7 @@ export interface VerificationTokenPayload {
 }
 
 export const generateAccessToken = (payload: any) => {
+  
   const { exp, iat, nbf, ...cleanPayload } = payload;
 
   return jwt.sign(cleanPayload, ACCESS_TOKEN_SECRET, {
