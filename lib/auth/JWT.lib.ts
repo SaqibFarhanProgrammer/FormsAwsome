@@ -21,7 +21,6 @@ export interface VerificationTokenPayload {
 }
 
 export const generateAccessToken = (payload: any) => {
-  
   const { exp, iat, nbf, ...cleanPayload } = payload;
 
   return jwt.sign(cleanPayload, ACCESS_TOKEN_SECRET, {
@@ -32,6 +31,7 @@ export const generateAccessToken = (payload: any) => {
 export const generateRefreshToken = (payload: TokenPayload): string => {
   return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRY,
+    
   });
 };
 
