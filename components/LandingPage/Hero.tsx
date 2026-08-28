@@ -19,9 +19,8 @@ export function HeroSection() {
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
-              Create beautiful, intelligent forms in minutes. No code required.
-              Collect submissions, analyze data, and grow your business — all in
-              one place.
+              Create beautiful, intelligent forms in minutes. No code required. Collect submissions,
+              analyze data, and grow your business — all in one place.
             </p>
 
             <div className="flex items-center gap-3 flex-wrap">

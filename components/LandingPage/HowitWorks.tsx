@@ -30,8 +30,7 @@ export function HowItWorks() {
             Build your first form in 3 simple steps
           </h2>
           <p className="text-lg text-muted-foreground">
-            From idea to live form in under 5 minutes. No technical skills
-            needed.
+            From idea to live form in under 5 minutes. No technical skills needed.
           </p>
         </div>
 
@@ -48,9 +47,7 @@ export function HowItWorks() {
                     <Icon size={24} className="text-primary" />
                   </div>
                   <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {step.desc}
-                  </p>
+                  <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
                 </div>
               </div>
             );

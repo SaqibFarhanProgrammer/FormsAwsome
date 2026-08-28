@@ -67,9 +67,7 @@ export function NotificationSettings() {
 
   const toggleNotification = (id: string, channel: "email" | "push" | "sms") => {
     setNotifications((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, [channel]: !item[channel] } : item
-      )
+      prev.map((item) => (item.id === id ? { ...item, [channel]: !item[channel] } : item)),
     );
   };
 

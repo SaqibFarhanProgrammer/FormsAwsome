@@ -117,7 +117,9 @@ export function BillingSettings() {
                       {card.type} ending in {card.last4}
                     </p>
                     {card.isDefault && (
-                      <Badge variant="secondary" className="rounded-lg text-xs">Default</Badge>
+                      <Badge variant="secondary" className="rounded-lg text-xs">
+                        Default
+                      </Badge>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">Expires {card.expiry}</p>
@@ -129,7 +131,11 @@ export function BillingSettings() {
                     Set Default
                   </Button>
                 )}
-                <Button variant="ghost" size="sm" className="rounded-xl text-xs h-8 text-destructive hover:text-destructive hover:bg-destructive/5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-xl text-xs h-8 text-destructive hover:text-destructive hover:bg-destructive/5"
+                >
                   Remove
                 </Button>
               </div>

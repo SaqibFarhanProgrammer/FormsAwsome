@@ -30,8 +30,7 @@ export function Testimonials() {
             Loved by creators and teams
           </h2>
           <p className="text-lg text-muted-foreground">
-            See what our users have to say about their experience with
-            FormBuilder.
+            See what our users have to say about their experience with FormBuilder.
           </p>
         </div>
 
@@ -43,16 +42,10 @@ export function Testimonials() {
             >
               <div className="flex items-center gap-1 mb-4">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    size={16}
-                    className="text-amber-400 fill-amber-400"
-                  />
+                  <Star key={i} size={16} className="text-amber-400 fill-amber-400" />
                 ))}
               </div>
-              <p className="text-sm text-foreground leading-relaxed mb-6">
-                "{review.text}"
-              </p>
+              <p className="text-sm text-foreground leading-relaxed mb-6">"{review.text}"</p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-semibold">
                   {review.initials}

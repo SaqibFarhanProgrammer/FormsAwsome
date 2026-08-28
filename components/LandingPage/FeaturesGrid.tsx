@@ -42,8 +42,8 @@ export function FeaturesGrid() {
             Everything you need to build powerful forms
           </h2>
           <p className="text-lg text-muted-foreground">
-            From simple contact forms to complex surveys — we have got you
-            covered with a complete toolkit.
+            From simple contact forms to complex surveys — we have got you covered with a complete
+            toolkit.
           </p>
         </div>
 
@@ -56,15 +56,10 @@ export function FeaturesGrid() {
                 className="rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-shadow group"
               >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  <Icon
-                    size={22}
-                    className="text-primary group-hover:text-primary-foreground"
-                  />
+                  <Icon size={22} className="text-primary group-hover:text-primary-foreground" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {feature.desc}
-                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
               </div>
             );
           })}

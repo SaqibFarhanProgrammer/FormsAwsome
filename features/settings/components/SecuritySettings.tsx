@@ -117,10 +117,7 @@ export function SecuritySettings() {
               <p className="text-sm font-medium">Two-Factor Auth</p>
               <p className="text-xs text-muted-foreground">Require code on login</p>
             </div>
-            <Switch
-              checked={twoFactorEnabled}
-              onCheckedChange={setTwoFactorEnabled}
-            />
+            <Switch checked={twoFactorEnabled} onCheckedChange={setTwoFactorEnabled} />
           </div>
           {twoFactorEnabled && (
             <div className="space-y-3 pt-4 border-t border-border">
@@ -130,7 +127,9 @@ export function SecuritySettings() {
                   <p className="text-sm font-medium truncate">Authenticator App</p>
                   <p className="text-xs text-muted-foreground">Google Authenticator</p>
                 </div>
-                <Badge variant="secondary" className="rounded-lg text-xs">Active</Badge>
+                <Badge variant="secondary" className="rounded-lg text-xs">
+                  Active
+                </Badge>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
                 <Fingerprint className="w-4 h-4 text-muted-foreground" />
@@ -138,7 +137,9 @@ export function SecuritySettings() {
                   <p className="text-sm font-medium truncate">Biometric</p>
                   <p className="text-xs text-muted-foreground">Face ID / Touch ID</p>
                 </div>
-                <Badge variant="outline" className="rounded-lg text-xs">Available</Badge>
+                <Badge variant="outline" className="rounded-lg text-xs">
+                  Available
+                </Badge>
               </div>
             </div>
           )}
@@ -154,7 +155,9 @@ export function SecuritySettings() {
             </div>
             <div>
               <CardTitle className="text-lg">Active Sessions</CardTitle>
-              <CardDescription>Manage devices that are currently logged into your account.</CardDescription>
+              <CardDescription>
+                Manage devices that are currently logged into your account.
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -194,7 +197,9 @@ export function SecuritySettings() {
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium">{session.device}</p>
                     {session.isCurrent && (
-                      <Badge variant="secondary" className="rounded-lg text-xs">Current</Badge>
+                      <Badge variant="secondary" className="rounded-lg text-xs">
+                        Current
+                      </Badge>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -203,7 +208,11 @@ export function SecuritySettings() {
                 </div>
               </div>
               {!session.isCurrent && (
-                <Button variant="outline" size="sm" className="rounded-xl text-destructive border-destructive/20 hover:bg-destructive/5 hover:text-destructive">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl text-destructive border-destructive/20 hover:bg-destructive/5 hover:text-destructive"
+                >
                   Revoke
                 </Button>
               )}

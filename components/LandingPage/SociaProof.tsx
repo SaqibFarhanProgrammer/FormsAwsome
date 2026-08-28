@@ -9,10 +9,7 @@ export function SocialProof() {
         </p>
         <div className="flex items-center justify-center gap-12 flex-wrap opacity-50">
           {logos.map((logo) => (
-            <span
-              key={logo}
-              className="text-xl font-bold text-muted-foreground"
-            >
+            <span key={logo} className="text-xl font-bold text-muted-foreground">
               {logo}
             </span>
           ))}

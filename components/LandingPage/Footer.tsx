@@ -65,8 +65,8 @@ export function CTAFooter() {
             Ready to build your first form?
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-            Join 10,000+ creators and teams who trust FormBuilder. Start for
-            free, no credit card required.
+            Join 10,000+ creators and teams who trust FormBuilder. Start for free, no credit card
+            required.
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <button className="h-12 px-8 rounded-xl bg-primary text-primary-foreground text-base font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
@@ -118,10 +118,7 @@ export function CTAFooter() {
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   {links.map((link) => (
                     <li key={link}>
-                      <a
-                        href="#"
-                        className="hover:text-foreground transition-colors"
-                      >
+                      <a href="#" className="hover:text-foreground transition-colors">
                         {link}
                       </a>
                     </li>
@@ -136,22 +133,13 @@ export function CTAFooter() {
               © 2026 FormBuilder. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                 <TwitterIcon />
               </a>
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                 <GithubIcon />
               </a>
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                 <InstagramIcon />
               </a>
             </div>

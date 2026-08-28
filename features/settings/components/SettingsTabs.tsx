@@ -47,19 +47,31 @@ export function SettingsTabs() {
         </TabsList>
 
         <div className="mt-6">
-          <TabsContent value="general" className="mt-0 space-y-6 animate-in fade-in-50 duration-200">
+          <TabsContent
+            value="general"
+            className="mt-0 space-y-6 animate-in fade-in-50 duration-200"
+          >
             <GeneralSettings />
           </TabsContent>
 
-          <TabsContent value="security" className="mt-0 space-y-6 animate-in fade-in-50 duration-200">
-            <SecuritySettings />    
+          <TabsContent
+            value="security"
+            className="mt-0 space-y-6 animate-in fade-in-50 duration-200"
+          >
+            <SecuritySettings />
           </TabsContent>
 
-          <TabsContent value="notifications" className="mt-0 space-y-6 animate-in fade-in-50 duration-200">
+          <TabsContent
+            value="notifications"
+            className="mt-0 space-y-6 animate-in fade-in-50 duration-200"
+          >
             <NotificationSettings />
           </TabsContent>
 
-          <TabsContent value="billing" className="mt-0 space-y-6 animate-in fade-in-50 duration-200">
+          <TabsContent
+            value="billing"
+            className="mt-0 space-y-6 animate-in fade-in-50 duration-200"
+          >
             <BillingSettings />
           </TabsContent>
         </div>

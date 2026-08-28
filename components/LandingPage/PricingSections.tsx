@@ -6,12 +6,7 @@ const plans = [
     price: "$0",
     period: "/month",
     desc: "Perfect for personal projects and small teams getting started.",
-    features: [
-      "3 forms",
-      "100 submissions/month",
-      "Basic analytics",
-      "Email notifications",
-    ],
+    features: ["3 forms", "100 submissions/month", "Basic analytics", "Email notifications"],
     cta: "Get Started",
     popular: false,
   },
@@ -56,8 +51,7 @@ export function PricingSection() {
             Simple, transparent pricing
           </h2>
           <p className="text-lg text-muted-foreground">
-            Start free, upgrade when you need more. No hidden fees, no
-            surprises.
+            Start free, upgrade when you need more. No hidden fees, no surprises.
           </p>
         </div>
 
@@ -79,23 +73,16 @@ export function PricingSection() {
                 </div>
               )}
 
-              <p className="text-sm font-medium text-muted-foreground mb-2">
-                {plan.name}
-              </p>
+              <p className="text-sm font-medium text-muted-foreground mb-2">{plan.name}</p>
               <div className="flex items-baseline gap-1 mb-6">
                 <span className="text-4xl font-bold">{plan.price}</span>
                 <span className="text-muted-foreground">{plan.period}</span>
               </div>
-              <p className="text-sm text-muted-foreground mb-6">
-                {plan.desc}
-              </p>
+              <p className="text-sm text-muted-foreground mb-6">{plan.desc}</p>
 
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-center gap-2 text-sm"
-                  >
+                  <li key={feature} className="flex items-center gap-2 text-sm">
                     <Check size={16} className="text-emerald-500" />
                     {feature}
                   </li>

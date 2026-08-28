@@ -43,11 +43,7 @@ export function Navbar() {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
           {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="hover:text-foreground transition-colors"
-            >
+            <a key={link.href} href={link.href} className="hover:text-foreground transition-colors">
               {link.label}
             </a>
           ))}
@@ -74,7 +70,7 @@ export function Navbar() {
       <div
         className={cn(
           "md:hidden border-t border-border bg-background overflow-hidden transition-all duration-300",
-          mobileOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
+          mobileOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0",
         )}
       >
         <div className="px-6 py-4 space-y-3">
