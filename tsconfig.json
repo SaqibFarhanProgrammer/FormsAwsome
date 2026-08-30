@@ -31,7 +31,8 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "types/**/*",
-    "app/api/auth/[...nextauth]/options.js"
-, "redux/store.js"  ],
+    "app/api/auth/[...nextauth]/options.js",
+    "redux/store.js"
+  ],
   "exclude": ["node_modules"]
 }

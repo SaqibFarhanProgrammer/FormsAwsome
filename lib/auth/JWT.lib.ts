@@ -31,7 +31,6 @@ export const generateAccessToken = (payload: any) => {
 export const generateRefreshToken = (payload: TokenPayload): string => {
   return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRY,
-    
   });
 };
 
