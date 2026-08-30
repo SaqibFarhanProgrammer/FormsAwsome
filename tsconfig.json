@@ -32,6 +32,6 @@
     "**/*.mts",
     "types/**/*",
     "app/api/auth/[...nextauth]/options.js"
-  ],
+, "redux/store.js"  ],
   "exclude": ["node_modules"]
 }
