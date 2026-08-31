@@ -8,7 +8,15 @@ export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
   const authRoutes = ["/auth/login", "/auth/register"];
-  const protectedRoutes = ["/dashboard", "/profile"];
+  const protectedRoutes = [
+    "/dashboard",
+    "/profile",
+    "/create",
+    "/all-forms",
+    "/submissions",
+    "/analytics",
+    "/settings",
+  ];
 
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
@@ -70,5 +78,14 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/auth/:path*", "/dashboard/:path*", "/profile/:path*"],
+  matcher: [
+    "/auth/:path*",
+    "/dashboard/:path*",
+    "/profile/:path*",
+    "/create/:path*",
+    "/all-forms/:path*",
+    "/submissions/:path*",
+    "/analytics/:path*",
+    "/settings/:path*",
+  ],
 };

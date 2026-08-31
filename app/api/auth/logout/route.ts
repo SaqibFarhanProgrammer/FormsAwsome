@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -7,5 +7,5 @@ export async function GET() {
   cookieStore.delete("accessToken");
   cookieStore.delete("refreshToken");
 
-  redirect("/auth/login");
+  return NextResponse.json({ message: "Logged out successfully" }, { status: 200 });
 }

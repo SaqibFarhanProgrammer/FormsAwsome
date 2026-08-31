@@ -15,9 +15,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { LogOut, Trash2, AlertTriangle } from "lucide-react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export function DangerZone() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const router = useRouter();
+  const handleLogout = async () => {
+    await axios.get("/api/auth/logout");
+    router.push("/auth/login");
+  };
 
   return (
     <Card className="rounded-2xl border-destructive/20 bg-destructive/5">
@@ -122,7 +129,10 @@ export function DangerZone() {
               </AlertDialogHeader>
               <AlertDialogFooter className="gap-2">
                 <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                <AlertDialogAction className="rounded-xl bg-destructive hover:bg-destructive/90">
+                <AlertDialogAction
+                  onClick={handleLogout}
+                  className="rounded-xl bg-destructive hover:bg-destructive/90"
+                >
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
                 </AlertDialogAction>

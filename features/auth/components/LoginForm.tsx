@@ -79,7 +79,7 @@ export function LoginForm() {
           return;
         }
 
-        router.push(loginData?.redirectUrl || "/dashboard");
+        router.push(loginData?.redirectUrl || "/profile");
       }
     } catch (error: any) {
       const errorMessage =

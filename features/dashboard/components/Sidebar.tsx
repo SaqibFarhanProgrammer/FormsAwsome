@@ -10,13 +10,16 @@ import {
   BarChart3,
   Settings,
   PanelLeft,
-  User,
+  User2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const navItems = [
+  { href: "/profile", label: "Profile", icon: User2 },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/create", label: "Create New Form", icon: Plus },
   { href: "/all-forms", label: "My Forms", icon: FileText },
@@ -32,6 +35,7 @@ type SidebarProps = {
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const data = useSelector((state: RootState) => state.profile);
 
   return (
     <aside
@@ -100,12 +104,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <div className="p-4 border-t border-sidebar-border">
         <div className="flex items-center gap-3 px-2">
           <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
-            <User size={16} className="text-muted-foreground" />
+            <img src={data.image!} alt="" />
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-sm font-medium truncate">John Doe</p>
-              <p className="text-xs text-muted-foreground truncate">john@example.com</p>
+              <p className="text-sm font-medium truncate">{data.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{data.email}</p>
             </div>
           )}
         </div>

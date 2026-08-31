@@ -1,64 +1,73 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { ProfileDataType } from "@/features/Profile/types/types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ProfileState {
-  data: ProfileDataType | null;
-  loading: boolean;
+  name: string | null;
+  email: string | null;
+  createdAt: string | null;
+  image: string | null;
+  isFetched: boolean;
   error: string | null;
-  lastFetched: number | null;
 }
 
 const initialState: ProfileState = {
-  data: null,
-  loading: false,
+  name: null,
+  email: null,
+  createdAt: null,
+  image: null,
+  isFetched: false, // ← important: pehle false
   error: null,
-  lastFetched: null,
 };
-
-export const fetchProfile = createAsyncThunk(
-  "profile/fetchProfile",
-  async (userId: string, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`/api/profile/${userId}`);
-      if (!response.ok) throw new Error("Failed to fetch profile");
-      return response.json() as Promise<ProfileDataType>;
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
-    }
-  },
-);
 
 const profileSlice = createSlice({
   name: "profile",
   initialState,
   reducers: {
-    updateProfileLocally: (state, action: PayloadAction<Partial<ProfileDataType>>) => {
-      if (state.data) {
-        state.data = { ...state.data, ...action.payload };
-      }
-    },
-    clearProfile: (state) => {
-      state.data = null;
+    // Pehli baar data set karne ke liye (server se aane ke baad)
+    setProfile: (
+      state,
+      action: PayloadAction<{
+        name: string;
+        email: string;
+        createdAt: string;
+        image: string | null;
+      }>,
+    ) => {
+      state.name = action.payload.name;
+      state.email = action.payload.email;
+      state.createdAt = action.payload.createdAt;
+      state.image = action.payload.image;
+      state.isFetched = true;
       state.error = null;
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchProfile.fulfilled, (state, action) => {
-        state.data = action.payload;
-        state.loading = false;
-        state.lastFetched = Date.now();
-      })
-      .addCase(fetchProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
+
+    updateProfileLocally: (
+      state,
+      action: PayloadAction<
+        Partial<{
+          name: string;
+          email: string;
+          createdAt: string;
+          image: string | null;
+        }>
+      >,
+    ) => {
+      state.name = action.payload.name!;
+      state.email = action.payload.email!;
+      state.createdAt = action.payload.createdAt!;
+      state.image = action.payload.image!;
+    },
+
+    // Optional: error set karne ke liye
+    setProfileError: (state, action: PayloadAction<string>) => {
+      state.error = action.payload;
+      state.isFetched = true;
+    },
+
+    clearProfile: () => initialState,
   },
 });
 
-export const { updateProfileLocally, clearProfile } = profileSlice.actions;
+export const { setProfile, updateProfileLocally, setProfileError, clearProfile } =
+  profileSlice.actions;
+
 export default profileSlice.reducer;

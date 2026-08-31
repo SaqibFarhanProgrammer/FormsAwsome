@@ -1,16 +1,16 @@
 "use client";
 
 import { RefreshCw, ArrowUpDown, Clock, CheckSquare, Bell, ChevronDown } from "lucide-react";
-import { GetProfileDataFromRedux } from "@/utils/GetProfileDataFromRedux";
+import { useSelector } from "react-redux";
 
 export function TopBar() {
-  const { data: user } = GetProfileDataFromRedux();
+  const data = useSelector((state: any) => state.profile);
 
   return (
-    <header className="flex items-center mx-6 gap-3 shrink-0 py-2">
+    <header className="flex items-center mx-6 gap-3 shrink-0 py-2 pt-3">
       <div className="flex-1 min-w-0 rounded-2xl border border-border bg-card px-5 py-3.5 shadow-sm">
         <p className="text-sm font-semibold text-foreground truncate">
-          Good Morning, {user?.name || "User"}
+          Good Morning, {data?.name || "User"}
         </p>
         <p className="text-xs text-muted-foreground mt-0.5 truncate">
           Your latest system updates here
@@ -62,7 +62,7 @@ export function TopBar() {
           <div className="w-9 h-9 rounded-full bg-muted overflow-hidden">
             <img
               src={
-                user?.image ||
+                data?.image ||
                 "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
               }
               alt="User Profile"
@@ -70,9 +70,9 @@ export function TopBar() {
             />
           </div>
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-foreground">{user?.name || "User"}</p>
+            <p className="text-sm font-semibold text-foreground">{data?.name || "User"}</p>
             <p className="text-xs text-muted-foreground">
-              @{user?.name?.split(" ").join("").toLowerCase() || "user"}
+              @{data?.name?.split(" ").join("").toLowerCase() || "user"}
             </p>
           </div>
         </div>

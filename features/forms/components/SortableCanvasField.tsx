@@ -79,8 +79,6 @@ export function FormCanvas({
           </SortableContext>
         )}
       </div>
-
-      {/* Bottom Add Button */}
       {fields.length > 0 && (
         <div className="flex justify-center mt-4">
           <Button variant="outline" className="rounded-xl gap-2">

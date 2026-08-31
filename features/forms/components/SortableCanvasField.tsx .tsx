@@ -14,33 +14,29 @@ import {
   CheckSquare,
   CircleDot,
   Mail,
-  Phone,
   Calendar,
   Hash,
   Link,
   Upload,
   Star,
-  ToggleLeft,
-  Heading1,
-  SeparatorHorizontal,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
-  heading: Heading1,
-  text: Type,
-  textarea: AlignLeft,
-  select: ListFilter,
-  checkbox: CheckSquare,
-  radio: CircleDot,
+  short_text: Type,
+  long_text: AlignLeft,
   email: Mail,
-  phone: Phone,
   number: Hash,
-  date: Calendar,
-  url: Link,
-  file: Upload,
+  radio: CircleDot,
+  checkbox: CheckSquare,
+  dropdown: ListFilter,
   rating: Star,
-  toggle: ToggleLeft,
-  divider: SeparatorHorizontal,
+  date: Calendar,
+  multiple_choice: ListFilter,
+  file_upload_image: Upload,
+  file_upload_pdf: Upload,
+  slider: Type,
+  URL: Link,
+  image: Type,
 };
 
 interface SortableCanvasFieldProps {
@@ -82,7 +78,6 @@ export function SortableCanvasField({
         }`}
       >
         <div className="p-4 flex items-start gap-3">
-          {/* Drag Handle */}
           <button
             {...attributes}
             {...listeners}
@@ -91,22 +86,18 @@ export function SortableCanvasField({
             <GripVertical className="w-4 h-4" />
           </button>
 
-          {/* Field Content */}
           <div className="flex-1 min-w-0 space-y-2">
-            {/* Label */}
             <div className="flex items-center gap-2">
               <Icon className="w-4 h-4 text-primary" />
               <label className="text-sm font-medium">
                 {field.label}
-                {field.required && <span className="text-destructive ml-0.5">*</span>}
+                {field.validation.required && <span className="text-destructive ml-0.5">*</span>}
               </label>
             </div>
 
-            {/* Field Preview */}
             <FieldPreview field={field} />
           </div>
 
-          {/* Remove Button */}
           <Button
             variant="ghost"
             size="sm"
@@ -126,17 +117,14 @@ export function SortableCanvasField({
 
 function FieldPreview({ field }: { field: FormField }) {
   switch (field.type) {
-    case "heading":
-      return <h3 className="text-lg font-semibold text-foreground">{field.label}</h3>;
-    case "divider":
-      return <div className="border-t border-border my-2" />;
-    case "textarea":
+    case "long_text":
       return (
         <div className="w-full min-h-[80px] rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
           {field.placeholder}
         </div>
       );
-    case "select":
+    case "dropdown":
+    case "multiple_choice":
       return (
         <div className="w-full h-10 rounded-lg border border-border bg-background px-3 flex items-center text-sm text-muted-foreground">
           Select an option
@@ -164,15 +152,6 @@ function FieldPreview({ field }: { field: FormField }) {
           ))}
         </div>
       );
-    case "toggle":
-      return (
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-6 rounded-full bg-muted relative">
-            <div className="w-4 h-4 rounded-full bg-background shadow-sm absolute left-1 top-1" />
-          </div>
-          <span className="text-sm text-muted-foreground">Toggle this option</span>
-        </div>
-      );
     case "rating":
       return (
         <div className="flex gap-1">
@@ -181,7 +160,8 @@ function FieldPreview({ field }: { field: FormField }) {
           ))}
         </div>
       );
-    case "file":
+    case "file_upload_image":
+    case "file_upload_pdf":
       return (
         <div className="w-full h-24 rounded-lg border-2 border-dashed border-border bg-muted/30 flex flex-col items-center justify-center gap-2">
           <Upload className="w-6 h-6 text-muted-foreground" />
@@ -195,6 +175,12 @@ function FieldPreview({ field }: { field: FormField }) {
           <span>MM/DD/YYYY</span>
         </div>
       );
+    case "short_text":
+    case "email":
+    case "number":
+    case "URL":
+    case "image":
+    case "slider":
     default:
       return (
         <div className="w-full h-10 rounded-lg border border-border bg-background px-3 flex items-center text-sm text-muted-foreground">

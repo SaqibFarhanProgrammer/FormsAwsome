@@ -32,7 +32,7 @@ export async function GetProfileService() {
   }
 
   await connectDB();
-  const user = await User.findById(userId).select("-passwordHash -refreshToken");
+  const user = await User.findById(userId).select("name email image createdAt");
 
   if (!user) {
     throw new AppError("User not found", 404);
@@ -43,6 +43,7 @@ export async function GetProfileService() {
     name: user.name,
     email: user.email,
     image: user.image,
+    createdAt: user.createdAt.toString(),
   };
 
   await SetDataToRedisWithTTL(

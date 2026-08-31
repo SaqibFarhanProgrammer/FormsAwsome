@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,13 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-interface SubmissionDetail {
-  label: string;
-  value: string;
-}
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ChevronDown, ChevronUp, Eye, Archive, Trash2 } from "lucide-react";
 
 interface Submission {
   id: string;
@@ -23,27 +20,27 @@ interface Submission {
   name: string;
   email: string;
   date: string;
-  status: "New" | "Viewed" | "Archived";
-  details: SubmissionDetail[];
+  status: "new" | "viewed" | "archived";
+  details: { label: string; value: string }[];
 }
 
-const submissions: Submission[] = [
+const submissionsData: Submission[] = [
   {
     id: "1",
     form: "Contact Form",
     name: "Sarah Johnson",
     email: "sarah@example.com",
     date: "Aug 27, 2026",
-    status: "New",
+    status: "new",
     details: [
       { label: "Name", value: "Sarah Johnson" },
       { label: "Email", value: "sarah@example.com" },
-      { label: "Phone", value: "+1 (555) 987-6543" },
+      { label: "Phone", value: "+1 (555) 123-4567" },
       { label: "Subject", value: "Product Inquiry" },
       {
         label: "Message",
         value:
-          "Hi, I'm interested in learning more about your enterprise plan. Could someone reach out to discuss pricing and features?",
+          "Hi, I am interested in learning more about your enterprise plan. Can someone reach out to discuss pricing?",
       },
     ],
   },
@@ -53,11 +50,12 @@ const submissions: Submission[] = [
     name: "Mike Chen",
     email: "mike@example.com",
     date: "Aug 27, 2026",
-    status: "New",
+    status: "new",
     details: [
       { label: "Name", value: "Mike Chen" },
       { label: "Email", value: "mike@example.com" },
-      { label: "Preferences", value: "Weekly Digest" },
+      { label: "Company", value: "TechCorp Inc." },
+      { label: "Interests", value: "Product Updates, Tutorials" },
     ],
   },
   {
@@ -66,12 +64,13 @@ const submissions: Submission[] = [
     name: "Emily Davis",
     email: "emily@example.com",
     date: "Aug 26, 2026",
-    status: "Viewed",
+    status: "viewed",
     details: [
       { label: "Name", value: "Emily Davis" },
       { label: "Email", value: "emily@example.com" },
+      { label: "Phone", value: "+1 (555) 987-6543" },
       { label: "Event", value: "Summer Workshop 2026" },
-      { label: "Attendees", value: "2" },
+      { label: "Tickets", value: "2" },
       { label: "Dietary", value: "Vegetarian" },
     ],
   },
@@ -81,11 +80,15 @@ const submissions: Submission[] = [
     name: "Alex Turner",
     email: "alex@example.com",
     date: "Aug 26, 2026",
-    status: "Archived",
+    status: "archived",
     details: [
       { label: "Name", value: "Alex Turner" },
       { label: "Email", value: "alex@example.com" },
       { label: "Subject", value: "Support Request" },
+      {
+        label: "Message",
+        value: "Having trouble exporting my form data. The CSV download seems to be broken.",
+      },
     ],
   },
   {
@@ -94,20 +97,187 @@ const submissions: Submission[] = [
     name: "Lisa Wang",
     email: "lisa@example.com",
     date: "Aug 25, 2026",
-    status: "Viewed",
+    status: "viewed",
     details: [
       { label: "Name", value: "Lisa Wang" },
       { label: "Email", value: "lisa@example.com" },
-      { label: "Preferences", value: "Monthly Digest" },
+      { label: "Company", value: "Design Studio" },
+    ],
+  },
+  {
+    id: "6",
+    form: "Job Application",
+    name: "David Kim",
+    email: "david@example.com",
+    date: "Aug 25, 2026",
+    status: "new",
+    details: [
+      { label: "Name", value: "David Kim" },
+      { label: "Email", value: "david@example.com" },
+      { label: "Phone", value: "+1 (555) 456-7890" },
+      { label: "Position", value: "Senior Frontend Developer" },
+      { label: "Experience", value: "5+ years" },
+      { label: "Portfolio", value: "davidkim.dev" },
+    ],
+  },
+  {
+    id: "7",
+    form: "Customer Feedback",
+    name: "Rachel Green",
+    email: "rachel@example.com",
+    date: "Aug 24, 2026",
+    status: "viewed",
+    details: [
+      { label: "Name", value: "Rachel Green" },
+      { label: "Email", value: "rachel@example.com" },
+      { label: "Rating", value: "4.5/5" },
+      { label: "Feedback", value: "Great platform! Would love to see more analytics features." },
+    ],
+  },
+  {
+    id: "8",
+    form: "Support Ticket",
+    name: "Tom Hardy",
+    email: "tom@example.com",
+    date: "Aug 24, 2026",
+    status: "archived",
+    details: [
+      { label: "Name", value: "Tom Hardy" },
+      { label: "Email", value: "tom@example.com" },
+      { label: "Issue", value: "Login not working" },
+      { label: "Priority", value: "High" },
+    ],
+  },
+  {
+    id: "9",
+    form: "Contact Form",
+    name: "Jessica Alba",
+    email: "jessica@example.com",
+    date: "Aug 23, 2026",
+    status: "new",
+    details: [
+      { label: "Name", value: "Jessica Alba" },
+      { label: "Email", value: "jessica@example.com" },
+      { label: "Subject", value: "Partnership" },
+      { label: "Message", value: "Interested in a partnership opportunity. Please contact me." },
+    ],
+  },
+  {
+    id: "10",
+    form: "Event Registration",
+    name: "Chris Evans",
+    email: "chris@example.com",
+    date: "Aug 23, 2026",
+    status: "new",
+    details: [
+      { label: "Name", value: "Chris Evans" },
+      { label: "Email", value: "chris@example.com" },
+      { label: "Event", value: "Webinar: Future of Forms" },
+      { label: "Tickets", value: "1" },
+    ],
+  },
+  {
+    id: "11",
+    form: "Newsletter Signup",
+    name: "Anna Bell",
+    email: "anna@example.com",
+    date: "Aug 22, 2026",
+    status: "viewed",
+    details: [
+      { label: "Name", value: "Anna Bell" },
+      { label: "Email", value: "anna@example.com" },
+      { label: "Company", value: "StartupXYZ" },
+    ],
+  },
+  {
+    id: "12",
+    form: "Job Application",
+    name: "Mark Wilson",
+    email: "mark@example.com",
+    date: "Aug 22, 2026",
+    status: "archived",
+    details: [
+      { label: "Name", value: "Mark Wilson" },
+      { label: "Email", value: "mark@example.com" },
+      { label: "Position", value: "UI/UX Designer" },
+      { label: "Experience", value: "3 years" },
+    ],
+  },
+  {
+    id: "13",
+    form: "Customer Feedback",
+    name: "Sophie Turner",
+    email: "sophie@example.com",
+    date: "Aug 21, 2026",
+    status: "new",
+    details: [
+      { label: "Name", value: "Sophie Turner" },
+      { label: "Email", value: "sophie@example.com" },
+      { label: "Rating", value: "5/5" },
+      { label: "Feedback", value: "Absolutely love the drag and drop builder!" },
+    ],
+  },
+  {
+    id: "14",
+    form: "Support Ticket",
+    name: "James Bond",
+    email: "james@example.com",
+    date: "Aug 21, 2026",
+    status: "viewed",
+    details: [
+      { label: "Name", value: "James Bond" },
+      { label: "Email", value: "james@example.com" },
+      { label: "Issue", value: "Form embed not loading" },
+      { label: "Priority", value: "Medium" },
+    ],
+  },
+  {
+    id: "15",
+    form: "Contact Form",
+    name: "Emma Watson",
+    email: "emma@example.com",
+    date: "Aug 20, 2026",
+    status: "archived",
+    details: [
+      { label: "Name", value: "Emma Watson" },
+      { label: "Email", value: "emma@example.com" },
+      { label: "Subject", value: "Feature Request" },
+      { label: "Message", value: "Would be great to have conditional logic in forms." },
     ],
   },
 ];
 
-const statusStyles: Record<string, string> = {
-  New: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
-  Viewed: "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-  Archived: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-};
+function getStatusBadge(status: Submission["status"]) {
+  switch (status) {
+    case "new":
+      return (
+        <Badge
+          variant="secondary"
+          className="rounded-lg bg-emerald-50 text-emerald-700 border-emerald-200/50 hover:bg-emerald-50 font-medium text-xs"
+        >
+          New
+        </Badge>
+      );
+    case "viewed":
+      return (
+        <Badge
+          variant="secondary"
+          className="rounded-lg bg-blue-50 text-blue-700 border-blue-200/50 hover:bg-blue-50 font-medium text-xs"
+        >
+          Viewed
+        </Badge>
+      );
+    case "archived":
+      return (
+        <Badge
+          variant="secondary"
+          className="rounded-lg bg-slate-100 text-slate-600 border-slate-200/50 hover:bg-slate-100 font-medium text-xs"
+        >
+          Archived
+        </Badge>
+      );
+  }
+}
 
 export function SubmissionsTable() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -117,140 +287,139 @@ export function SubmissionsTable() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold tracking-tight">Recent Submissions</h2>
-        <button className="h-8 px-3 rounded-lg border border-border bg-background text-sm font-medium hover:bg-accent transition-colors">
-          View All
-        </button>
-      </div>
-      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+    <Card className="rounded-2xl border-border overflow-hidden">
+      {/* Scrollable Table Container */}
+      <div className="max-h-[600px] overflow-y-auto">
         <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50 hover:bg-muted/50">
+          <TableHeader className="sticky top-0 bg-card z-10">
+            <TableRow className="hover:bg-transparent border-border">
               <TableHead className="w-10"></TableHead>
-              <TableHead>Form</TableHead>
-              <TableHead>Submitted By</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Form
+              </TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Submitted By
+              </TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Email
+              </TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Date
+              </TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Status
+              </TableHead>
+              <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider text-right">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {submissions.map((sub) => {
-              const isExpanded = expandedId === sub.id;
-              return (
-                <>
-                  {/* Main Row */}
-                  <TableRow
-                    key={sub.id}
-                    onClick={() => toggleExpand(sub.id)}
-                    className="cursor-pointer hover:bg-muted/30 transition-colors"
-                  >
-                    <TableCell>
-                      <ChevronDown
-                        size={16}
-                        className={cn(
-                          "text-muted-foreground transition-transform duration-200",
-                          isExpanded && "rotate-180",
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium">{sub.form}</TableCell>
-                    <TableCell>{sub.name}</TableCell>
-                    <TableCell className="text-muted-foreground">{sub.email}</TableCell>
-                    <TableCell className="text-muted-foreground">{sub.date}</TableCell>
-                    <TableCell>
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full border border-transparent px-2 py-0.5 text-xs font-medium",
-                          statusStyles[sub.status],
-                        )}
-                      >
-                        {sub.status}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <button
-                        onClick={(e) => e.stopPropagation()}
-                        className="p-1.5 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
-                      >
-                        <MoreHorizontal size={16} />
-                      </button>
+            {submissionsData.map((submission) => (
+              <React.Fragment key={submission.id}>
+                <TableRow
+                  className="cursor-pointer hover:bg-muted/30 transition-colors border-border"
+                  onClick={() => toggleExpand(submission.id)}
+                >
+                  <TableCell className="py-3">
+                    <button
+                      className="w-6 h-6 rounded-md hover:bg-muted flex items-center justify-center transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleExpand(submission.id);
+                      }}
+                    >
+                      {expandedId === submission.id ? (
+                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </button>
+                  </TableCell>
+                  <TableCell className="py-3 text-sm font-medium">{submission.form}</TableCell>
+                  <TableCell className="py-3 text-sm">{submission.name}</TableCell>
+                  <TableCell className="py-3 text-sm text-muted-foreground">
+                    {submission.email}
+                  </TableCell>
+                  <TableCell className="py-3 text-sm text-muted-foreground">
+                    {submission.date}
+                  </TableCell>
+                  <TableCell className="py-3">{getStatusBadge(submission.status)}</TableCell>
+                  <TableCell className="py-3 text-right">
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
+                        <Eye className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+
+                {/* Expanded Detail Row */}
+                {expandedId === submission.id && (
+                  <TableRow className="hover:bg-transparent border-0">
+                    <TableCell colSpan={7} className="p-0">
+                      <div className="px-4 pb-4">
+                        <Card className="rounded-xl border-border bg-muted/30 p-5">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-sm font-semibold">Submission Details</h4>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-xl gap-2 text-xs h-8"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                Mark as Viewed
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-xl gap-2 text-xs h-8"
+                              >
+                                <Archive className="w-3.5 h-3.5" />
+                                Archive
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-xl gap-2 text-xs h-8 text-destructive border-destructive/20 hover:bg-destructive/5"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                Delete
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {submission.details.map((detail, idx) => (
+                              <div
+                                key={idx}
+                                className="p-3 rounded-xl bg-background border border-border"
+                              >
+                                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                                  {detail.label}
+                                </p>
+                                <p className="text-sm font-medium">{detail.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </Card>
+                      </div>
                     </TableCell>
                   </TableRow>
-
-                  {/* Expanded Detail Row */}
-                  {isExpanded && (
-                    <TableRow className="bg-muted/20 hover:bg-muted/20">
-                      <TableCell colSpan={7} className="p-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {sub.details.map((detail) => (
-                            <div
-                              key={detail.label}
-                              className={cn(
-                                "rounded-xl border border-border bg-card p-4",
-                                detail.label === "Message" && "sm:col-span-2 lg:col-span-2",
-                              )}
-                            >
-                              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-                                {detail.label}
-                              </p>
-                              <p className="text-sm font-medium text-foreground">{detail.value}</p>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-2 mt-4">
-                          {sub.status === "New" && (
-                            <button className="h-8 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors">
-                              Mark as Viewed
-                            </button>
-                          )}
-                          {sub.status !== "Archived" && (
-                            <button className="h-8 px-3 rounded-lg border border-border bg-background text-xs font-medium hover:bg-accent transition-colors">
-                              Archive
-                            </button>
-                          )}
-                          <button className="h-8 px-3 rounded-lg border border-border bg-background text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors">
-                            Delete
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </>
-              );
-            })}
+                )}
+              </React.Fragment>
+            ))}
           </TableBody>
         </Table>
-
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-          <p className="text-xs text-muted-foreground">Showing 1-5 of 1,284 submissions</p>
-          <div className="flex items-center gap-1">
-            <button
-              className="h-8 w-8 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-colors disabled:opacity-50"
-              disabled
-            >
-              <ChevronLeft size={14} />
-            </button>
-            <button className="h-8 w-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
-              1
-            </button>
-            <button className="h-8 w-8 rounded-lg border border-border flex items-center justify-center text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
-              2
-            </button>
-            <button className="h-8 w-8 rounded-lg border border-border flex items-center justify-center text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
-              3
-            </button>
-            <span className="text-muted-foreground px-1">...</span>
-            <button className="h-8 w-8 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
-              <ChevronRight size={14} />
-            </button>
-          </div>
-        </div>
       </div>
-    </div>
+
+      {/* Bottom Info Bar */}
+      <div className="border-t border-border px-6 py-3 bg-card flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          Showing all {submissionsData.length} submissions
+        </p>
+      </div>
+    </Card>
   );
 }

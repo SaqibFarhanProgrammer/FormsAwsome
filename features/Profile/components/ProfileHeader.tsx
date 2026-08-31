@@ -1,38 +1,31 @@
 "use client";
-import { RootState } from "@/redux/store";
-import { fetchProfile } from "@/redux/features/profile/Profile.slice";
+import { updateProfileLocally } from "@/redux/features/profile/Profile.slice";
+import { formatDate } from "@/utils/FormatDate";
 import { Mail, Clock, Pencil, Settings, Loader2 } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
+import Link from "next/link";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
-export function ProfileHeader() {
+export function ProfileHeader({ data }: { data: any }) {
   const dispatch = useDispatch();
-  const { data, loading, error } = useSelector((state: RootState) => state.profile);
 
   useEffect(() => {
-    // Fetch profile when component mounts (if not already loaded)
-    if (!data && !loading) {
-      dispatch(fetchProfile("current") as any);
-    }
-  }, [dispatch, data, loading]);
+    dispatch(
+      updateProfileLocally({
+        name: data.name,
+        email: data.email,
+        createdAt: data.createdAt,
+        image: data.image,
+      }),
+    );
+  }, []);
 
-  if (loading) {
+  if (!data) {
     return (
       <div className="rounded-2xl border border-border bg-card shadow-sm p-8 flex items-center justify-center min-h-64">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           <p className="text-muted-foreground">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !data) {
-    return (
-      <div className="rounded-2xl border border-border bg-card shadow-sm p-8 flex items-center justify-center min-h-64">
-        <div className="flex flex-col items-center gap-3">
-          <p className="text-destructive font-medium">Failed to load profile</p>
-          <p className="text-muted-foreground text-sm">{error || "Profile data not available"}</p>
         </div>
       </div>
     );
@@ -78,7 +71,7 @@ export function ProfileHeader() {
               )}
               <span className="flex items-center gap-1.5">
                 <Clock size={14} />
-                Joined March 2024
+                {formatDate(data.createdAt)}
               </span>
             </div>
           </div>
@@ -88,10 +81,13 @@ export function ProfileHeader() {
               <Pencil size={14} />
               Edit Profile
             </button>
-            <button className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-2">
+            <Link
+              href="/settings"
+              className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-2"
+            >
               <Settings size={14} />
               Settings
-            </button>
+            </Link>
           </div>
         </div>
       </div>

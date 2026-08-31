@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 
 const forms = [
   {
+    id: 1,
     title: "Contact Form",
     desc: "General contact inquiries",
     status: "Active",
@@ -10,6 +11,7 @@ const forms = [
     views: "2.1k",
   },
   {
+    id: 2,
     title: "Contact Form",
     desc: "General contact inquiries",
     status: "Active",
@@ -17,6 +19,7 @@ const forms = [
     views: "2.1k",
   },
   {
+    id: 3,
     title: "Contact Form",
     desc: "General contact inquiries",
     status: "Active",
@@ -24,6 +27,7 @@ const forms = [
     views: "2.1k",
   },
   {
+    id: 4,
     title: "Contact Form",
     desc: "General contact inquiries",
     status: "Active",
@@ -31,6 +35,7 @@ const forms = [
     views: "2.1k",
   },
   {
+    id: 5,
     title: "Contact Form",
     desc: "General contact inquiries",
     status: "Active",
@@ -38,6 +43,7 @@ const forms = [
     views: "2.1k",
   },
   {
+    id: 6,
     title: "Contact Form",
     desc: "General contact inquiries",
     status: "Active",
@@ -45,6 +51,7 @@ const forms = [
     views: "2.1k",
   },
   {
+    id: 7,
     title: "Contact Form",
     desc: "General contact inquiries",
     status: "Active",
@@ -52,6 +59,7 @@ const forms = [
     views: "2.1k",
   },
   {
+    id: 8,
     title: "Contact Form",
     desc: "General contact inquiries",
     status: "Active",
@@ -59,6 +67,7 @@ const forms = [
     views: "2.1k",
   },
   {
+    id: 9,
     title: "Contact Form",
     desc: "General contact inquiries",
     status: "Active",
@@ -66,6 +75,7 @@ const forms = [
     views: "2.1k",
   },
   {
+    id: 10,
     title: "Newsletter Signup",
     desc: "Email subscription form",
     status: "Active",
@@ -73,6 +83,7 @@ const forms = [
     views: "5.4k",
   },
   {
+    id: 11,
     title: "Job Application",
     desc: "Career opportunities",
     status: "Draft",
@@ -80,6 +91,7 @@ const forms = [
     views: "0",
   },
   {
+    id: 12,
     title: "Event Registration",
     desc: "Summer workshop 2026",
     status: "Active",
@@ -87,7 +99,6 @@ const forms = [
     views: "1.2k",
   },
 ];
-
 export function FormsGrid() {
   return (
     <div>
@@ -100,7 +111,7 @@ export function FormsGrid() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {forms.map((form) => (
           <div
-            key={form.title}
+            key={form.id.toString() + form.title}
             className="rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group"
           >
             <div className="flex items-start justify-between mb-3">
