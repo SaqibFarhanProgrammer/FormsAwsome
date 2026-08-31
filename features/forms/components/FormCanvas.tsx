@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FormField } from "@/redux/features/Create-form/Form.Slice";
+import { FormField, updateFormMeta } from "@/redux/features/Create-form/Form.Slice";
 import {
   Trash2,
   Type,
@@ -20,8 +20,10 @@ import {
   ToggleLeft,
   Heading1,
   SeparatorHorizontal,
+  Save,
 } from "lucide-react";
-
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
 const iconMap: Record<string, React.ElementType> = {
   heading: Heading1,
   text: Type,
@@ -53,22 +55,68 @@ export function FormCanvas({
   onSelectField,
   onRemoveField,
 }: FormCanvasProps) {
+  const dispatch = useDispatch();
+  const title = useSelector((state: any) => state.form.formTitle);
+  const description = useSelector((state: any) => state.form.formDescription);
+
+  async function handleUpdateForm() {
+    const response = await fetch("/api/forms/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        fields,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Failed to update form");
+    } else {
+      console.log("Form updated successfully");
+    }
+  }
+
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
-      {/* Form Header */}
       <Card className="rounded-2xl border-border mb-6 p-6 bg-card">
-        <div className="space-y-2">
-          <input
-            type="text"
-            defaultValue="Untitled Form"
-            className="w-full text-2xl font-semibold bg-transparent border-none outline-none placeholder:text-muted-foreground"
-            placeholder="Form Title"
-          />
-          <input
-            type="text"
-            className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground text-muted-foreground"
-            placeholder="Form description (optional)"
-          />
+        <div className="flex items-start gap-4">
+          <div className="space-y-2 flex-1">
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => {
+                dispatch(
+                  updateFormMeta({
+                    title: e.target.value,
+                  }),
+                );
+              }}
+              defaultValue="Untitled Form"
+              className="w-full text-2xl font-semibold bg-transparent border-none outline-none placeholder:text-muted-foreground"
+              placeholder="Form Title"
+            />
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => {
+                dispatch(
+                  updateFormMeta({
+                    description: e.target.value,
+                  }),
+                );
+              }}
+              className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground text-muted-foreground"
+              placeholder="Form description (optional)"
+            />
+          </div>
+
+          {/* Save Button */}
+          <Button onClick={handleUpdateForm} className="shrink-0">
+            Save
+          </Button>
         </div>
       </Card>
 
