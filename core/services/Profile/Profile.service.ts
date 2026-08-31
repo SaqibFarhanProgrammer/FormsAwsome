@@ -5,10 +5,8 @@ import { User } from "@/models/User.models";
 import { verifyAccessToken } from "@/lib/auth/JWT.lib";
 import { cookies } from "next/headers";
 import { GetDataFromRedis, SetDataToRedisWithTTL } from "@/lib/redis/redis";
-import axios from "axios";
 
 export async function GetProfileService() {
-
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
@@ -57,4 +55,3 @@ export async function GetProfileService() {
 
   return profileData;
 }
-

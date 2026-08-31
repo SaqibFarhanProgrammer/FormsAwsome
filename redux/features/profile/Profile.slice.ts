@@ -25,7 +25,7 @@ export const fetchProfile = createAsyncThunk(
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
-  }
+  },
 );
 
 const profileSlice = createSlice({

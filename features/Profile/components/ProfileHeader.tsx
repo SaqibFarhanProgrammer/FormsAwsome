@@ -1,7 +1,7 @@
 "use client";
 import { RootState } from "@/redux/store";
 import { fetchProfile } from "@/redux/features/profile/Profile.slice";
-import { MapPin, Mail, Clock, Pencil, Settings, Loader2 } from "lucide-react";
+import { Mail, Clock, Pencil, Settings, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 

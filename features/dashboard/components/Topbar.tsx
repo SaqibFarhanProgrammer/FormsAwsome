@@ -4,7 +4,6 @@ import { RefreshCw, ArrowUpDown, Clock, CheckSquare, Bell, ChevronDown } from "l
 import { GetProfileDataFromRedux } from "@/utils/GetProfileDataFromRedux";
 
 export function TopBar() {
-
   const { data: user } = GetProfileDataFromRedux();
 
   return (

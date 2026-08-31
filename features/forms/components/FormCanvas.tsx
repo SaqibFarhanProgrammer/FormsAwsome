@@ -20,10 +20,8 @@ import {
   ToggleLeft,
   Heading1,
   SeparatorHorizontal,
-  Save,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
 const iconMap: Record<string, React.ElementType> = {
   heading: Heading1,
   text: Type,
