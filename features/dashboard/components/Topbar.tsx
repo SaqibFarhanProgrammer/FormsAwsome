@@ -2,25 +2,20 @@
 
 import { useState, useRef, useEffect } from "react";
 import { RefreshCw, ArrowUpDown, Clock, CheckSquare, Bell, ChevronDown } from "lucide-react";
+import { useSelector } from "react-redux";
+import { GetProfileDataFromRedux } from "@/utils/GetProfileDataFromRedux";
 
 export function TopBar() {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const { data: user } = GetProfileDataFromRedux();
 
   return (
     <header className="flex items-center mx-6 gap-3 shrink-0 py-2">
       <div className="flex-1 min-w-0 rounded-2xl border border-border bg-card px-5 py-3.5 shadow-sm">
-        <p className="text-sm font-semibold text-foreground truncate">Good Morning, John</p>
+        <p className="text-sm font-semibold text-foreground truncate">
+          Good Morning, {user?.name || "User"}
+        </p>
         <p className="text-xs text-muted-foreground mt-0.5 truncate">
           Your latest system updates here
         </p>
@@ -70,14 +65,19 @@ export function TopBar() {
         <div className="flex items-center gap-2.5 pl-1">
           <div className="w-9 h-9 rounded-full bg-muted overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
-              alt="John"
+              src={
+                user?.image ||
+                "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+              }
+              alt="User Profile"
               className="w-full h-full object-cover"
             />
           </div>
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-foreground">John Smith</p>
-            <p className="text-xs text-muted-foreground">@admin</p>
+            <p className="text-sm font-semibold text-foreground">{user?.name || "User"}</p>
+            <p className="text-xs text-muted-foreground">
+              @{user?.name?.split(" ").join("").toLowerCase() || "user"}
+            </p>
           </div>
         </div>
       </div>

@@ -32,7 +32,7 @@
     "**/*.mts",
     "types/**/*",
     "app/api/auth/[...nextauth]/options.js",
-    "redux/store.js"
+    "redux/store.ts"
   ],
   "exclude": ["node_modules"]
 }

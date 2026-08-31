@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, nanoid } from "@reduxjs/toolkit";
 
 export interface FormField {
   id: string;
@@ -15,6 +15,7 @@ interface FormState {
   selectedFieldId: string | null;
   formTitle: string;
   formDescription: string;
+  isDirty: boolean;
 }
 
 const initialState: FormState = {
@@ -22,9 +23,8 @@ const initialState: FormState = {
   selectedFieldId: null,
   formTitle: "Untitled Form",
   formDescription: "",
+  isDirty: false,
 };
-
-let fieldCounter = 0;
 
 const formSlice = createSlice({
   name: "form",
@@ -40,9 +40,8 @@ const formSlice = createSlice({
         options?: string[];
       }>,
     ) => {
-      fieldCounter += 1;
       const newField: FormField = {
-        id: `field-${Date.now()}-${fieldCounter}`,
+        id: nanoid(),
         type: action.payload.type,
         label: action.payload.label,
         placeholder: action.payload.placeholder || `Enter ${action.payload.label.toLowerCase()}...`,
@@ -52,15 +51,21 @@ const formSlice = createSlice({
       };
       state.fields.push(newField);
       state.selectedFieldId = newField.id;
+      state.isDirty = true;
     },
     removeField: (state, action: PayloadAction<string>) => {
-      state.fields = state.fields.filter((f) => f.id !== action.payload);
-      if (state.selectedFieldId === action.payload) {
-        state.selectedFieldId = null;
+      const index = state.fields.findIndex((f) => f.id === action.payload);
+      if (index !== -1) {
+        state.fields.splice(index, 1);
+        if (state.selectedFieldId === action.payload) {
+          state.selectedFieldId = null;
+        }
+        state.isDirty = true;
       }
     },
     reorderFields: (state, action: PayloadAction<FormField[]>) => {
       state.fields = action.payload.map((f, index) => ({ ...f, order: index }));
+      state.isDirty = true;
     },
     selectField: (state, action: PayloadAction<string | null>) => {
       state.selectedFieldId = action.payload;
@@ -68,7 +73,9 @@ const formSlice = createSlice({
     updateField: (state, action: PayloadAction<{ id: string } & Partial<FormField>>) => {
       const field = state.fields.find((f) => f.id === action.payload.id);
       if (field) {
-        Object.assign(field, action.payload);
+        const { id, order, ...updates } = action.payload;
+        Object.assign(field, updates);
+        state.isDirty = true;
       }
     },
     updateFormMeta: (state, action: PayloadAction<{ title?: string; description?: string }>) => {
@@ -78,12 +85,17 @@ const formSlice = createSlice({
       if (action.payload.description !== undefined) {
         state.formDescription = action.payload.description;
       }
+      state.isDirty = true;
     },
     clearForm: (state) => {
       state.fields = [];
       state.selectedFieldId = null;
       state.formTitle = "Untitled Form";
       state.formDescription = "";
+      state.isDirty = false;
+    },
+    markSaved: (state) => {
+      state.isDirty = false;
     },
   },
 });
@@ -96,6 +108,7 @@ export const {
   updateField,
   updateFormMeta,
   clearForm,
+  markSaved,
 } = formSlice.actions;
 
 export default formSlice.reducer;
