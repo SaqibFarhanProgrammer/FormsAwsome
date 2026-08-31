@@ -1,12 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import { RefreshCw, ArrowUpDown, Clock, CheckSquare, Bell, ChevronDown } from "lucide-react";
-import { useSelector } from "react-redux";
 import { GetProfileDataFromRedux } from "@/utils/GetProfileDataFromRedux";
 
 export function TopBar() {
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: user } = GetProfileDataFromRedux();
 
