@@ -49,9 +49,7 @@ export function FormCanvas({
       <div
         ref={setNodeRef}
         className={`min-h-[400px] rounded-2xl border-2 border-dashed transition-colors ${
-          isOver
-            ? "border-primary bg-primary/5"
-            : "border-border bg-card/30"
+          isOver ? "border-primary bg-primary/5" : "border-border bg-card/30"
         } ${fields.length === 0 ? "flex items-center justify-center" : "p-4 space-y-3"}`}
       >
         {fields.length === 0 ? (
@@ -65,15 +63,10 @@ export function FormCanvas({
                 Drag elements from the left sidebar here
               </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Or click the + button to add fields
-            </p>
+            <p className="text-xs text-muted-foreground">Or click the + button to add fields</p>
           </div>
         ) : (
-          <SortableContext
-            items={fields.map((f) => f.id)}
-            strategy={verticalListSortingStrategy}
-          >
+          <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
             {fields.map((field) => (
               <SortableCanvasField
                 key={field.id}

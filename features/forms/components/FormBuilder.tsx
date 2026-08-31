@@ -7,8 +7,6 @@ import {
   removeField,
   selectField,
   updateField,
-  clearForm,
-  FormField,
 } from "@/redux/features/Create-form/Form.Slice";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { TopBar } from "./Topbar";
@@ -27,7 +25,7 @@ export function FormBuilder() {
         label,
         placeholder: `Enter ${label.toLowerCase()}...`,
         required: false,
-      })
+      }),
     );
     setPropertiesOpen(true);
   };
@@ -37,7 +35,7 @@ export function FormBuilder() {
     setPropertiesOpen(true);
   };
 
-  const selectedField = fields.find((f:any) => f.id === selectedFieldId) || null;
+  const selectedField = fields.find((f: any) => f.id === selectedFieldId) || null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

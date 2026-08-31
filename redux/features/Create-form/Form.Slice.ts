@@ -38,7 +38,7 @@ const formSlice = createSlice({
         placeholder?: string;
         required?: boolean;
         options?: string[];
-      }>
+      }>,
     ) => {
       fieldCounter += 1;
       const newField: FormField = {
@@ -65,19 +65,13 @@ const formSlice = createSlice({
     selectField: (state, action: PayloadAction<string | null>) => {
       state.selectedFieldId = action.payload;
     },
-    updateField: (
-      state,
-      action: PayloadAction<{ id: string } & Partial<FormField>>
-    ) => {
+    updateField: (state, action: PayloadAction<{ id: string } & Partial<FormField>>) => {
       const field = state.fields.find((f) => f.id === action.payload.id);
       if (field) {
         Object.assign(field, action.payload);
       }
     },
-    updateFormMeta: (
-      state,
-      action: PayloadAction<{ title?: string; description?: string }>
-    ) => {
+    updateFormMeta: (state, action: PayloadAction<{ title?: string; description?: string }>) => {
       if (action.payload.title !== undefined) {
         state.formTitle = action.payload.title;
       }

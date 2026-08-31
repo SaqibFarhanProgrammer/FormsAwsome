@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/redux/features/Create-form/Form.Slice";
 import {
-  GripVertical,
   Trash2,
   Type,
   AlignLeft,

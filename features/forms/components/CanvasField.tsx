@@ -41,7 +41,7 @@ const iconMap: Record<string, React.ElementType> = {
 interface CanvasFieldProps {
   field: FormField;
   isOverlay?: boolean;
-    required?: boolean;
+  required?: boolean;
 }
 
 export function CanvasField({ field, isOverlay, required }: CanvasFieldProps) {

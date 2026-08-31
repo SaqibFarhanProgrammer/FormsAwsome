@@ -56,14 +56,9 @@ export function SortableCanvasField({
   onSelect,
   onRemove,
 }: SortableCanvasFieldProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: field.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: field.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -132,11 +127,7 @@ export function SortableCanvasField({
 function FieldPreview({ field }: { field: FormField }) {
   switch (field.type) {
     case "heading":
-      return (
-        <h3 className="text-lg font-semibold text-foreground">
-          {field.label}
-        </h3>
-      );
+      return <h3 className="text-lg font-semibold text-foreground">{field.label}</h3>;
     case "divider":
       return <div className="border-t border-border my-2" />;
     case "textarea":
