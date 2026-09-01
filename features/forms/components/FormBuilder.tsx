@@ -39,7 +39,6 @@ export function FormBuilder() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Custom TopBar */}
       <TopBar />
 
       {/* Main Content */}

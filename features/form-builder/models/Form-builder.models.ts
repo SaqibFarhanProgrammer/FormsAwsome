@@ -1,190 +1,106 @@
-import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
+import mongoose from "mongoose";
 import { FormState } from "../types/Form-builder.types";
 
-export interface FormOption {
-  label: string;
-  value: string;
-}
-
-export interface FormValidation {
-  required: boolean;
-  min?: number;
-  max?: number;
-  pattern?: string;
-}
-
-export interface FormField {
+export type FormField = {
   id: string;
   type: string;
   label: string;
   placeholder?: string;
   helperText?: string;
-  options?: FormOption[];
-  validation: FormValidation;
-}
-
-interface FormBuilderState {
-  fields: FormField[];
-  selectedFieldId: string | null;
-  formTitle: string;
-  formDescription: string;
-  isDirty: boolean;
-  state: FormState;
-}
-
-const initialState: FormBuilderState = {
-  fields: [],
-  selectedFieldId: null,
-  formTitle: "Untitled Form",
-  formDescription: "",
-  isDirty: false,
-  state: FormState.DRAFT,
+  options?: {
+    label: string;
+    value: string;
+  }[];
+  validation: {
+    required: boolean;
+    min?: number;
+    max?: number;
+    pattern?: string;
+  };
 };
 
-const formSlice = createSlice({
-  name: "form",
-  initialState,
+export type FormType = {
+  title: string;
+  description?: string;
+  userId: mongoose.Types.ObjectId;
+  slug: string;
+  version: number;
+  fields: FormField[];
+  settings: {
+    submitButtonText: string;
+    successMessage: string;
+    redirectUrl?: string;
+    notifyEmail?: string;
+  };
+  state: FormState;
+};
 
-  reducers: {
-    addField: (
-      state,
-      action: PayloadAction<{
-        type: string;
-        label: string;
-        placeholder?: string;
-        helperText?: string;
-        options?: FormOption[];
-        validation?: Partial<FormValidation>;
-      }>,
-    ) => {
-      const { type, label, placeholder, helperText, options, validation } = action.payload;
-
-      const newField: FormField = {
-        id: nanoid(),
-        type,
-        label,
-        placeholder: placeholder || `Enter ${label.toLowerCase()}...`,
-        helperText: helperText || "",
-        options: options || [],
-        validation: {
-          required: validation?.required ?? false,
-          min: validation?.min,
-          max: validation?.max,
-          pattern: validation?.pattern,
+const formSchema = new mongoose.Schema<FormType>(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    version: {
+      type: Number,
+      default: 1,
+    },
+    fields: {
+      type: [
+        {
+          id: { type: String, required: true },
+          type: { type: String, required: true },
+          label: { type: String, required: true },
+          placeholder: { type: String },
+          helperText: { type: String },
+          options: [
+            {
+              label: { type: String, required: true },
+              value: { type: String, required: true },
+            },
+          ],
+          validation: {
+            required: { type: Boolean, default: false },
+            min: { type: Number },
+            max: { type: Number },
+            pattern: { type: String },
+          },
         },
-      };
-
-      state.fields.push(newField);
-      state.selectedFieldId = newField.id;
-      state.isDirty = true;
+      ],
+      default: [],
     },
-
-    removeField: (state, action: PayloadAction<string>) => {
-      const index = state.fields.findIndex((field) => field.id === action.payload);
-
-      if (index === -1) return;
-
-      state.fields.splice(index, 1);
-
-      if (state.selectedFieldId === action.payload) {
-        state.selectedFieldId = null;
-      }
-
-      state.isDirty = true;
+    settings: {
+      submitButtonText: { type: String, default: "Submit" },
+      successMessage: { type: String, default: "Thank you for your submission!" },
+      redirectUrl: { type: String },
+      notifyEmail: { type: String },
     },
-
-    reorderFields: (state, action: PayloadAction<FormField[]>) => {
-      state.fields = action.payload;
-      state.isDirty = true;
-    },
-
-    selectField: (state, action: PayloadAction<string | null>) => {
-      state.selectedFieldId = action.payload;
-    },
-
-    updateField: (
-      state,
-      action: PayloadAction<{
-        id: string;
-        updates: Partial<Omit<FormField, "id">>;
-      }>,
-    ) => {
-      const field = state.fields.find((field) => field.id === action.payload.id);
-
-      if (!field) return;
-
-      Object.assign(field, action.payload.updates);
-      state.isDirty = true;
-    },
-
-    updateFieldValidation: (
-      state,
-      action: PayloadAction<{
-        id: string;
-        validation: Partial<FormValidation>;
-      }>,
-    ) => {
-      const field = state.fields.find((field) => field.id === action.payload.id);
-
-      if (!field) return;
-
-      field.validation = {
-        ...field.validation,
-        ...action.payload.validation,
-      };
-
-      state.isDirty = true;
-    },
-
-    updateFormMeta: (
-      state,
-      action: PayloadAction<{
-        title?: string;
-        description?: string;
-      }>,
-    ) => {
-      if (action.payload.title !== undefined) {
-        state.formTitle = action.payload.title;
-      }
-
-      if (action.payload.description !== undefined) {
-        state.formDescription = action.payload.description;
-      }
-
-      state.isDirty = true;
-    },
-
-    setFormState: (state, action: PayloadAction<FormState>) => {
-      state.state = action.payload;
-      state.isDirty = true;
-    },
-
-    clearForm: (state) => {
-      state.fields = [];
-      state.selectedFieldId = null;
-      state.formTitle = "Untitled Form";
-      state.formDescription = "";
-      state.state = FormState.DRAFT;
-      state.isDirty = false;
-    },
-
-    markSaved: (state) => {
-      state.isDirty = false;
+    state: {
+      type: String,
+      enum: Object.values(FormState),
+      default: FormState.DRAFT,
     },
   },
-});
+  {
+    timestamps: true,
+  },
+);
 
-export const {
-  addField,
-  removeField,
-  reorderFields,
-  selectField,
-  updateField,
-  updateFieldValidation,
-  updateFormMeta,
-  setFormState,
-  clearForm,
-  markSaved,
-} = formSlice.actions;
-
-export default formSlice.reducer;
+export const Form = mongoose.models.Form || mongoose.model<FormType>("Form", formSchema);

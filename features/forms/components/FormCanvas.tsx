@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FormField, updateFormMeta } from "@/redux/features/Create-form/Form.Slice";
+import dayjs from "dayjs";
 import {
   Trash2,
   Type,
@@ -22,8 +23,9 @@ import {
   SeparatorHorizontal,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { CatchErrorFunctionForService } from "@/utils/CatchErrorFunction";
 import axios from "axios";
+import { useState } from "react";
+import { AppError } from "@/lib/auth/AppError";
 const iconMap: Record<string, React.ElementType> = {
   heading: Heading1,
   text: Type,
@@ -58,22 +60,19 @@ export function FormCanvas({
   const dispatch = useDispatch();
   const title = useSelector((state: any) => state.form.formTitle);
   const description = useSelector((state: any) => state.form.formDescription);
-  const settings = useSelector((state: any) => state.form.settings);
+  const [UiError, setUiError] = useState("");
 
   async function handleUpdateForm() {
     try {
-      // submitButtonText: settings?.submitButtonText || "Submit",
-      //     successMessage: settings?.successMessage || "Thank you for your submission!",
-      //     redirectUrl: settings?.redirectUrl || null,
-      //     notifyEmail: settings?.notifyEmail || null,
+      const date: string = new Date().toString();
+
+      const DefaultSlug = `untitled-form-${dayjs().format("HH:mm:ss")}`;
 
       const res = await axios.post("/api/forms/create", {
         title,
         description,
         fields: fields ? fields : [],
-        slug: title
-          ? title.toLowerCase().replace(/\s+/g, "-")
-          : `untitled-form-${Date.now().toLocaleString()}`,
+        slug: DefaultSlug,
         settings: {
           submitButtonText: "Submit",
           successMessage: "Thank you for your submission!",
@@ -81,8 +80,16 @@ export function FormCanvas({
           notifyEmail: null,
         },
       });
+
+      console.log(res);
     } catch (error: any) {
-      CatchErrorFunctionForService(error, "Error updating form meta", "CREATE NEW FORM ERROR");
+      if (error instanceof AppError) {
+        console.error("AppError:", error.message);
+        setUiError(error.message);
+      }
+      const errorMessage = error.response?.data?.message || error.message || "An error occurred";
+
+      setUiError(errorMessage);
     }
   }
 
@@ -134,6 +141,7 @@ export function FormCanvas({
               <p className="text-sm text-muted-foreground mt-1">
                 Click elements from the left sidebar to add them here
               </p>
+              <p>{UiError && <span className="text-sm text-destructive mt-1">{UiError}</span>}</p>
             </div>
           </div>
         ) : (

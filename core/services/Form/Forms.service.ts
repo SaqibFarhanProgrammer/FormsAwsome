@@ -4,7 +4,6 @@ import { AppError } from "@/lib/auth/AppError";
 import { connectDB } from "@/core/DB/ConnectDB";
 import { verifyAccessToken } from "@/lib/auth/JWT.lib";
 import { cookies } from "next/headers";
-import { Form } from "@/features/form-builder/models/Form-builder.models";
 import {
   DeleteDataFromRedis,
   GetDataFromRedis,
@@ -13,6 +12,7 @@ import {
 } from "@/lib/redis/redis";
 import { Submission } from "@/features/submissions/models/Submition.models";
 import { FormState } from "@/features/form-builder/types/Form-builder.types";
+import { Form } from "@/features/form-builder/models/Form-builder.models";
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
@@ -20,10 +20,6 @@ export async function createFormService(request: NextRequest) {
 
   if (!title || !slug || !fields) {
     throw new AppError("Title, slug and fields are required", 400);
-  }
-
-  if (!Array.isArray(fields) || fields.length === 0) {
-    throw new AppError("Fields must be a non-empty array", 400);
   }
 
   const cookieStore = await cookies();
