@@ -22,6 +22,8 @@ import {
   SeparatorHorizontal,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
+import { CatchErrorFunctionForService } from "@/utils/CatchErrorFunction";
+import axios from "axios";
 const iconMap: Record<string, React.ElementType> = {
   heading: Heading1,
   text: Type,
@@ -56,24 +58,31 @@ export function FormCanvas({
   const dispatch = useDispatch();
   const title = useSelector((state: any) => state.form.formTitle);
   const description = useSelector((state: any) => state.form.formDescription);
+  const settings = useSelector((state: any) => state.form.settings);
 
   async function handleUpdateForm() {
-    const response = await fetch("/api/forms/update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    try {
+      // submitButtonText: settings?.submitButtonText || "Submit",
+      //     successMessage: settings?.successMessage || "Thank you for your submission!",
+      //     redirectUrl: settings?.redirectUrl || null,
+      //     notifyEmail: settings?.notifyEmail || null,
+
+      const res = await axios.post("/api/forms/create", {
         title,
         description,
-        fields,
-      }),
-    });
-
-    if (!response.ok) {
-      console.error("Failed to update form");
-    } else {
-      console.log("Form updated successfully");
+        fields: fields ? fields : [],
+        slug: title
+          ? title.toLowerCase().replace(/\s+/g, "-")
+          : `untitled-form-${Date.now().toLocaleString()}`,
+        settings: {
+          submitButtonText: "Submit",
+          successMessage: "Thank you for your submission!",
+          redirectUrl: null,
+          notifyEmail: null,
+        },
+      });
+    } catch (error: any) {
+      CatchErrorFunctionForService(error, "Error updating form meta", "CREATE NEW FORM ERROR");
     }
   }
 
@@ -110,11 +119,6 @@ export function FormCanvas({
               placeholder="Form description (optional)"
             />
           </div>
-
-          {/* Save Button */}
-          <Button onClick={handleUpdateForm} className="shrink-0">
-            Save
-          </Button>
         </div>
       </Card>
 

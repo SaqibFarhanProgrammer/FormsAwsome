@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const navLinks = [
   { href: "#features", label: "Features" },
@@ -49,14 +50,16 @@ export function Navbar() {
           ))}
         </div>
 
-        {/* CTAs */}
         <div className="flex items-center gap-3">
           <button className="hidden sm:block h-9 px-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Sign In
           </button>
-          <button className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+          <Link
+            href="/auth/login"
+            className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
+          >
             Get Started
-          </button>
+          </Link>
           <button
             className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -66,7 +69,6 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div
         className={cn(
           "md:hidden border-t border-border bg-background overflow-hidden transition-all duration-300",

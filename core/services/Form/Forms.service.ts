@@ -50,7 +50,7 @@ export async function createFormService(request: NextRequest) {
   }
 
   const form = await Form.create({
-    title: title.trim(),
+    title: title.trim() || "Untitled Form",
     description: description?.trim() || "",
     userId,
     slug: slug.toLowerCase().trim(),
