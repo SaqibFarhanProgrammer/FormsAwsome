@@ -211,11 +211,7 @@ export function FormCanvas({
       {/* ─── Save Button ──────────────────────────────────────────────── */}
       {fields.length > 0 && (
         <div className="flex justify-end">
-          <Button
-            onClick={handleUpdateForm}
-            disabled={isSaving}
-            className="rounded-xl px-6"
-          >
+          <Button onClick={handleUpdateForm} disabled={isSaving} className="rounded-xl px-6">
             {isSaving ? (
               <>
                 <Skeleton className="w-4 h-4 rounded-full mr-2" />
@@ -254,7 +250,7 @@ function CanvasFieldItem({
           "group relative rounded-xl border-2 cursor-pointer transition-all duration-200",
           isSelected
             ? "border-primary bg-primary/[0.04] shadow-sm ring-1 ring-primary/10"
-            : "border-border/80 bg-card hover:border-primary/25 hover:bg-muted/20 hover:shadow-sm"
+            : "border-border/80 bg-card hover:border-primary/25 hover:bg-muted/20 hover:shadow-sm",
         )}
       >
         <div className="p-4 flex items-start gap-3">
@@ -279,25 +275,33 @@ function CanvasFieldItem({
           <div className="flex-1 min-w-0 space-y-2.5">
             {/* Label Row */}
             <div className="flex items-center gap-2.5">
-              <div className={cn(
-                "w-7 h-7 rounded-lg flex items-center justify-center",
-                isSelected ? "bg-primary/10" : "bg-muted"
-              )}>
-                <Icon className={cn(
-                  "w-3.5 h-3.5",
-                  isSelected ? "text-primary" : "text-muted-foreground"
-                )} />
+              <div
+                className={cn(
+                  "w-7 h-7 rounded-lg flex items-center justify-center",
+                  isSelected ? "bg-primary/10" : "bg-muted",
+                )}
+              >
+                <Icon
+                  className={cn(
+                    "w-3.5 h-3.5",
+                    isSelected ? "text-primary" : "text-muted-foreground",
+                  )}
+                />
               </div>
               <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-foreground">
-                  {field.label}
-                </label>
+                <label className="text-sm font-medium text-foreground">{field.label}</label>
                 {field.required && (
-                  <Badge variant="secondary" className="text-[10px] h-5 px-1.5 bg-destructive/10 text-destructive border-0 hover:bg-destructive/10">
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] h-5 px-1.5 bg-destructive/10 text-destructive border-0 hover:bg-destructive/10"
+                  >
                     Required
                   </Badge>
                 )}
-                <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground border-border/60">
+                <Badge
+                  variant="outline"
+                  className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground border-border/60"
+                >
                   {fieldTypeLabels[field.type] || field.type}
                 </Badge>
               </div>
@@ -342,9 +346,7 @@ function CanvasFieldItem({
 function FieldPreview({ field }: { field: FormField }) {
   switch (field.type) {
     case "heading":
-      return (
-        <h3 className="text-base font-semibold text-foreground">{field.label}</h3>
-      );
+      return <h3 className="text-base font-semibold text-foreground">{field.label}</h3>;
 
     case "divider":
       return <Separator className="my-2" />;
@@ -395,14 +397,18 @@ function FieldPreview({ field }: { field: FormField }) {
     case "toggle":
       return (
         <div className="flex items-center gap-3">
-          <div className={cn(
-            "w-10 h-6 rounded-full relative transition-colors",
-            field.defaultValue ? "bg-primary" : "bg-muted"
-          )}>
-            <div className={cn(
-              "w-4 h-4 rounded-full bg-background shadow-sm absolute top-1 transition-all",
-              field.defaultValue ? "left-5" : "left-1"
-            )} />
+          <div
+            className={cn(
+              "w-10 h-6 rounded-full relative transition-colors",
+              field.defaultValue ? "bg-primary" : "bg-muted",
+            )}
+          >
+            <div
+              className={cn(
+                "w-4 h-4 rounded-full bg-background shadow-sm absolute top-1 transition-all",
+                field.defaultValue ? "left-5" : "left-1",
+              )}
+            />
           </div>
           <span className="text-sm text-muted-foreground">Toggle this option</span>
         </div>
@@ -416,7 +422,9 @@ function FieldPreview({ field }: { field: FormField }) {
               key={i}
               className={cn(
                 "w-5 h-5",
-                i <= (field.defaultValue || 0) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/30"
+                i <= (field.defaultValue || 0)
+                  ? "text-amber-400 fill-amber-400"
+                  : "text-muted-foreground/30",
               )}
             />
           ))}
