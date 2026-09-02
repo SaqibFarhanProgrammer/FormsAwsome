@@ -1,12 +1,12 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/Badge";
+import { Separator } from "@/components/ui/Separator";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/Tooltip";
-import { FormField, updateFormMeta } from "@/redux/features/Create-form/Form.Slice";
+import { FormField, updateFormMeta } from "@/redux/features/create-form/form.slice";
 import dayjs from "dayjs";
 import {
   Trash2,
@@ -124,12 +124,10 @@ export function FormCanvas({
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
-      {/* ─── Form Header Card ─────────────────────────────────────────── */}
       <Card className="rounded-2xl border-border shadow-sm">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div className="space-y-3 flex-1">
-              {/* Title Input */}
               <div className="relative">
                 <input
                   type="text"
@@ -147,7 +145,6 @@ export function FormCanvas({
                 <div className="absolute -bottom-1 left-0 w-12 h-0.5 bg-primary/30 rounded-full" />
               </div>
 
-              {/* Description Input */}
               <input
                 type="text"
                 value={description}
@@ -166,7 +163,6 @@ export function FormCanvas({
         </CardContent>
       </Card>
 
-      {/* ─── Error Alert ──────────────────────────────────────────────── */}
       {uiError && (
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 flex items-center gap-3">
           <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
@@ -174,7 +170,6 @@ export function FormCanvas({
         </div>
       )}
 
-      {/* ─── Canvas Area ──────────────────────────────────────────────── */}
       <Card className="rounded-2xl border-2 border-dashed border-border/60 bg-card/30 shadow-none">
         <CardContent className="p-4 space-y-3 min-h-[400px]">
           {fields.length === 0 ? (
@@ -196,19 +191,18 @@ export function FormCanvas({
           ) : (
             fields.map((field, index) => (
               <CanvasFieldItem
-                key={field.id}
+                key={field._id}
                 field={field}
                 index={index}
-                isSelected={field.id === selectedFieldId}
-                onSelect={() => onSelectField(field.id)}
-                onRemove={() => onRemoveField(field.id)}
+                isSelected={field._id === selectedFieldId}
+                onSelect={() => onSelectField(field._id)}
+                onRemove={() => onRemoveField(field._id)}
               />
             ))
           )}
         </CardContent>
       </Card>
 
-      {/* ─── Save Button ──────────────────────────────────────────────── */}
       {fields.length > 0 && (
         <div className="flex justify-end">
           <Button onClick={handleUpdateForm} disabled={isSaving} className="rounded-xl px-6">
@@ -254,7 +248,6 @@ function CanvasFieldItem({
         )}
       >
         <div className="p-4 flex items-start gap-3">
-          {/* Drag Handle */}
           <Tooltip>
             <TooltipTrigger>
               <div className="mt-1 opacity-0 group-hover:opacity-40 transition-opacity cursor-grab active:cursor-grabbing">
@@ -266,14 +259,11 @@ function CanvasFieldItem({
             </TooltipContent>
           </Tooltip>
 
-          {/* Index Number */}
           <div className="mt-1 w-6 h-6 rounded-md bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground flex-shrink-0 ring-1 ring-border/50">
             {index + 1}
           </div>
 
-          {/* Field Content */}
           <div className="flex-1 min-w-0 space-y-2.5">
-            {/* Label Row */}
             <div className="flex items-center gap-2.5">
               <div
                 className={cn(
@@ -307,13 +297,11 @@ function CanvasFieldItem({
               </div>
             </div>
 
-            {/* Field Preview */}
             <div className="pl-9.5">
               <FieldPreview field={field} />
             </div>
           </div>
 
-          {/* Remove Button */}
           <Tooltip>
             <TooltipTrigger>
               <Button
@@ -334,7 +322,6 @@ function CanvasFieldItem({
           </Tooltip>
         </div>
 
-        {/* Selected Indicator Bar */}
         {isSelected && (
           <div className="absolute left-0 top-3 bottom-3 w-1 rounded-full bg-primary" />
         )}

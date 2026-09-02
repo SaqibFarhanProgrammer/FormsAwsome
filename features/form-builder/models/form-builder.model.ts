@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { FormState } from "../types/Form-builder.types";
+import { FormState } from "../types/form-builder.types";
 
 export type FormField = {
   id: string;

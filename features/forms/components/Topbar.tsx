@@ -1,12 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import { ArrowLeft, Eye, Save, Share2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { createForm } from "@/redux/features/Form-builder/Form-Create.slice";
+import { createForm } from "@/redux/features/form-builder/form-create.slice";
 import { AppDispatch, RootState } from "@/redux/store";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@/components/ui/Spinner";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { AppError } from "@/lib/auth/AppError";
 import Link from "next/link";

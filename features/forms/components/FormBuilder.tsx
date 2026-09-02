@@ -7,7 +7,7 @@ import {
   removeField,
   selectField,
   updateField,
-} from "@/redux/features/Create-form/Form.Slice";
+} from "@/redux/features/create-form/form.slice";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { TopBar } from "./Topbar";
 import { FormCanvas } from "./FormCanvas";
@@ -66,7 +66,7 @@ export function FormBuilder() {
         >
           <PropertiesPanel
             selectedField={selectedField}
-            onUpdateField={(id, updates) => dispatch(updateField({ id, ...updates }))}
+            onUpdateField={(id, updates) => dispatch(updateField({ _id: id  , ...updates }))}
             onClose={() => {
               setPropertiesOpen(false);
               dispatch(selectField(null));
