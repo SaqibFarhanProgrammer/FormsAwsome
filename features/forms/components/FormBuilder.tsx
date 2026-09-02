@@ -66,7 +66,7 @@ export function FormBuilder() {
         >
           <PropertiesPanel
             selectedField={selectedField}
-            onUpdateField={(id, updates) => dispatch(updateField({ _id: id  , ...updates }))}
+            onUpdateField={(id, updates) => dispatch(updateField({ _id: id, ...updates }))}
             onClose={() => {
               setPropertiesOpen(false);
               dispatch(selectField(null));
