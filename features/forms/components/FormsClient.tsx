@@ -4,7 +4,7 @@ import { useState } from "react";
 import { FormsGrid } from "./FormsGrid";
 import { FormsFilters } from "./FormsFilter";
 
-export function FormsClient() {
+export function FormsClient({ forms }: { forms: any[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
@@ -20,7 +20,7 @@ export function FormsClient() {
         onSortChange={setSortBy}
       />
 
-      <FormsGrid searchQuery={searchQuery} statusFilter={statusFilter} sortBy={sortBy} />
+      <FormsGrid forms={forms} searchQuery={searchQuery} statusFilter={statusFilter} sortBy={sortBy} />
     </div>
   );
 }

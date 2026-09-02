@@ -10,13 +10,14 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { Spinner } from "@/components/ui/spinner";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { AppError } from "@/lib/auth/AppError";
+import Link from "next/link";
 
 export function TopBar() {
   const title = useSelector((state: any) => state.form.formTitle);
   const description = useSelector((state: any) => state.form.formDescription);
   const { fields } = useSelector((state: any) => state.form);
   console.log(fields);
-  
+
   const loading = useSelector((state: RootState) => state.formCreate.isLoading);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -59,20 +60,21 @@ export function TopBar() {
   };
 
   return (
-    <div className="h-16 border-b border-border bg-card flex items-center justify-between px-6 flex-shrink-0">
+    <div className="h-10 border-b border-border bg-card flex items-center justify-between px-6 flex-shrink-0">
       <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="rounded-xl gap-2 text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </Button>
+        <Link href="/all-forms">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="rounded-xl gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+        </Link>
         <div className="h-6 w-px bg-border" />
         <div>
           <h1 className="text-sm font-semibold">Untitled Form</h1>
-          <p className="text-xs text-muted-foreground">Draft · Last edited just now</p>
         </div>
         <Badge
           variant="secondary"

@@ -243,7 +243,7 @@ function CanvasFieldItem({
   const Icon = iconMap[field.type] || Type;
 
   return (
-    <TooltipProvider delayDuration={200}>
+    <TooltipProvider>
       <div
         onClick={onSelect}
         className={cn(
@@ -256,7 +256,7 @@ function CanvasFieldItem({
         <div className="p-4 flex items-start gap-3">
           {/* Drag Handle */}
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger>
               <div className="mt-1 opacity-0 group-hover:opacity-40 transition-opacity cursor-grab active:cursor-grabbing">
                 <GripVertical className="w-4 h-4 text-muted-foreground" />
               </div>
@@ -315,7 +315,7 @@ function CanvasFieldItem({
 
           {/* Remove Button */}
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger>
               <Button
                 variant="ghost"
                 size="sm"

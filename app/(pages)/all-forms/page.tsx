@@ -1,6 +1,10 @@
+import { getAllFormsService } from "@/core/services/Form/Forms.service";
 import { FormsClient } from "@/features/forms/components/FormsClient";
 
-export default function FormsPage() {
+export default async function FormsPage() {
+
+  const AllForms: any[] = await getAllFormsService()
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -11,7 +15,7 @@ export default function FormsPage() {
           </p>
         </div>
       </div>
-      <FormsClient />
+      <FormsClient forms={AllForms} />
     </div>
   );
 }

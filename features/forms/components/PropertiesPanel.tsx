@@ -52,7 +52,6 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
 
   return (
     <div className="p-4 space-y-4">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold">Field Properties</h3>
@@ -192,6 +191,9 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
 
       {/* Actions */}
       <div className="space-y-2">
+        <Button variant="default" className="rounded-xl w-full gap-2 text-xs">
+          Publish Form
+        </Button>
         <Button variant="outline" className="rounded-xl w-full gap-2 text-xs">
           <Copy className="w-3.5 h-3.5" />
           Duplicate Field

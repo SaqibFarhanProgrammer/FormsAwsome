@@ -88,16 +88,16 @@ export async function getAllFormsService() {
   }
 
   const userId = payload.userId;
-  const cacheKey = `forms:user:${userId}`;
+  // const cacheKey = `forms:user:${userId}`;
 
-  // Check Redis cache
-  const cacheExists = await IsDataExitsInRedis(cacheKey);
-  if (cacheExists) {
-    const cachedForms = await GetDataFromRedis(cacheKey);
-    if (cachedForms) {
-      return JSON.parse(cachedForms);
-    }
-  }
+  // // Check Redis cache
+  // const cacheExists = await IsDataExitsInRedis(cacheKey);
+  // if (cacheExists) {
+  //   const cachedForms = await GetDataFromRedis(cacheKey);
+  //   if (cachedForms) {
+  //     return JSON.parse(cachedForms);
+  //   }
+  // }
 
   // Get from DB
   await connectDB();
@@ -108,18 +108,18 @@ export async function getAllFormsService() {
   }
 
   const formsData = forms.map((form) => ({
-    id: form._id,
+    id: form._id.toString(),
     title: form.title,
     description: form.description,
     slug: form.slug,
     version: form.version,
     state: form.state,
-    createdAt: form.createdAt,
-    updatedAt: form.updatedAt,
+    createdAt: form.createdAt.toString(),
+    updatedAt: form.updatedAt.toString(),
   }));
 
   // Cache for 1 hour
-  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formsData), 3600);
+  // await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formsData), 3600);
 
   return formsData;
 }
@@ -129,24 +129,24 @@ export async function getSingleFormService(formIdOrSlug: string) {
     throw new AppError("Form ID or slug is required", 400);
   }
 
-  const cacheKeyById = `form:${formIdOrSlug}`;
-  const cacheKeyBySlug = `form:slug:${formIdOrSlug}`;
+  // const cacheKeyById = `form:${formIdOrSlug}`;
+  // const cacheKeyBySlug = `form:slug:${formIdOrSlug}`;
 
-  let cacheExists = await IsDataExitsInRedis(cacheKeyById);
-  if (cacheExists) {
-    const cachedForm = await GetDataFromRedis(cacheKeyById);
-    if (cachedForm) {
-      return JSON.parse(cachedForm);
-    }
-  }
+  // let cacheExists = await IsDataExitsInRedis(cacheKeyById);
+  // if (cacheExists) {
+  //   const cachedForm = await GetDataFromRedis(cacheKeyById);
+  //   if (cachedForm) {
+  //     return JSON.parse(cachedForm);
+  //   }
+  // }
 
-  cacheExists = await IsDataExitsInRedis(cacheKeyBySlug);
-  if (cacheExists) {
-    const cachedForm = await GetDataFromRedis(cacheKeyBySlug);
-    if (cachedForm) {
-      return JSON.parse(cachedForm);
-    }
-  }
+  // cacheExists = await IsDataExitsInRedis(cacheKeyBySlug);
+  // if (cacheExists) {
+  //   const cachedForm = await GetDataFromRedis(cacheKeyBySlug);
+  //   if (cachedForm) {
+  //     return JSON.parse(cachedForm);
+  //   }
+  // }
 
   await connectDB();
 
@@ -167,7 +167,7 @@ export async function getSingleFormService(formIdOrSlug: string) {
   }
 
   const formData = {
-    id: form._id,
+    _id: form._id,
     title: form.title,
     description: form.description,
     slug: form.slug,
@@ -179,9 +179,9 @@ export async function getSingleFormService(formIdOrSlug: string) {
     updatedAt: form.updatedAt,
   };
 
-  // Cache for 24 hours
-  await SetDataToRedisWithTTL(cacheKeyById, JSON.stringify(formData), 86400);
-  await SetDataToRedisWithTTL(cacheKeyBySlug, JSON.stringify(formData), 86400);
+  // // Cache for 24 hours
+  // await SetDataToRedisWithTTL(cacheKeyById, JSON.stringify(formData), 86400);
+  // await SetDataToRedisWithTTL(cacheKeyBySlug, JSON.stringify(formData), 86400);
 
   return formData;
 }
