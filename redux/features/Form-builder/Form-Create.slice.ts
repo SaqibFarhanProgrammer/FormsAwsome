@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 
 interface FormField {
@@ -32,7 +32,7 @@ const initialState: FormCreateState = {
 
 export const createForm = createAsyncThunk(
   "formCreate/createForm",
-  async (data: CreateFormPayload, { rejectWithValue }) => {
+  async (data: CreateFormPayload, { rejectWithValue })  => {
     try {
       const res = await axios.post("/api/forms/create", {
         title: data.title,
@@ -47,7 +47,6 @@ export const createForm = createAsyncThunk(
         },
       });
 
-      // Sirf actual response data return karo
       return res.data;
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { FormField } from "@/redux/features/Create-form/Form.Slice";
+import { FormField, updateField } from "@/redux/features/Create-form/Form.Slice";
 import { Settings, Trash2, Copy, Eye, QrCode, Plus, X, ChevronRight } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface PropertiesPanelProps {
   selectedField: FormField | null;
@@ -17,7 +19,7 @@ interface PropertiesPanelProps {
 }
 
 export function PropertiesPanel({ selectedField, onUpdateField, onClose }: PropertiesPanelProps) {
-  const [options, setOptions] = useState<string[]>(["Option 1", "Option 2", "Option 3"]);
+  const dipatch = useDispatch();
 
   if (!selectedField) {
     return (
@@ -112,14 +114,14 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
         <div className="space-y-3">
           <Label className="text-xs font-medium uppercase tracking-wider">Options</Label>
           <div className="space-y-2">
-            {options.map((option, index) => (
+            {selectedField.options?.map((option, index) => (
               <div key={index} className="flex items-center gap-2">
                 <Input
                   value={option}
                   onChange={(e) => {
-                    const newOptions = [...options];
+                    const newOptions = [...selectedField.options!];
                     newOptions[index] = e.target.value;
-                    setOptions(newOptions);
+                    onUpdateField(selectedField.id, { options: newOptions });
                   }}
                   className="rounded-xl h-9 text-sm flex-1"
                 />
@@ -127,7 +129,14 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
                   variant="ghost"
                   size="sm"
                   className="h-9 w-9 p-0 rounded-lg text-muted-foreground hover:text-destructive"
-                  onClick={() => setOptions(options.filter((_, i) => i !== index))}
+                  onClick={() =>
+                    dipatch(
+                      updateField({
+                        id: selectedField.id,
+                        options: selectedField.options!.filter((_, i) => i !== index),
+                      }),
+                    )
+                  }
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -137,7 +146,14 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
               variant="outline"
               size="sm"
               className="rounded-xl w-full gap-2 text-xs"
-              onClick={() => setOptions([...options, `Option ${options.length + 1}`])}
+              onClick={() =>
+                dipatch(
+                  updateField({
+                    id: selectedField.id,
+                    options: [...selectedField.options!, ""],
+                  }),
+                )
+              }
             >
               <Plus className="w-3.5 h-3.5" />
               Add Option

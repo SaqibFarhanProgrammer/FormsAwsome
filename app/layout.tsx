@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Inter } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/providers/Redux.provicder";
+import { GlobalAlert } from "@/components/common/global-alert";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,8 +26,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable}  ${InterFont.variable} font-inter  h-full antialiased`}
       cz-shortcut-listen="true"
     >
-      <body className="min-h-full flex flex-col">
-        <ReduxProvider>{children}</ReduxProvider>
+      <body className="min-h-full flex flex-col"
+      cz-shortcut-listen="true"
+      >
+        <ReduxProvider>
+          <GlobalAlert />
+    
+          {children}
+        </ReduxProvider>
       </body>
     </html>
   );
