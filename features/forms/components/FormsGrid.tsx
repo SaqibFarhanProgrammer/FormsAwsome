@@ -1,7 +1,7 @@
 "use client";
 
 import { FileText } from "lucide-react";
-import Form_Card from "@/features/form-builder/components/Form_Card";
+import FormCard from "@/features/form-builder/components/FormCard";
 
 interface Form {
   id: string;
@@ -13,169 +13,6 @@ interface Form {
   createdAt: string;
   updatedAt: string;
 }
-
-// const formsData: Form[] = [
-//   {
-//     id: "1",
-//     title: "Contact Form",
-//     description: "General contact inquiries",
-//     status: "active",
-//     submissions: 342,
-//     views: 2100,
-//     createdAt: "2026-08-20",
-//     updatedAt: "2026-08-27",
-//   },
-//   {
-//     id: "2",
-//     title: "Newsletter Signup",
-//     description: "Email subscription form",
-//     status: "active",
-//     submissions: 891,
-//     views: 5400,
-//     createdAt: "2026-08-18",
-//     updatedAt: "2026-08-26",
-//   },
-//   {
-//     id: "3",
-//     title: "Job Application",
-//     description: "Career opportunities",
-//     status: "draft",
-//     submissions: 0,
-//     views: 0,
-//     createdAt: "2026-08-25",
-//     updatedAt: "2026-08-25",
-//   },
-//   {
-//     id: "4",
-//     title: "Event Registration",
-//     description: "Summer workshop 2026",
-//     status: "active",
-//     submissions: 51,
-//     views: 1200,
-//     createdAt: "2026-08-15",
-//     updatedAt: "2026-08-24",
-//   },
-//   {
-//     id: "5",
-//     title: "Customer Feedback",
-//     description: "Product feedback survey",
-//     status: "active",
-//     submissions: 128,
-//     views: 3400,
-//     createdAt: "2026-08-10",
-//     updatedAt: "2026-08-23",
-//   },
-//   {
-//     id: "6",
-//     title: "Support Ticket",
-//     description: "Technical support requests",
-//     status: "active",
-//     submissions: 67,
-//     views: 890,
-//     createdAt: "2026-08-08",
-//     updatedAt: "2026-08-22",
-//   },
-//   {
-//     id: "7",
-//     title: "Product Survey",
-//     description: "New feature feedback",
-//     status: "draft",
-//     submissions: 0,
-//     views: 12,
-//     createdAt: "2026-08-28",
-//     updatedAt: "2026-08-28",
-//   },
-//   {
-//     id: "7",
-//     title: "Product Survey",
-//     description: "New feature feedback",
-//     status: "draft",
-//     submissions: 0,
-//     views: 12,
-//     createdAt: "2026-08-28",
-//     updatedAt: "2026-08-28",
-//   },
-//   {
-//     id: "7",
-//     title: "Product Survey",
-//     description: "New feature feedback",
-//     status: "draft",
-//     submissions: 0,
-//     views: 12,
-//     createdAt: "2026-08-28",
-//     updatedAt: "2026-08-28",
-//   },
-//   {
-//     id: "7",
-//     title: "Product Survey",
-//     description: "New feature feedback",
-//     status: "draft",
-//     submissions: 0,
-//     views: 12,
-//     createdAt: "2026-08-28",
-//     updatedAt: "2026-08-28",
-//   },
-//   {
-//     id: "7",
-//     title: "Product Survey",
-//     description: "New feature feedback",
-//     status: "draft",
-//     submissions: 0,
-//     views: 12,
-//     createdAt: "2026-08-28",
-//     updatedAt: "2026-08-28",
-//   },
-//   {
-//     id: "7",
-//     title: "Product Survey",
-//     description: "New feature feedback",
-//     status: "draft",
-//     submissions: 0,
-//     views: 12,
-//     createdAt: "2026-08-28",
-//     updatedAt: "2026-08-28",
-//   },
-//   {
-//     id: "7",
-//     title: "Product Survey",
-//     description: "New feature feedback",
-//     status: "draft",
-//     submissions: 0,
-//     views: 12,
-//     createdAt: "2026-08-28",
-//     updatedAt: "2026-08-28",
-//   },
-//   {
-//     id: "7",
-//     title: "Product Survey",
-//     description: "New feature feedback",
-//     status: "draft",
-//     submissions: 0,
-//     views: 12,
-//     createdAt: "2026-08-28",
-//     updatedAt: "2026-08-28",
-//   },
-//   {
-//     id: "7",
-//     title: "Product Survey",
-//     description: "New feature feedback",
-//     status: "draft",
-//     submissions: 0,
-//     views: 12,
-//     createdAt: "2026-08-28",
-//     updatedAt: "2026-08-28",
-//   },
-//   {
-//     id: "8",
-//     title: "Booking Form",
-//     description: "Appointment scheduling",
-//     status: "archived",
-//     submissions: 234,
-//     views: 1500,
-//     createdAt: "2026-07-15",
-//     updatedAt: "2026-08-01",
-//   },
-// ];
 
 interface FormsGridProps {
   searchQuery: string;
@@ -229,7 +66,7 @@ export function FormsGrid({ searchQuery, statusFilter, sortBy, forms }: FormsGri
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {filtered.map((form) => (
-        <Form_Card key={form.id} form={form} />
+        <FormCard key={form.id} form={form} />
       ))}
     </div>
   );

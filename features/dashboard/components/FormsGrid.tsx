@@ -1,4 +1,4 @@
-import Form_Card from "@/features/form-builder/components/Form_Card";
+import FormCard from "@/features/form-builder/components/FormCard";
 
 // const forms = [
 //   {
@@ -109,7 +109,7 @@ export function FormsGrid({ forms }: { forms: any[] }) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {forms.map((form) => (
-          <Form_Card key={form.id} form={form} />
+          <FormCard key={form.id} form={form} />
         ))}
       </div>
     </div>

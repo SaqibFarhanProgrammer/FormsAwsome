@@ -48,7 +48,7 @@ function getStatusBadge(status: string) {
   }
 }
 
-function Form_Card({ form }: { form: any }) {
+function FormCard({ form }: { form: any }) {
   return (
     <Card
       key={form.id}
@@ -102,7 +102,6 @@ function Form_Card({ form }: { form: any }) {
             {form.description || "No description"}
           </p>
         </div>
-
         <div className="flex items-center gap-4 pt-2">
           <div className="flex items-center gap-1.5">
             <Send className="w-3.5 h-3.5 text-muted-foreground" />
@@ -118,4 +117,4 @@ function Form_Card({ form }: { form: any }) {
   );
 }
 
-export default Form_Card;
+export default FormCard;
