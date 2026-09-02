@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { LoginUserService } from "@/core/services/auth/Login.service";
+import { LoginUserService } from "@/core/services/auth/login.service";
 import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
 
 export async function POST(request: NextRequest) {

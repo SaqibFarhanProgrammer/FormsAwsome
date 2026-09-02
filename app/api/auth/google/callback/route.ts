@@ -1,9 +1,9 @@
 // app/api/auth/google/callback/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import axios from "axios";
-import { connectDB } from "@/core/DB/ConnectDB";
-import { User } from "@/models/User.models";
-import { generateAccessToken, generateRefreshToken } from "@/lib/auth/JWT.lib";
+import { connectDB } from "@/core/db/connectDb";
+import { User } from "@/models/user.model";
+import { generateAccessToken, generateRefreshToken } from "@/lib/auth/jwt.lib";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

@@ -1,5 +1,5 @@
-import { connectDB } from "@/core/DB/ConnectDB";
-import { Form } from "@/features/form-builder/models/Form-builder.models";
+import { connectDB } from "@/core/db/connectDb";
+import { Form } from "@/features/form-builder/models/form-builder.model";
 import { AppError } from "@/lib/auth/AppError";
 import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
 import { NextRequest, NextResponse } from "next/server";

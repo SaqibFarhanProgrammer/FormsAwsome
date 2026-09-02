@@ -1,7 +1,7 @@
 // app/api/auth/register/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { RegisterUserService } from "@/core/services/auth/Register.service";
+import { RegisterUserService } from "@/core/services/auth/register.service";
 import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
 
 export async function POST(request: NextRequest) {

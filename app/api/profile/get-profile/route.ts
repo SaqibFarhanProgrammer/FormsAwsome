@@ -1,6 +1,6 @@
 // app/api/auth/profile/route.ts
 import { NextResponse } from "next/server";
-import { GetProfileService } from "@/core/services/Profile/Profile.service";
+import { GetProfileService } from "@/core/services/profile/profile.service";
 import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
 
 export async function GET() {

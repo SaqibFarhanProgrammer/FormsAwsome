@@ -1,13 +1,13 @@
 import { NextRequest } from "next/server";
-import { AppError } from "@/lib/auth/AppError";
-import { comparePassword } from "@/utils/CatchErrorFunction";
-import { connectDB } from "@/core/DB/ConnectDB";
-import { User } from "@/models/User.models";
-import { generateTokens } from "@/lib/auth/JWT.lib";
-import { generateVerificationToken } from "@/lib/auth/JWT.lib";
-import { generateVerificationCode } from "@/lib/auth/VerificationCode.lib";
+import { AppError } from "@/lib/auth/appError";
+import { comparePassword } from "@/utils/catchErrorFunction";
+import { connectDB } from "@/core/db/connectDb";
+import { User } from "@/models/user.model";
+import { generateTokens } from "@/lib/auth/jwt.lib";
+import { generateVerificationToken } from "@/lib/auth/jwt.lib";
+import { generateVerificationCode } from "@/lib/auth/verificationCode.lib";
 import { SetDataToRedisWithTTL } from "@/lib/redis/redis";
-import SendVerificationEmail from "@/features/NodeMailer/Nodemailer.config";
+import SendVerificationEmail from "@/features/node-mailer/nodemailer.config";
 import { cookies } from "next/headers";
 
 export async function LoginUserService(request: NextRequest) {

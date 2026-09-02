@@ -1,8 +1,8 @@
-import { GetProfileService } from "@/core/services/Profile/Profile.service";
-import { ProfileHeader } from "@/features/Profile/components/ProfileHeader";
-import { ProfileStats } from "@/features/Profile/components/ProfileStats";
-import { QuickActions } from "@/features/Profile/components/QuickActions";
-import { RecentActivity } from "@/features/Profile/components/RecentActivity";
+import { GetProfileService } from "@/core/services/profile/profile.service";
+import { ProfileHeader } from "@/features/profile/components/ProfileHeader";
+import { ProfileStats } from "@/features/profile/components/ProfileStats";
+import { QuickActions } from "@/features/profile/components/QuickActions";
+import { RecentActivity } from "@/features/profile/components/RecentActivity";
 
 export default async function ProfilePage() {
   const data = await GetProfileService();

@@ -2,12 +2,12 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { AppError } from "@/lib/auth/AppError";
-import { connectDB } from "@/core/DB/ConnectDB";
-import { User } from "@/models/User.models";
+import { connectDB } from "@/core/db/connectDb";
+import { User } from "@/models/user.model";
 import { SetDataToRedisWithTTL } from "@/lib/redis/redis";
-import { generateVerificationToken } from "@/lib/auth/JWT.lib";
+import { generateVerificationToken } from "@/lib/auth/jwt.lib";
 import { generateVerificationCode } from "@/lib/auth/VerificationCode.lib";
-import SendVerificationEmail from "@/features/NodeMailer/Nodemailer.config";
+import SendVerificationEmail from "@/features/node-mailer/nodemailer.config";
 import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
 
 export async function POST(request: NextRequest) {

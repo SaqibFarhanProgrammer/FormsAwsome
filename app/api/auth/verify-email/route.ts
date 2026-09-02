@@ -2,10 +2,10 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { AppError } from "@/lib/auth/AppError";
-import { connectDB } from "@/core/DB/ConnectDB";
-import { User } from "@/models/User.models";
+import { connectDB } from "@/core/db/connectDb";
+import { User } from "@/models/user.model";
 import { GetDataFromRedis, DeleteDataFromRedis } from "@/lib/redis/redis";
-import { verifyVerificationToken, generateTokens } from "@/lib/auth/JWT.lib";
+import { verifyVerificationToken, generateTokens } from "@/lib/auth/jwt.lib";
 import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
 
 export async function POST(request: NextRequest) {
