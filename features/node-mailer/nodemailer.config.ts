@@ -1,6 +1,6 @@
 import { CatchErrorFunctionForService } from "@/utils/CatchErrorFunction";
 import nodemailer from "nodemailer";
-import EmailTemplate from "./NodemailEmailTemplete";
+import EmailTemplate from "./nodemail-email-template";
 
 let transporter: nodemailer.Transporter | null = null;
 

@@ -1,6 +1,6 @@
 "use client";
-import { updateProfileLocally } from "@/redux/features/profile/Profile.slice";
-import { formatDate } from "@/utils/FormatDate";
+import { updateProfileLocally } from "@/redux/features/profile/profile.slice";
+import { formatDate } from "@/utils/formatDate";
 import { Mail, Clock, Pencil, Settings, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
