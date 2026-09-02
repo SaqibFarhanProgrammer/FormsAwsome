@@ -94,7 +94,6 @@ function Form_Card({ form }: { form: any }) {
           </div>
         </div>
 
-        {/* Title & Description */}
         <div className="space-y-1">
           <h3 className="font-semibold text-foreground leading-tight">
             {form.title || "Untitled Form"}
@@ -104,13 +103,12 @@ function Form_Card({ form }: { form: any }) {
           </p>
         </div>
 
-        {/* Stats */}
         <div className="flex items-center gap-4 pt-2">
           <div className="flex items-center gap-1.5">
             <Send className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">30 submissions</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center pl-7 gap-1.5">
             <Eye className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">150 views</span>
           </div>
