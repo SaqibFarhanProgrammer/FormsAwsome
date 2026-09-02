@@ -2,9 +2,9 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Card } from "@/components/ui/card";
+import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { FormField } from "@/features/form-builder/types/Form-builder.types";
+import { FormField } from "@/features/form-builder/types/form-builder.types";
 import {
   GripVertical,
   Trash2,

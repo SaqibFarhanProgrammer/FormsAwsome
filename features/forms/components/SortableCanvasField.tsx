@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Plus, MousePointerClick } from "lucide-react";
 import { SortableCanvasField } from "./SortableCanvasFieldDuplicate";
-import { FormField } from "@/features/form-builder/types/Form-builder.types";
+import { FormField } from "@/features/form-builder/types/form-builder.types";
 
 interface FormCanvasProps {
   fields: FormField[];

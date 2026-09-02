@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Switch } from "@/components/ui/Switch";
+import { Separator } from "@/components/ui/Separator";
 import { Bell, Mail, MessageSquare, FormInput, BarChart3, Shield, Zap } from "lucide-react";
 
 interface NotificationItem {

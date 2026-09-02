@@ -1,7 +1,7 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { FormField } from "@/features/form-builder/types/Form-builder.types";
+import { Card } from "@/components/ui/Card";
+import { FormField } from "@/features/form-builder/types/form-builder.types";
 import {
   Type,
   AlignLeft,

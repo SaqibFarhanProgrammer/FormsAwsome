@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, nanoid } from "@reduxjs/toolkit";
 
 export interface FormField {
-  id: string;
+  _id: string;
   type: string;
   label: string;
   placeholder?: string;
@@ -41,7 +41,7 @@ const formSlice = createSlice({
       }>,
     ) => {
       const newField: FormField = {
-        id: nanoid(),
+        _id: nanoid(),
         type: action.payload.type,
         label: action.payload.label,
         placeholder: action.payload.placeholder || `Enter ${action.payload.label.toLowerCase()}...`,
@@ -50,11 +50,11 @@ const formSlice = createSlice({
         order: state.fields.length,
       };
       state.fields.push(newField);
-      state.selectedFieldId = newField.id;
+      state.selectedFieldId = newField._id;
       state.isDirty = true;
     },
     removeField: (state, action: PayloadAction<string>) => {
-      const index = state.fields.findIndex((f) => f.id === action.payload);
+      const index = state.fields.findIndex((f) => f._id === action.payload);
       if (index !== -1) {
         state.fields.splice(index, 1);
         if (state.selectedFieldId === action.payload) {
@@ -70,10 +70,10 @@ const formSlice = createSlice({
     selectField: (state, action: PayloadAction<string | null>) => {
       state.selectedFieldId = action.payload;
     },
-    updateField: (state, action: PayloadAction<{ id: string } & Partial<FormField>>) => {
-      const field = state.fields.find((f) => f.id === action.payload.id);
+    updateField: (state, action: PayloadAction<{ _id: string } & Partial<FormField>>) => {
+      const field = state.fields.find((f) => f._id === action.payload._id);
       if (field) {
-        const { id, order, ...updates } = action.payload;
+        const { _id, order, ...updates } = action.payload;
         Object.assign(field, updates);
         state.isDirty = true;
       }
