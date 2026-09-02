@@ -1,25 +1,6 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  FileText,
-  MoreHorizontal,
-  Eye,
-  BarChart3,
-  Pencil,
-  Copy,
-  Archive,
-  Trash2,
-  Send,
-} from "lucide-react";
+import { FileText } from "lucide-react";
 import Form_Card from "@/features/form-builder/components/Form_Card";
 
 interface Form {

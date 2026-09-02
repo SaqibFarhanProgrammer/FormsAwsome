@@ -4,12 +4,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { hideAlert } from "@/redux/features/global/alertSlice";
-import { 
-  CheckCircle2, 
-  AlertCircle, 
-  AlertTriangle, 
-  X 
-} from "lucide-react";
+import { CheckCircle2, AlertCircle, AlertTriangle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Alert Config Map ──────────────────────────────────────────────
@@ -46,7 +41,7 @@ const alertConfig = {
 export function GlobalAlert() {
   const dispatch = useDispatch();
   const { message, type, duration } = useSelector((state: RootState) => state.alert);
-  
+
   const [progress, setProgress] = useState(100);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -103,9 +98,7 @@ export function GlobalAlert() {
           config.bgColor,
           config.borderColor,
           config.shadowColor,
-          isVisible
-            ? "translate-x-0 opacity-100"
-            : "translate-x-full opacity-0"
+          isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0",
         )}
       >
         {/* ─── Close Button ──────────────────────────────────────────── */}
@@ -118,11 +111,8 @@ export function GlobalAlert() {
 
         {/* ─── Content Row ───────────────────────────────────────────── */}
         <div className="flex items-start gap-3 pr-6">
-          <Icon 
-            size={20} 
-            className={cn("mt-0.5 shrink-0", config.iconColor)} 
-          />
-          
+          <Icon size={20} className={cn("mt-0.5 shrink-0", config.iconColor)} />
+
           <div className="flex-1 space-y-1">
             <h5 className="font-semibold text-sm leading-none text-neutral-900 dark:text-neutral-100">
               {config.title}
@@ -137,9 +127,9 @@ export function GlobalAlert() {
         <div className="absolute bottom-0 left-0 h-[2px] w-full bg-black/5 dark:bg-white/5">
           <div
             className={cn("h-full transition-all ease-linear", config.progressColor)}
-            style={{ 
+            style={{
               width: `${progress}%`,
-              transitionDuration: "0ms" // Manual update via interval
+              transitionDuration: "0ms", // Manual update via interval
             }}
           />
         </div>

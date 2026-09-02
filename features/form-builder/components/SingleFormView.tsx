@@ -30,7 +30,10 @@ export function SingleFormView() {
             <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-xl w-fit">
               {[
                 { id: "preview" as const, label: "Preview" },
-                { id: "submissions" as const, label: `Submissions (${singleFormData.stats.totalSubmissions})` },
+                {
+                  id: "submissions" as const,
+                  label: `Submissions (${singleFormData.stats.totalSubmissions})`,
+                },
                 { id: "fields" as const, label: "Fields" },
               ].map((tab) => (
                 <button
@@ -49,9 +52,10 @@ export function SingleFormView() {
 
             {/* Tab Content */}
             {activeTab === "preview" && <FormPreview fields={singleFormData.fields} />}
-            {activeTab === "submissions" && <FormSubmissions submissions={singleFormData.submissions} />}
+            {activeTab === "submissions" && (
+              <FormSubmissions submissions={singleFormData.submissions} />
+            )}
             {activeTab === "fields" && <FormFieldsList fields={singleFormData.fields} />}
-
           </div>
 
           {/* Right Column - 1/3 Stats & Actions */}

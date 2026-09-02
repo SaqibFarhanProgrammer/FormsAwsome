@@ -1,4 +1,3 @@
-import { GlobalAlert } from "@/components/common/global-alert";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 
 export default function PagesLayout({ children }: { children: React.ReactNode }) {

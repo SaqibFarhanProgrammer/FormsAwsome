@@ -69,7 +69,10 @@ export function FormFieldsList({ fields }: FormFieldsListProps) {
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium truncate">{field.label || field.type}</p>
                   {isRequired && (
-                    <Badge variant="secondary" className="rounded-md text-[10px] px-1.5 py-0 h-4 bg-destructive/10 text-destructive border-0">
+                    <Badge
+                      variant="secondary"
+                      className="rounded-md text-[10px] px-1.5 py-0 h-4 bg-destructive/10 text-destructive border-0"
+                    >
                       Required
                     </Badge>
                   )}

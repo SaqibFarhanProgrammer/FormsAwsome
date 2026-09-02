@@ -4,8 +4,7 @@ import { StatsCards } from "@/features/dashboard/components/StateCard";
 import { SubmissionsTable } from "@/features/dashboard/components/SubmissionsTable";
 
 export default async function DashboardPage() {
-
-  const AllForms: any[] = await getAllFormsService()
+  const AllForms: any[] = await getAllFormsService();
 
   return (
     <>

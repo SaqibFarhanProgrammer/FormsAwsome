@@ -20,7 +20,12 @@ export function FormsClient({ forms }: { forms: any[] }) {
         onSortChange={setSortBy}
       />
 
-      <FormsGrid forms={forms} searchQuery={searchQuery} statusFilter={statusFilter} sortBy={sortBy} />
+      <FormsGrid
+        forms={forms}
+        searchQuery={searchQuery}
+        statusFilter={statusFilter}
+        sortBy={sortBy}
+      />
     </div>
   );
 }

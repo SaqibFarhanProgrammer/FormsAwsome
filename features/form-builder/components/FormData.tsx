@@ -1,7 +1,8 @@
 export const singleFormData = {
   id: "form_123",
   title: "Customer Feedback Survey",
-  description: "We value your opinion. Please take a moment to share your feedback about our product and services.",
+  description:
+    "We value your opinion. Please take a moment to share your feedback about our product and services.",
   slug: "customer-feedback-survey",
   state: "active" as const,
   version: 1,
@@ -22,25 +23,72 @@ export const singleFormData = {
   // Form Fields (preview only)
   fields: [
     { id: "f1", type: "heading", label: "Personal Information", validation: { required: false } },
-    { id: "f2", type: "text", label: "Full Name", placeholder: "Enter your full name", validation: { required: true } },
-    { id: "f3", type: "email", label: "Email Address", placeholder: "you@example.com", validation: { required: true } },
-    { id: "f4", type: "phone", label: "Phone Number", placeholder: "+1 (555) 000-0000", validation: { required: false } },
+    {
+      id: "f2",
+      type: "text",
+      label: "Full Name",
+      placeholder: "Enter your full name",
+      validation: { required: true },
+    },
+    {
+      id: "f3",
+      type: "email",
+      label: "Email Address",
+      placeholder: "you@example.com",
+      validation: { required: true },
+    },
+    {
+      id: "f4",
+      type: "phone",
+      label: "Phone Number",
+      placeholder: "+1 (555) 000-0000",
+      validation: { required: false },
+    },
     { id: "f5", type: "divider", label: "", validation: { required: false } },
     { id: "f6", type: "heading", label: "Feedback", validation: { required: false } },
-    { id: "f7", type: "select", label: "How did you hear about us?", placeholder: "Select an option", options: [
-      { label: "Social Media", value: "social" },
-      { label: "Friend / Family", value: "referral" },
-      { label: "Google Search", value: "search" },
-      { label: "Advertisement", value: "ad" },
-    ], validation: { required: true } },
-    { id: "f8", type: "rating", label: "How would you rate our service?", validation: { required: true, min: 1, max: 5 } },
-    { id: "f9", type: "textarea", label: "Your Feedback", placeholder: "Tell us what you think...", validation: { required: true, min: 20 } },
-    { id: "f10", type: "checkbox", label: "What features do you use?", options: [
-      { label: "Form Builder", value: "builder" },
-      { label: "Analytics", value: "analytics" },
-      { label: "Submissions", value: "submissions" },
-    ], validation: { required: false } },
-    { id: "f11", type: "toggle", label: "Would you recommend us?", validation: { required: false } },
+    {
+      id: "f7",
+      type: "select",
+      label: "How did you hear about us?",
+      placeholder: "Select an option",
+      options: [
+        { label: "Social Media", value: "social" },
+        { label: "Friend / Family", value: "referral" },
+        { label: "Google Search", value: "search" },
+        { label: "Advertisement", value: "ad" },
+      ],
+      validation: { required: true },
+    },
+    {
+      id: "f8",
+      type: "rating",
+      label: "How would you rate our service?",
+      validation: { required: true, min: 1, max: 5 },
+    },
+    {
+      id: "f9",
+      type: "textarea",
+      label: "Your Feedback",
+      placeholder: "Tell us what you think...",
+      validation: { required: true, min: 20 },
+    },
+    {
+      id: "f10",
+      type: "checkbox",
+      label: "What features do you use?",
+      options: [
+        { label: "Form Builder", value: "builder" },
+        { label: "Analytics", value: "analytics" },
+        { label: "Submissions", value: "submissions" },
+      ],
+      validation: { required: false },
+    },
+    {
+      id: "f11",
+      type: "toggle",
+      label: "Would you recommend us?",
+      validation: { required: false },
+    },
   ],
 
   // Submissions dropdown data

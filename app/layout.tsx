@@ -26,12 +26,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable}  ${InterFont.variable} font-inter  h-full antialiased`}
       cz-shortcut-listen="true"
     >
-      <body className="min-h-full flex flex-col"
-      cz-shortcut-listen="true"
-      >
+      <body className="min-h-full flex flex-col" cz-shortcut-listen="true">
         <ReduxProvider>
           <GlobalAlert />
-    
+
           {children}
         </ReduxProvider>
       </body>

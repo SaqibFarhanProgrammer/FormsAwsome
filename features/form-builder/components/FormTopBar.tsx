@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Pencil, Eye, Trash2, Link } from "lucide-react";
+import { ArrowLeft, Pencil, Eye, Link } from "lucide-react";
 
 const THEME = { primary: "#432DD7" };
 
@@ -17,7 +17,11 @@ export function FormTopBar({ title, state, slug }: FormTopBarProps) {
     <div className="h-10 border-b border-border bg-card flex items-center justify-between px-6 sticky top-0 z-50">
       {/* Left */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" className="rounded-xl gap-2 text-muted-foreground hover:text-foreground">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="rounded-xl gap-2 text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="w-4 h-4" />
           Back
         </Button>

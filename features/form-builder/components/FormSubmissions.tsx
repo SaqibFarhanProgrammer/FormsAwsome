@@ -25,19 +25,28 @@ function getStatusBadge(status: Submission["status"]) {
   switch (status) {
     case "new":
       return (
-        <Badge variant="secondary" className="rounded-lg bg-emerald-50 text-emerald-700 border-emerald-200/50 text-xs font-medium">
+        <Badge
+          variant="secondary"
+          className="rounded-lg bg-emerald-50 text-emerald-700 border-emerald-200/50 text-xs font-medium"
+        >
           New
         </Badge>
       );
     case "viewed":
       return (
-        <Badge variant="secondary" className="rounded-lg bg-blue-50 text-blue-700 border-blue-200/50 text-xs font-medium">
+        <Badge
+          variant="secondary"
+          className="rounded-lg bg-blue-50 text-blue-700 border-blue-200/50 text-xs font-medium"
+        >
           Viewed
         </Badge>
       );
     case "archived":
       return (
-        <Badge variant="secondary" className="rounded-lg bg-slate-100 text-slate-600 border-slate-200/50 text-xs font-medium">
+        <Badge
+          variant="secondary"
+          className="rounded-lg bg-slate-100 text-slate-600 border-slate-200/50 text-xs font-medium"
+        >
           Archived
         </Badge>
       );
@@ -101,8 +110,13 @@ export function FormSubmissions({ submissions }: FormSubmissionsProps) {
                   </p>
                   <div className="grid gap-2">
                     {Object.entries(submission.values).map(([key, value]) => (
-                      <div key={key} className="flex items-start gap-3 p-2.5 rounded-lg bg-background border border-border">
-                        <span className="text-xs text-muted-foreground font-medium w-32 flex-shrink-0">{key}</span>
+                      <div
+                        key={key}
+                        className="flex items-start gap-3 p-2.5 rounded-lg bg-background border border-border"
+                      >
+                        <span className="text-xs text-muted-foreground font-medium w-32 flex-shrink-0">
+                          {key}
+                        </span>
                         <span className="text-sm">{value || "—"}</span>
                       </div>
                     ))}

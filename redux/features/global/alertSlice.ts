@@ -24,7 +24,7 @@ const alertSlice = createSlice({
         message: string;
         type: AlertType;
         duration?: number;
-      }>
+      }>,
     ) => {
       state.message = action.payload.message;
       state.type = action.payload.type;
