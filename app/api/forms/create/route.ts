@@ -1,7 +1,7 @@
 // app/api/forms/create/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
-import { createFormService } from "@/core/services/Form/Forms.service";
+import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
+import { createFormService } from "@/core/services/form/forms.service";
 
 export async function POST(request: NextRequest) {
   try {

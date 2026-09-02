@@ -1,11 +1,11 @@
 // core/services/auth/Register.service.ts
 
 import { NextRequest } from "next/server";
-import { AppError } from "@/lib/auth/AppError";
-import { hashPassword } from "@/utils/CatchErrorFunction"; // apna path
-import { connectDB } from "@/core/DB/ConnectDB";
-import { User } from "@/models/User.models";
-import { generateVerificationToken } from "@/lib/auth/JWT.lib";
+import { AppError } from "@/lib/auth/appError";
+import { hashPassword } from "@/utils/catchErrorFunction";
+import { connectDB } from "@/core/db/connectDb";
+import { User } from "@/models/user.model";
+import { generateVerificationToken } from "@/lib/auth/jwt.lib";
 import { generateVerificationCode } from "@/lib/auth/VerificationCode.lib";
 import { SetDataToRedisWithTTL } from "@/lib/redis/redis";
 import SendVerificationEmail from "@/features/NodeMailer/Nodemailer.config";

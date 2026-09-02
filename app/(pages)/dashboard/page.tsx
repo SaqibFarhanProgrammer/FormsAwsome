@@ -1,4 +1,4 @@
-import { getAllFormsService } from "@/core/services/Form/Forms.service";
+import { getAllFormsService } from "@/core/services/form/forms.service";
 import { FormsGrid } from "@/features/dashboard/components/FormsGrid";
 import { StatsCards } from "@/features/dashboard/components/StateCard";
 import { SubmissionsTable } from "@/features/dashboard/components/SubmissionsTable";

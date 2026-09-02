@@ -1,14 +1,14 @@
 // app/api/auth/resend-verification/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { AppError } from "@/lib/auth/AppError";
+import { AppError } from "@/lib/auth/appError";
 import { connectDB } from "@/core/db/connectDb";
 import { User } from "@/models/user.model";
 import { SetDataToRedisWithTTL } from "@/lib/redis/redis";
 import { generateVerificationToken } from "@/lib/auth/jwt.lib";
-import { generateVerificationCode } from "@/lib/auth/VerificationCode.lib";
+import { generateVerificationCode } from "@/lib/auth/verificationCode.lib";
 import SendVerificationEmail from "@/features/node-mailer/nodemailer.config";
-import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
+import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
 
 export async function POST(request: NextRequest) {
   try {

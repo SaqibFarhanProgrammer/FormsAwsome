@@ -1,4 +1,4 @@
-import { AppError } from "@/lib/auth/AppError";
+import { AppError } from "@/lib/auth/appError";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 

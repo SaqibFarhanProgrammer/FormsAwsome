@@ -1,4 +1,4 @@
-import { getAllFormsService } from "@/core/services/Form/Forms.service";
+import { getAllFormsService } from "@/core/services/form/forms.service";
 import { FormsClient } from "@/features/forms/components/FormsClient";
 
 export default async function FormsPage() {

@@ -1,7 +1,7 @@
 // app/api/forms/archive/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
-import { deleteFormService } from "@/core/services/Form/Forms.service";
+import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
+import { deleteFormService } from "@/core/services/form/forms.service";
 
 export async function PATCH(request: NextRequest) {
   try {

@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { RegisterUserService } from "@/core/services/auth/register.service";
-import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
+import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,12 +1,12 @@
 // app/api/auth/verify-email/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { AppError } from "@/lib/auth/AppError";
+import { AppError } from "@/lib/auth/appError";
 import { connectDB } from "@/core/db/connectDb";
 import { User } from "@/models/user.model";
 import { GetDataFromRedis, DeleteDataFromRedis } from "@/lib/redis/redis";
 import { verifyVerificationToken, generateTokens } from "@/lib/auth/jwt.lib";
-import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
+import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
 
 export async function POST(request: NextRequest) {
   try {
