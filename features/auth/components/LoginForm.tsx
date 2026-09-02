@@ -9,9 +9,9 @@ import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/Label";
 import { Eye, EyeOff } from "lucide-react";
 
 const loginSchema = z.object({

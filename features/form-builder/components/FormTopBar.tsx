@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import { ArrowLeft, Pencil, Eye, Link } from "lucide-react";
 
 const THEME = { primary: "#432DD7" };

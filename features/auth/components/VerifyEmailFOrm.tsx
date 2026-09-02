@@ -7,9 +7,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import * as z from "zod";
 import Link from "next/link";
 
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/Label";
 import { ArrowLeft } from "lucide-react";
 
 const verifySchema = z.object({

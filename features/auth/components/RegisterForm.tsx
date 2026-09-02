@@ -8,9 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/Label";
 import { Eye, EyeOff } from "lucide-react";
 import LeftPanel from "./LeftPanel";
 import { CatchErrorFunctionForService } from "@/utils/CatchErrorFunction";

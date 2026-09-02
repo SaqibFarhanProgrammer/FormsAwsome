@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Send, Eye, TrendingUp, Clock, CalendarDays } from "lucide-react";
 
 const THEME = { primary: "#432DD7", secondary: "#6B5BFF" };

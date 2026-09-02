@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { SubmissionType } from "../types/Submitions.types";
+import { SubmissionType } from "../types/submissions.types";
 
 const submissionSchema = new mongoose.Schema<SubmissionType>(
   {
