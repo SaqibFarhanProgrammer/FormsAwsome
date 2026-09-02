@@ -32,7 +32,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useState } from "react";
-import { AppError } from "@/lib/auth/AppError";
+import { AppError } from "@/lib/auth/appError";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, React.ElementType> = {

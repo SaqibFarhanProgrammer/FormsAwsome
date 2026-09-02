@@ -1,5 +1,5 @@
 import Link from "next/dist/client/link";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 
 export const GoogleIcon = () => (
   <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="currentColor">

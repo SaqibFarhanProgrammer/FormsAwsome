@@ -2,7 +2,7 @@
 import { AppError } from "@/lib/auth/appError";
 import { connectDB } from "@/core/db/connectDb";
 import { User } from "@/models/user.model";
-import { verifyAccessToken } from "@/lib/auth/JWT.lib";
+import { verifyAccessToken } from "@/lib/auth/jwt.lib";
 import { cookies } from "next/headers";
 import { GetDataFromRedis, SetDataToRedisWithTTL } from "@/lib/redis/redis";
 

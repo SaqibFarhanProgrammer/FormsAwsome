@@ -8,7 +8,7 @@ import { createForm } from "@/redux/features/form-builder/form-create.slice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { Spinner } from "@/components/ui/Spinner";
 import { showAlert } from "@/redux/features/global/alertSlice";
-import { AppError } from "@/lib/auth/AppError";
+import { AppError } from "@/lib/auth/appError";
 import Link from "next/link";
 
 export function TopBar() {

@@ -1,7 +1,7 @@
 import { connectDB } from "@/core/db/connectDb";
 import { Form } from "@/features/form-builder/models/form-builder.model";
-import { AppError } from "@/lib/auth/AppError";
-import { CatchErrorFunctionForRoute } from "@/utils/CatchErrorFunction";
+import { AppError } from "@/lib/auth/appError";
+import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(request: NextRequest) {

@@ -6,9 +6,9 @@ import { hashPassword } from "@/utils/catchErrorFunction";
 import { connectDB } from "@/core/db/connectDb";
 import { User } from "@/models/user.model";
 import { generateVerificationToken } from "@/lib/auth/jwt.lib";
-import { generateVerificationCode } from "@/lib/auth/VerificationCode.lib";
+import { generateVerificationCode } from "@/lib/auth/verificationCode.lib";
 import { SetDataToRedisWithTTL } from "@/lib/redis/redis";
-import SendVerificationEmail from "@/features/NodeMailer/Nodemailer.config";
+import SendVerificationEmail from "@/features/node-mailer/nodemailer.config";
 
 export async function RegisterUserService(request: NextRequest) {
   const body = await request.json();

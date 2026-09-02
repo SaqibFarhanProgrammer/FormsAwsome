@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
 import { Eye, EyeOff } from "lucide-react";
 import LeftPanel from "./LeftPanel";
-import { CatchErrorFunctionForService } from "@/utils/CatchErrorFunction";
+import { CatchErrorFunctionForService } from "@/utils/catchErrorFunction";
 
 const registerSchema = z
   .object({

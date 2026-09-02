@@ -1,5 +1,5 @@
 import { createClient, RedisClientType } from "redis";
-import { AppError } from "../auth/AppError";
+import { AppError } from "../auth/appError";
 
 const URL = process.env.REDIS_URL;
 

@@ -1,4 +1,4 @@
-import { CatchErrorFunctionForService } from "@/utils/CatchErrorFunction";
+import { CatchErrorFunctionForService } from "@/utils/catchErrorFunction";
 import nodemailer from "nodemailer";
 import EmailTemplate from "./nodemail-email-template";
 
