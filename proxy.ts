@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateAccessToken, verifyRefreshToken } from "./lib/auth/JWT.lib";
+import { generateAccessToken, verifyRefreshToken } from "./lib/auth/jwt.lib";
 
 export async function proxy(req: NextRequest) {
   const accessToken = req.cookies.get("accessToken")?.value;

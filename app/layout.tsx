@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Inter } from "next/font/google";
 import "./globals.css";
-import ReduxProvider from "@/providers/Redux.provicder";
-import { GlobalAlert } from "@/components/common/global-alert";
+import ReduxProvider from "@/providers/ReduxProvider";
+import { GlobalAlert } from "@/components/common/GlobalAlert";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

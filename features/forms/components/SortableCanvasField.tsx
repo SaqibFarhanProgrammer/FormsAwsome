@@ -3,7 +3,7 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Plus, MousePointerClick } from "lucide-react";
 import { SortableCanvasField } from "./SortableCanvasFieldDuplicate";
 import { FormField } from "@/features/form-builder/types/Form-builder.types";

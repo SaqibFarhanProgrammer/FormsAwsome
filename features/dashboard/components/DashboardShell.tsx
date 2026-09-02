@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/Tooltip";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./Topbar";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Copy, Share2, QrCode, Globe, Trash2 } from "lucide-react";
 
 const THEME = { primary: "#432DD7" };

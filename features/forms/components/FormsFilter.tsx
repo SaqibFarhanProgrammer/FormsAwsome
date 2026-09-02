@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Search, Plus, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 
 interface FormsFiltersProps {

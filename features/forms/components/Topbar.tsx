@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Eye, Save, Share2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";

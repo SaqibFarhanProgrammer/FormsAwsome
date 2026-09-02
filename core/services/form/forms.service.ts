@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { AppError } from "@/lib/auth/AppError";
 import { connectDB } from "@/core/DB/ConnectDB";
-import { verifyAccessToken } from "@/lib/auth/JWT.lib";
+import { verifyAccessToken } from "@/lib/auth/jwt.lib";
 import { cookies } from "next/headers";
 import {
   DeleteDataFromRedis,
@@ -10,9 +10,9 @@ import {
   IsDataExitsInRedis,
   SetDataToRedisWithTTL,
 } from "@/lib/redis/redis";
-import { Submission } from "@/features/submissions/models/Submition.models";
-import { FormState } from "@/features/form-builder/types/Form-builder.types";
-import { Form } from "@/features/form-builder/models/Form-builder.models";
+import { Submission } from "@/features/submissions/models/submission.model";
+import { FormState } from "@/features/form-builder/types/form-builder.types";
+import { Form } from "@/features/form-builder/models/form-builder.model";
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
