@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import {
   DropdownMenu,
@@ -62,10 +61,8 @@ function FormCard({ form }: { form: any }) {
           <div className="flex items-center gap-2">
             {getStatusBadge(form.state)}
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg ">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
+              <DropdownMenuTrigger className="group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 h-8 w-8 p-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50">
+                <MoreHorizontal className="w-4 h-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="rounded-xl w-48">
                 <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
