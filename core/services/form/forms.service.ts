@@ -155,14 +155,13 @@ export async function getSingleFormService(formIdOrSlug: string) {
   let form = null;
 
   console.log(formIdOrSlug);
-  
+
   try {
     const form = await Form.findOne({
       userId: userid,
       $or: [{ slug: formIdOrSlug }],
     });
     console.log(form);
-    
   } catch (error) {
     form = await Form.findOne({ slug: formIdOrSlug });
   }
@@ -176,7 +175,7 @@ export async function getSingleFormService(formIdOrSlug: string) {
   }
 
   const formData = {
-    _id: form._id,
+    _id: form._id.toString(),
     title: form.title,
     description: form.description,
     slug: form.slug,
@@ -185,8 +184,8 @@ export async function getSingleFormService(formIdOrSlug: string) {
     fields: form.fields,
     settings: form.settings,
     state: form.state,
-    createdAt: form.createdAt,
-    updatedAt: form.updatedAt,
+    createdAt: form.createdAt.toString(),
+    updatedAt: form.updatedAt.toString(),
   };
 
   // // Cache for 24 hours
@@ -204,33 +203,14 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
   const body = await request.json();
   const { title, description, fields, settings, state } = body;
 
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
-
-  if (!accessToken) {
-    throw new AppError("Access token not found", 401);
-  }
-
-  let payload;
-  try {
-    payload = verifyAccessToken(accessToken);
-  } catch {
-    throw new AppError("Invalid access token", 401);
-  }
-
-  const userId = payload.userId;
+  const userid = await getUserIdFromToken();
 
   await connectDB();
 
   // Find form by ID or slug
-  let form = null;
-  try {
-    form = await Form.findById(formIdOrSlug);
-  } catch (error) {
-    form = await Form.findOne({ slug: formIdOrSlug });
-  }
-
-  if (!form) {
+  const isFormExit = await Form.findOne({ slug: formIdOrSlug });
+  let form;
+  if (!isFormExit) {
     form = await Form.findOne({ slug: formIdOrSlug });
   }
 
@@ -239,7 +219,7 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
   }
 
   // Check if user owns the form
-  if (form.userId.toString() !== userId) {
+  if (form.userId.toString() !== userid) {
     throw new AppError("Unauthorized to update this form", 403);
   }
 
@@ -253,8 +233,8 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
   }
 
   if (fields !== undefined) {
-    if (!Array.isArray(fields) || fields.length === 0) {
-      throw new AppError("Fields must be a non-empty array", 400);
+    if (!Array.isArray(fields)) {
+      throw new AppError("Fields must be an array", 400);
     }
     form.fields = fields;
   }

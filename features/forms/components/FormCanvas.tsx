@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Separator } from "@/components/ui/Separator";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/Tooltip";
-import { FormField, updateFormMeta } from "@/redux/features/create-form/form.slice";
-import dayjs from "dayjs";
+import { FormFieldType, updateFormMeta } from "@/redux/features/form-builder/form.slice";
+import { RootState } from "@/redux/store";
 import {
   Trash2,
   Type,
@@ -34,6 +34,7 @@ import axios from "axios";
 import { useState } from "react";
 import { AppError } from "@/lib/auth/appError";
 import { cn } from "@/lib/utils";
+import { showAlert } from "@/redux/features/global/alertSlice";
 
 const iconMap: Record<string, React.ElementType> = {
   heading: Heading1,
@@ -72,7 +73,7 @@ const fieldTypeLabels: Record<string, string> = {
 };
 
 interface FormCanvasProps {
-  fields: FormField[];
+  fields: FormFieldType[];
   selectedFieldId: string | null;
   onSelectField: (id: string) => void;
   onRemoveField: (id: string) => void;
@@ -85,29 +86,42 @@ export function FormCanvas({
   onRemoveField,
 }: FormCanvasProps) {
   const dispatch = useDispatch();
-  const title = useSelector((state: any) => state.form.formTitle);
-  const description = useSelector((state: any) => state.form.formDescription);
+  const title = useSelector((state: RootState) => state.form.formTitle);
+  const description = useSelector((state: RootState) => state.form.formDescription);
+  const slug = useSelector((state: RootState) => state.form.formSlug);
+  const settings = useSelector((state: RootState) => state.form.settings);
   const [uiError, setUiError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   async function handleUpdateForm() {
+    if (!slug) {
+      setUiError("Create the form first before saving changes.");
+      dispatch(
+        showAlert({
+          message: "Create the form first before saving changes.",
+          type: "danger",
+        }),
+      );
+      return;
+    }
+
     setIsSaving(true);
     setUiError("");
-    try {
-      const DefaultSlug = `untitled-form-${dayjs().format("HH:mm:ss")}`;
 
-      const res = await axios.post("/api/forms/create", {
+    try {
+      const res = await axios.put(`/api/forms/${encodeURIComponent(slug)}`, {
         title,
         description,
         fields: fields ? fields : [],
-        slug: DefaultSlug,
-        settings: {
-          submitButtonText: "Submit",
-          successMessage: "Thank you for your submission!",
-          redirectUrl: null,
-          notifyEmail: null,
-        },
+        settings,
       });
+
+      dispatch(
+        showAlert({
+          message: "Changes Saved",
+          type: "success",
+        }),
+      );
 
       console.log(res);
     } catch (error: any) {
@@ -191,32 +205,30 @@ export function FormCanvas({
           ) : (
             fields.map((field, index) => (
               <CanvasFieldItem
-                key={field._id}
+                key={field.id}
                 field={field}
                 index={index}
-                isSelected={field._id === selectedFieldId}
-                onSelect={() => onSelectField(field._id)}
-                onRemove={() => onRemoveField(field._id)}
+                isSelected={field.id === selectedFieldId}
+                onSelect={() => onSelectField(field.id)}
+                onRemove={() => onRemoveField(field.id)}
               />
             ))
           )}
         </CardContent>
       </Card>
 
-      {fields.length > 0 && (
-        <div className="flex justify-end">
-          <Button onClick={handleUpdateForm} disabled={isSaving} className="rounded-xl px-6">
-            {isSaving ? (
-              <>
-                <Skeleton className="w-4 h-4 rounded-full mr-2" />
-                Saving...
-              </>
-            ) : (
-              "Save Form"
-            )}
-          </Button>
-        </div>
-      )}
+      <div className="flex justify-end">
+        <Button onClick={handleUpdateForm} disabled={isSaving} className="rounded-xl px-6">
+          {isSaving ? (
+            <>
+              <Skeleton className="w-4 h-4 rounded-full mr-2" />
+              Saving...
+            </>
+          ) : (
+            "Save Form"
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
@@ -228,7 +240,7 @@ function CanvasFieldItem({
   onSelect,
   onRemove,
 }: {
-  field: FormField;
+  field: FormFieldType;
   index: number;
   isSelected: boolean;
   onSelect: () => void;
@@ -330,7 +342,7 @@ function CanvasFieldItem({
   );
 }
 
-function FieldPreview({ field }: { field: FormField }) {
+function FieldPreview({ field }: { field: FormFieldType }) {
   switch (field.type) {
     case "heading":
       return <h3 className="text-base font-semibold text-foreground">{field.label}</h3>;
@@ -409,7 +421,7 @@ function FieldPreview({ field }: { field: FormField }) {
               key={i}
               className={cn(
                 "w-5 h-5",
-                i <= (field.defaultValue || 0)
+                i <= Number(field.defaultValue || 0)
                   ? "text-amber-400 fill-amber-400"
                   : "text-muted-foreground/30",
               )}

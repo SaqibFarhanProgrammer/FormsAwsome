@@ -10,20 +10,13 @@ import { FormPreview } from "./FormPreview";
 import { FormFieldsList } from "./FormFieldsList";
 import { FormType } from "../models/form-builder.model";
 
-export function SingleFormView({ formData }: { formData:FormType }) {
+export function SingleFormView({ formData }: { formData: FormType }) {
   const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields">("preview");
-
-
-
 
   return (
     <div className="min-h-screen bg-background">
       {/* Top Bar */}
-      <FormTopBar
-        title={formData.title}
-        state={formData.state}
-        slug={formData.slug}
-      />
+      <FormTopBar title={formData.title} state={formData.state} slug={formData.slug} />
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">

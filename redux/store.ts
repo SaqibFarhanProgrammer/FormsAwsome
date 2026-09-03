@@ -1,10 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import formReducer from "@/redux/features/form-builder/form-create.slice";
-import formCreateReducer from "@/redux/features/form-builder/form-create.slice";
+import formCreateReducer from "@/redux/features/create-form/form-create.slice";
 import profileReducer from "@/redux/features/profile/profile.slice";
 import alertReducer from "@/redux/features/global/alertSlice";
-
+import formReducer from "@/redux/features/form-builder/form.slice";
 export const store = configureStore({
   reducer: {
     form: formReducer,

@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import dayjs from "dayjs";
 
 interface FormField {
   id: string;
@@ -12,10 +11,19 @@ interface FormField {
   order: number;
 }
 
+interface FormSettings {
+  submitButtonText: string;
+  successMessage: string;
+  redirectUrl: string;
+  notifyEmail: string;
+}
+
 interface CreateFormPayload {
   title: string;
   description: string;
   fields: FormField[];
+  slug: string;
+  settings?: FormSettings;
 }
 
 interface FormCreateState {
@@ -38,12 +46,12 @@ export const createForm = createAsyncThunk(
         title: data.title,
         description: data.description,
         fields: data.fields ?? [],
-        slug: `untitled-form-${dayjs().format("HH-mm-ss")}`,
-        settings: {
+        slug: data.slug,
+        settings: data.settings ?? {
           submitButtonText: "Submit",
           successMessage: "Thank you for your submission!",
-          redirectUrl: null,
-          notifyEmail: null,
+          redirectUrl: "",
+          notifyEmail: "",
         },
       });
 

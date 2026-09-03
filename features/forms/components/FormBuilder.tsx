@@ -1,22 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addField,
   removeField,
   selectField,
   updateField,
-} from "@/redux/features/create-form/form.slice";
+  setFormSlug,
+} from "@/redux/features/form-builder/form.slice";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { TopBar } from "./Topbar";
 import { FormCanvas } from "./FormCanvas";
 import { ElementsSidebar } from "./ElementsSidebar";
+import { RootState } from "@/redux/store";
 
 export function FormBuilder() {
   const dispatch = useDispatch();
-  const { fields, selectedFieldId } = useSelector((state: any) => state.form);
+  const searchParams = useSearchParams();
+  const { fields, selectedFieldId } = useSelector((state: RootState) => state.form);
   const [propertiesOpen, setPropertiesOpen] = useState(false);
+
+  useEffect(() => {
+    const slug = searchParams.get("slug");
+    if (slug) {
+      dispatch(setFormSlug(slug));
+    }
+  }, [dispatch, searchParams]);
 
   const handleAddField = (type: string, label: string) => {
     dispatch(
@@ -35,7 +46,7 @@ export function FormBuilder() {
     setPropertiesOpen(true);
   };
 
-  const selectedField = fields.find((f: any) => f.id === selectedFieldId) || null;
+  const selectedField = fields.find((f: any) => f.id === selectedFieldId);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -65,8 +76,8 @@ export function FormBuilder() {
           }`}
         >
           <PropertiesPanel
-            selectedField={selectedField}
-            onUpdateField={(id, updates) => dispatch(updateField({ _id: id, ...updates }))}
+            selectedField={selectedField!}
+            onUpdateField={(id, updates) => dispatch(updateField({ id, ...updates }))}
             onClose={() => {
               setPropertiesOpen(false);
               dispatch(selectField(null));

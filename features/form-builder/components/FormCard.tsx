@@ -51,68 +51,68 @@ function getStatusBadge(status: string) {
 function FormCard({ form }: { form: any }) {
   return (
     <Link href={`/all-forms/${form.slug}`} className="w-full">
-    <Card
-      key={form.id}
-      className="rounded-2xl border-border bg-card hover:shadow-md hover:border-primary/20 transition-all duration-200 group cursor-pointer"
-    >
-      <CardContent className=" space-y-4">
-        <div className="flex items-start justify-between">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center">
-            <FileText className="w-5 h-5 text-primary" />
+      <Card
+        key={form.id}
+        className="rounded-2xl border-border bg-card hover:shadow-md hover:border-primary/20 transition-all duration-200 group cursor-pointer"
+      >
+        <CardContent className=" space-y-4">
+          <div className="flex items-start justify-between">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+              <FileText className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex items-center gap-2">
+              {getStatusBadge(form.state)}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 h-8 w-8 p-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50">
+                  <MoreHorizontal className="w-4 h-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="rounded-xl w-48">
+                  <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
+                    <Eye className="w-4 h-4" /> Preview
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
+                    <Pencil className="w-4 h-4" /> Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
+                    <BarChart3 className="w-4 h-4" /> Analytics
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
+                    <Copy className="w-4 h-4" /> Duplicate
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
+                    <Send className="w-4 h-4" /> Share
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
+                    <Archive className="w-4 h-4" /> Archive
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-lg cursor-pointer gap-2 text-destructive focus:text-destructive">
+                    <Trash2 className="w-4 h-4" /> Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            {getStatusBadge(form.state)}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 h-8 w-8 p-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50">
-                <MoreHorizontal className="w-4 h-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="rounded-xl w-48">
-                <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
-                  <Eye className="w-4 h-4" /> Preview
-                </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
-                  <Pencil className="w-4 h-4" /> Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
-                  <BarChart3 className="w-4 h-4" /> Analytics
-                </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
-                  <Copy className="w-4 h-4" /> Duplicate
-                </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
-                  <Send className="w-4 h-4" /> Share
-                </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg cursor-pointer gap-2">
-                  <Archive className="w-4 h-4" /> Archive
-                </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg cursor-pointer gap-2 text-destructive focus:text-destructive">
-                  <Trash2 className="w-4 h-4" /> Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
 
-        <div className="space-y-1">
-          <h3 className="font-semibold text-foreground leading-tight">
-            {form.title || "Untitled Form"}
-          </h3>
-          <p className="text-sm text-muted-foreground line-clamp-1">
-            {form.description || "No description"}
-          </p>
-        </div>
-        <div className="flex items-center gap-4 pt-2">
-          <div className="flex items-center gap-1.5">
-            <Send className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">30 submissions</span>
+          <div className="space-y-1">
+            <h3 className="font-semibold text-foreground leading-tight">
+              {form.title || "Untitled Form"}
+            </h3>
+            <p className="text-sm text-muted-foreground line-clamp-1">
+              {form.description || "No description"}
+            </p>
           </div>
-          <div className="flex items-center pl-7 gap-1.5">
-            <Eye className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">150 views</span>
+          <div className="flex items-center gap-4 pt-2">
+            <div className="flex items-center gap-1.5">
+              <Send className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">30 submissions</span>
+            </div>
+            <div className="flex items-center pl-7 gap-1.5">
+              <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">150 views</span>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
     </Link>
   );
 }

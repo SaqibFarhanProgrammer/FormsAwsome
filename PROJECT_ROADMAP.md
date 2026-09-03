@@ -1,4 +1,5 @@
 # 🚀 FormsAwesome Project Roadmap
+
 **Complete step-by-step breakdown of remaining work to complete the project.**
 
 ---
@@ -6,6 +7,7 @@
 ## 📋 Current Project Status
 
 ### ✅ Completed Components
+
 - App Router structure with proper folder hierarchy
 - UI Component Library (Button, Card, Dropdown, Badge, Table, etc.)
 - Redux store setup with slices
@@ -14,12 +16,14 @@
 - Landing page with navbar, hero, features, testimonials, pricing
 
 ### 🔄 In Progress / Partially Complete
+
 - Authentication system (login/register routes exist)
 - Dashboard layout
 - Form Builder components structure
 - API routes structure
 
 ### ❌ Not Started / Needs Work
+
 - Complete authentication flow with NextAuth
 - Form CRUD operations (full backend)
 - Drag & Drop form builder
@@ -32,10 +36,12 @@
 ## 🎯 PHASE 1: Complete Authentication System
 
 ### Step 1.1: Setup NextAuth.js Configuration
+
 **Goal:** Configure NextAuth with Credentials, Google, and GitHub providers
 
 #### Sub-steps:
-1. Install required packages: `npm install next-auth` 
+
+1. Install required packages: `npm install next-auth`
 2. Create `/app/api/auth/[...nextauth]/route.ts`
 3. Setup NextAuth configuration with:
    - Credentials provider (email + password)
@@ -54,11 +60,13 @@
 ---
 
 ### Step 1.2: Fix User Authentication Routes
+
 **Goal:** Make login/register pages fully functional
 
 #### Sub-steps:
 
 ##### 1.2.1 Login Page (`/app/auth/login/page.tsx`)
+
 - [ ] Create login form with email & password inputs
 - [ ] Add "Remember me" checkbox
 - [ ] Add Google login button
@@ -72,6 +80,7 @@
 - [ ] Add "Don't have account?" link to register
 
 ##### 1.2.2 Register Page (`/app/auth/register/page.tsx`)
+
 - [ ] Create registration form (name, email, password, confirm password)
 - [ ] Implement password strength validation
 - [ ] Add form validation using react-hook-form
@@ -85,6 +94,7 @@
 - [ ] Add "Already have account?" link to login
 
 ##### 1.2.3 Email Verification Page (`/app/auth/verify-email/page.tsx`)
+
 - [ ] Get verification code from URL query params
 - [ ] Create POST endpoint `/api/auth/verify-email`
   - Verify code is valid and not expired
@@ -95,6 +105,7 @@
 - [ ] Redirect to login after verification
 
 ##### 1.2.4 Password Reset Flow
+
 - [ ] Create forgot password page (`/app/auth/forgot-password/page.tsx`)
   - Form to enter email
   - Submit to `/api/auth/forgot-password` endpoint
@@ -109,11 +120,13 @@
 ---
 
 ### Step 1.3: Create Auth API Endpoints
+
 **Goal:** Setup complete backend authentication
 
 #### Sub-steps:
 
 ##### 1.3.1 `/api/auth/register` - POST
+
 ```
 Body: { email, password, name }
 - Validate email format
@@ -125,6 +138,7 @@ Body: { email, password, name }
 ```
 
 ##### 1.3.2 `/api/auth/verify-email` - POST
+
 ```
 Body: { email, code }
 - Find user by email
@@ -134,6 +148,7 @@ Body: { email, code }
 ```
 
 ##### 1.3.3 `/api/auth/forgot-password` - POST
+
 ```
 Body: { email }
 - Find user by email
@@ -144,6 +159,7 @@ Body: { email }
 ```
 
 ##### 1.3.4 `/api/auth/reset-password` - POST
+
 ```
 Body: { token, newPassword }
 - Verify token is valid and not expired
@@ -154,6 +170,7 @@ Body: { token, newPassword }
 ```
 
 ##### 1.3.5 `/api/auth/login` - POST (for credentials)
+
 ```
 Body: { email, password }
 - Find user by email
@@ -163,6 +180,7 @@ Body: { email, password }
 ```
 
 ##### 1.3.6 `/api/auth/refresh-token` - POST
+
 ```
 Body: { refreshToken }
 - Verify refresh token
@@ -174,9 +192,11 @@ Body: { refreshToken }
 ---
 
 ### Step 1.4: Setup Auth Middleware
+
 **Goal:** Protect routes and verify user session
 
 #### Sub-steps:
+
 1. Create middleware in `middleware.ts` at root
 2. Use `withAuth()` wrapper from NextAuth
 3. Protect routes:
@@ -191,9 +211,11 @@ Body: { refreshToken }
 ## 🎯 PHASE 2: Complete Form CRUD API
 
 ### Step 2.1: Form Creation Endpoint
+
 **Goal:** `/api/forms` - POST - Create new blank form
 
 #### Sub-steps:
+
 - [ ] Create POST endpoint at `/app/api/forms/route.ts`
 - [ ] Verify user is authenticated
 - [ ] Validate request body: `{ title, description }`
@@ -220,9 +242,11 @@ Body: { refreshToken }
 ---
 
 ### Step 2.2: Get All Forms Endpoint
+
 **Goal:** `/api/forms` - GET - List all user's forms with pagination
 
 #### Sub-steps:
+
 - [ ] Create GET endpoint
 - [ ] Verify authentication
 - [ ] Query database for all forms where `userId === currentUser`
@@ -234,9 +258,11 @@ Body: { refreshToken }
 ---
 
 ### Step 2.3: Get Single Form Endpoint
+
 **Goal:** `/api/forms/[id]` - GET - Fetch form for editing
 
 #### Sub-steps:
+
 - [ ] Create GET endpoint with `[id]` dynamic segment
 - [ ] Verify authentication
 - [ ] Verify user owns the form
@@ -246,9 +272,11 @@ Body: { refreshToken }
 ---
 
 ### Step 2.4: Update Form Endpoint
+
 **Goal:** `/api/forms/[id]` - PUT - Update form data, fields, settings
 
 #### Sub-steps:
+
 - [ ] Create PUT endpoint
 - [ ] Verify authentication and ownership
 - [ ] Allow updating: title, description, fields, settings, state
@@ -260,9 +288,11 @@ Body: { refreshToken }
 ---
 
 ### Step 2.5: Delete/Archive Form Endpoint
+
 **Goal:** `/api/forms/[id]` - DELETE - Remove form
 
 #### Sub-steps:
+
 - [ ] Create DELETE endpoint
 - [ ] Verify authentication and ownership
 - [ ] Soft delete: set `state = ARCHIVED` (preferred)
@@ -272,9 +302,11 @@ Body: { refreshToken }
 ---
 
 ### Step 2.6: Form Model & Schema
+
 **Goal:** Define proper MongoDB schema
 
 #### Sub-steps:
+
 - [ ] Create/update `models/form.model.ts`:
   ```typescript
   interface Form {
@@ -283,7 +315,7 @@ Body: { refreshToken }
     title: string;
     description: string;
     slug: string;
-    state: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+    state: "DRAFT" | "PUBLISHED" | "ARCHIVED";
     version: number;
     fields: FormField[];
     settings: FormSettings;
@@ -301,9 +333,11 @@ Body: { refreshToken }
 ## 🎯 PHASE 3: Dashboard & Forms List UI
 
 ### Step 3.1: Setup Dashboard Layout
+
 **Goal:** Create main dashboard with sidebar and header
 
 #### Sub-steps:
+
 - [ ] Create dashboard layout in `/app/(pages)/dashboard/layout.tsx`
 - [ ] Add Sidebar component with:
   - Logo/Brand
@@ -320,9 +354,11 @@ Body: { refreshToken }
 ---
 
 ### Step 3.2: Dashboard Home Page
+
 **Goal:** `/app/(pages)/dashboard/page.tsx` - Overview
 
 #### Sub-steps:
+
 - [ ] Create dashboard home page
 - [ ] Fetch user's statistics:
   - Total forms
@@ -337,9 +373,11 @@ Body: { refreshToken }
 ---
 
 ### Step 3.3: All Forms Page
+
 **Goal:** `/app/(pages)/all-forms/page.tsx` - Complete forms list with features
 
 #### Sub-steps:
+
 - [ ] Create forms list page
 - [ ] Fetch all forms from API
 - [ ] Implement pagination
@@ -359,9 +397,11 @@ Body: { refreshToken }
 ---
 
 ### Step 3.4: Forms List Component
+
 **Goal:** Fix and complete `features/dashboard/components/FormsGrid.tsx`
 
 #### Sub-steps:
+
 - [ ] Update `FormsGrid` to accept forms as props
 - [ ] Implement grid layout responsively
 - [ ] Each `FormCard` component should:
@@ -381,9 +421,11 @@ Body: { refreshToken }
 ## 🎯 PHASE 4: Form Builder - Drag & Drop
 
 ### Step 4.1: Form Builder Page Setup
+
 **Goal:** `/app/create/page.tsx` - Drag & Drop editor
 
 #### Sub-steps:
+
 - [ ] Create form builder page
 - [ ] Setup layout with:
   - Left sidebar: Field palette (Text, Email, Number, Select, Checkbox, Radio, etc.)
@@ -397,9 +439,11 @@ Body: { refreshToken }
 ---
 
 ### Step 4.2: Field Components
+
 **Goal:** Create reusable field components for form builder
 
 #### Sub-steps:
+
 - [ ] Create field types:
   - Text Input
   - Email Input
@@ -427,9 +471,11 @@ Body: { refreshToken }
 ---
 
 ### Step 4.3: Properties Panel
+
 **Goal:** Right-side panel to configure selected field
 
 #### Sub-steps:
+
 - [ ] When field is selected, show its properties
 - [ ] Allow editing:
   - Field label
@@ -446,9 +492,11 @@ Body: { refreshToken }
 ---
 
 ### Step 4.4: Form Settings
+
 **Goal:** Configure form-level settings
 
 #### Sub-steps:
+
 - [ ] Add form settings panel:
   - Title
   - Description
@@ -463,9 +511,11 @@ Body: { refreshToken }
 ---
 
 ### Step 4.5: Save Form Functionality
+
 **Goal:** Save form draft and publish
 
 #### Sub-steps:
+
 - [ ] Implement "Save Draft" button
   - Call PUT `/api/forms/[id]`
   - State stays as DRAFT
@@ -483,9 +533,11 @@ Body: { refreshToken }
 ## 🎯 PHASE 5: Public Form & Submissions
 
 ### Step 5.1: Public Form Page
+
 **Goal:** `/app/f/[slug]` - Public form respondents access
 
 #### Sub-steps:
+
 - [ ] Create public form route
 - [ ] Fetch published form by slug
 - [ ] Render form fields (non-editable)
@@ -500,9 +552,11 @@ Body: { refreshToken }
 ---
 
 ### Step 5.2: Form Submissions API
+
 **Goal:** `/api/forms/[id]/submissions` - Save respondent answers
 
 #### Sub-steps:
+
 - [ ] Create POST endpoint to save submission
 - [ ] Store submission with:
   - Form ID
@@ -517,9 +571,11 @@ Body: { refreshToken }
 ---
 
 ### Step 5.3: Submissions List Page
+
 **Goal:** `/app/(pages)/submissions/page.tsx` - View all form responses
 
 #### Sub-steps:
+
 - [ ] Create submissions list page
 - [ ] Fetch user's forms
 - [ ] Show submissions for selected form
@@ -536,9 +592,11 @@ Body: { refreshToken }
 ---
 
 ### Step 5.4: Submission Detail View
+
 **Goal:** View individual submission details
 
 #### Sub-steps:
+
 - [ ] Create detail page or modal
 - [ ] Show all respondent's answers
 - [ ] Display submission metadata:
@@ -555,9 +613,11 @@ Body: { refreshToken }
 ## 🎯 PHASE 6: Analytics
 
 ### Step 6.1: Analytics Dashboard
+
 **Goal:** `/app/(pages)/analytics/page.tsx` - Form performance metrics
 
 #### Sub-steps:
+
 - [ ] Create analytics page
 - [ ] Show metrics:
   - Total views
@@ -575,9 +635,11 @@ Body: { refreshToken }
 ---
 
 ### Step 6.2: Form Analytics Detail
+
 **Goal:** Per-field analytics
 
 #### Sub-steps:
+
 - [ ] Show per-field analytics:
   - How many submitted this field
   - Skip rate for this field
@@ -591,9 +653,11 @@ Body: { refreshToken }
 ## 🎯 PHASE 7: User Profile & Settings
 
 ### Step 7.1: User Profile Page
+
 **Goal:** `/app/(pages)/profile/page.tsx` - User information
 
 #### Sub-steps:
+
 - [ ] Display user info:
   - Avatar/Profile picture
   - Name
@@ -610,9 +674,11 @@ Body: { refreshToken }
 ---
 
 ### Step 7.2: Settings Page
+
 **Goal:** `/app/(pages)/settings/page.tsx` - User preferences
 
 #### Sub-steps:
+
 - [ ] Email preferences:
   - Get notification emails for new submissions
   - Digest frequency
@@ -635,6 +701,7 @@ Body: { refreshToken }
 ## 🎯 PHASE 8: Additional Features (Nice to Have)
 
 ### Step 8.1: Form Sharing & Collaboration
+
 - [ ] Share form via link
 - [ ] QR code for form
 - [ ] Email form to contacts
@@ -642,11 +709,13 @@ Body: { refreshToken }
 - [ ] Collaborate with team members (view only / edit access)
 
 ### Step 8.2: Form Templates
+
 - [ ] Pre-built templates (Contact, Survey, Registration, etc.)
 - [ ] Clone/duplicate forms
 - [ ] Save custom forms as templates
 
 ### Step 8.3: Advanced Features
+
 - [ ] Conditional logic (show field if X == Y)
 - [ ] Custom CSS styling
 - [ ] Payment integration (Stripe)
@@ -655,6 +724,7 @@ Body: { refreshToken }
 - [ ] Database integrations (Google Sheets, Airtable)
 
 ### Step 8.4: File Storage
+
 - [ ] File upload fields
 - [ ] Store in cloud (AWS S3, Cloudinary)
 - [ ] Set file size/type limits
@@ -664,12 +734,14 @@ Body: { refreshToken }
 ## 🛠️ Technical Checklist
 
 ### Database/Models
+
 - [ ] User model complete with all fields
 - [ ] Form model with all relationships
 - [ ] Submission model
 - [ ] Create proper MongoDB indexes for performance
 
 ### API Endpoints Summary
+
 - [x] Auth routes (basic structure exists)
 - [ ] `/api/auth/register` - POST
 - [ ] `/api/auth/verify-email` - POST
@@ -684,6 +756,7 @@ Body: { refreshToken }
 - [ ] `/api/profile/settings` - GET/PUT
 
 ### UI/UX
+
 - [ ] Responsive design (mobile, tablet, desktop)
 - [ ] Loading states
 - [ ] Error handling with user-friendly messages
@@ -694,6 +767,7 @@ Body: { refreshToken }
 - [ ] Accessibility (ARIA labels, keyboard navigation)
 
 ### Performance
+
 - [ ] Optimize database queries
 - [ ] Add pagination to large lists
 - [ ] Image optimization
@@ -701,6 +775,7 @@ Body: { refreshToken }
 - [ ] API response caching (Redis)
 
 ### Security
+
 - [ ] Protect API routes with authentication
 - [ ] Validate all inputs server-side
 - [ ] Sanitize user data
@@ -709,6 +784,7 @@ Body: { refreshToken }
 - [ ] SQL/NoSQL injection prevention
 
 ### Testing
+
 - [ ] Unit tests for utilities
 - [ ] Integration tests for API
 - [ ] E2E tests for critical flows
@@ -733,9 +809,10 @@ Body: { refreshToken }
 **Next immediate step: Complete PHASE 1 (Authentication)**
 
 Start with:
+
 1. Setup NextAuth.js
 2. Create login page
-3. Create register page  
+3. Create register page
 4. Create auth API endpoints
 5. Test auth flow
 

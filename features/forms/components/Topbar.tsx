@@ -4,34 +4,55 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ArrowLeft, Eye, Save, Share2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { createForm } from "@/redux/features/form-builder/form-create.slice";
+import { createForm } from "@/redux/features/create-form/form-create.slice";
+import { setFormSlug } from "@/redux/features/form-builder/form.slice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { Spinner } from "@/components/ui/Spinner";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { AppError } from "@/lib/auth/appError";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function TopBar() {
-  const title = useSelector((state: any) => state.form.formTitle);
-  const description = useSelector((state: any) => state.form.formDescription);
-  const { fields } = useSelector((state: any) => state.form);
-  console.log(fields);
+  const title = useSelector((state: RootState) => state.form.formTitle);
+  const description = useSelector((state: RootState) => state.form.formDescription);
+  const slug = useSelector((state: RootState) => state.form.formSlug);
+  const settings = useSelector((state: RootState) => state.form.settings);
+  const { fields } = useSelector((state: RootState) => state.form);
 
   const loading = useSelector((state: RootState) => state.formCreate.isLoading);
 
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
   const handleCreateForm = async () => {
+    if (!slug) {
+      dispatch(
+        showAlert({
+          message: "Form slug is missing. Please reopen the create page.",
+          type: "danger",
+        }),
+      );
+      return;
+    }
+
     try {
       const result = await dispatch(
         createForm({
           title,
           description,
           fields: fields ?? [],
+          slug,
+          settings,
         }),
       ).unwrap();
 
       if (result.success) {
+        const slug = result.data?.slug;
+        if (slug) {
+          dispatch(setFormSlug(slug));
+          router.replace(`/create?slug=${encodeURIComponent(slug)}`);
+        }
         dispatch(
           showAlert({
             message: "Form created successfully",

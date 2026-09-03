@@ -6,39 +6,50 @@ import { Label } from "@/components/ui/Label";
 import { Switch } from "@/components/ui/Switch";
 import { Button } from "@/components/ui/Button";
 import { Separator } from "@/components/ui/Separator";
-import { FormField, updateField } from "@/redux/features/create-form/form.slice";
+import {
+  FormFieldType,
+  FormSettings,
+  updateField,
+  updateFormMeta,
+  updateFormSettings,
+} from "@/redux/features/form-builder/form.slice";
 import { Settings, Trash2, Copy, Eye, QrCode, Plus, X, ChevronRight } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface PropertiesPanelProps {
-  selectedField: FormField | null;
-  onUpdateField: (id: string, updates: Partial<FormField>) => void;
+  selectedField: FormFieldType | null;
+  onUpdateField: (id: string, updates: Partial<FormFieldType>) => void;
   onClose: () => void;
 }
 
 export function PropertiesPanel({ selectedField, onUpdateField, onClose }: PropertiesPanelProps) {
-  const dipatch = useDispatch();
+  const dispatch = useDispatch();
+  const formTitle = useSelector((state: RootState) => state.form.formTitle);
+  const formDescription = useSelector((state: RootState) => state.form.formDescription);
+  const settings = useSelector((state: RootState) => state.form.settings);
+  const fields = useSelector((state: RootState) => state.form.fields);
 
   if (!selectedField) {
     return (
-      <div className="p-4">
+      <div className="p-4 space-y-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold">Properties</h3>
+          <h3 className="text-sm font-semibold">Form Settings</h3>
           <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg" onClick={onClose}>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
-        <div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
-          <div className="w-12 h-12 rounded-xl  flex items-center justify-center">
-            <Settings className="w-6 h-6 text-muted-foreground" />
-          </div>
-          <div>
-            <p className="text-sm font-medium">No Field Selected</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Click on a field to edit properties
-            </p>
-          </div>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Settings className="w-4 h-4" />
+          <p className="text-xs">Configure what respondents see after submitting.</p>
         </div>
+        <FormSettingsPanel
+          title={formTitle}
+          description={formDescription}
+          settings={settings}
+          onUpdateMeta={(updates) => dispatch(updateFormMeta(updates))}
+          onUpdateSettings={(updates) => dispatch(updateFormSettings(updates))}
+        />
       </div>
     );
   }
@@ -59,6 +70,16 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
+
+      <Separator />
+
+      <FormSettingsPanel
+        title={formTitle}
+        description={formDescription}
+        settings={settings}
+        onUpdateMeta={(updates) => dispatch(updateFormMeta(updates))}
+        onUpdateSettings={(updates) => dispatch(updateFormSettings(updates))}
+      />
 
       <Separator />
 
@@ -127,7 +148,7 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
                   size="sm"
                   className="h-9 w-9 p-0 rounded-lg text-muted-foreground hover:text-destructive"
                   onClick={() =>
-                    dipatch(
+                    dispatch(
                       updateField({
                         id: selectedField.id,
                         options: selectedField.options!.filter((_, i) => i !== index),
@@ -144,7 +165,7 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
               size="sm"
               className="rounded-xl w-full gap-2 text-xs"
               onClick={() =>
-                dipatch(
+                dispatch(
                   updateField({
                     id: selectedField.id,
                     options: [...selectedField.options!, ""],
@@ -160,7 +181,77 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
         </div>
       )}
 
-      {/* QR Code */}
+      <Separator />
+
+      <div className="space-y-3">
+        <Label className="text-xs font-medium uppercase tracking-wider">Field Logic</Label>
+        <div className="flex items-center justify-between">
+          <div>
+            <Label className="text-sm font-medium">Conditional visibility</Label>
+            <p className="text-xs text-muted-foreground">Show this field based on another answer</p>
+          </div>
+          <Switch
+            checked={selectedField.logic?.enabled ?? false}
+            onCheckedChange={(enabled) =>
+              onUpdateField(selectedField.id, {
+                logic: {
+                  enabled,
+                  sourceFieldId: selectedField.logic?.sourceFieldId || "",
+                  operator: selectedField.logic?.operator || "equals",
+                  value: selectedField.logic?.value || "",
+                },
+              })
+            }
+          />
+        </div>
+        <>
+          <select
+            value={selectedField.logic?.sourceFieldId || ""}
+            onChange={(event) =>
+              onUpdateField(selectedField.id, {
+                logic: { ...selectedField.logic!, sourceFieldId: event.target.value },
+              })
+            }
+            className="h-9 w-full rounded-xl border border-input bg-background px-3 text-sm"
+          >
+            <option value="">Select a source field</option>
+            {fields
+              .filter((field) => field.id !== selectedField.id)
+              .map((field) => (
+                <option key={field.id} value={field.id}>
+                  {field.label}
+                </option>
+              ))}
+          </select>
+          <select
+            value={selectedField.logic?.operator || "equals"}
+            onChange={(event) =>
+              onUpdateField(selectedField.id, {
+                logic: {
+                  ...selectedField.logic!,
+                  operator: event.target.value as "equals" | "not_equals" | "contains",
+                },
+              })
+            }
+            className="h-9 w-full rounded-xl border border-input bg-background px-3 text-sm"
+          >
+            <option value="equals">Equals</option>
+            <option value="not_equals">Does not equal</option>
+            <option value="contains">Contains</option>
+          </select>
+          <Input
+            value={selectedField.logic?.value}
+            onChange={(event) =>
+              onUpdateField(selectedField.id, {
+                logic: { ...selectedField.logic!, value: event.target.value },
+              })
+            }
+            className="rounded-xl h-9 text-sm"
+            placeholder="Expected answer"
+          />
+        </>
+      </div>
+
       <Card className="rounded-xl border-border bg-muted/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
@@ -208,6 +299,99 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
           Delete Field
         </Button>
       </div>
+    </div>
+  );
+}
+
+function FormSettingInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs font-medium uppercase tracking-wider">{label}</Label>
+      <Input
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+        className="rounded-xl h-9 text-sm"
+      />
+    </div>
+  );
+}
+
+function FormSettingsPanel({
+  title,
+  description,
+  settings,
+  onUpdateMeta,
+  onUpdateSettings,
+}: {
+  title: string;
+  description: string;
+  settings: FormSettings;
+  onUpdateMeta: (updates: { title?: string; description?: string }) => void;
+  onUpdateSettings: (updates: Partial<FormSettings>) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="form-title" className="text-xs font-medium uppercase tracking-wider">
+          Form title
+        </Label>
+        <Input
+          id="form-title"
+          value={title}
+          onChange={(event) => onUpdateMeta({ title: event.target.value })}
+          className="rounded-xl h-9 text-sm"
+          placeholder="Untitled Form"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="form-description" className="text-xs font-medium uppercase tracking-wider">
+          Form description
+        </Label>
+        <Input
+          id="form-description"
+          value={description}
+          onChange={(event) => onUpdateMeta({ description: event.target.value })}
+          className="rounded-xl h-9 text-sm"
+          placeholder="Describe your form"
+        />
+      </div>
+      <FormSettingInput
+        label="Submit button text"
+        value={settings.submitButtonText}
+        onChange={(value) => onUpdateSettings({ submitButtonText: value })}
+      />
+      <FormSettingInput
+        label="Success message"
+        value={settings.successMessage}
+        onChange={(value) => onUpdateSettings({ successMessage: value })}
+      />
+      <FormSettingInput
+        label="Redirect URL (optional)"
+        value={settings.redirectUrl}
+        placeholder="https://example.com/thanks"
+        onChange={(value) => onUpdateSettings({ redirectUrl: value })}
+      />
+      <FormSettingInput
+        label="Notification email (optional)"
+        type="email"
+        value={settings.notifyEmail}
+        placeholder="you@example.com"
+        onChange={(value) => onUpdateSettings({ notifyEmail: value })}
+      />
     </div>
   );
 }

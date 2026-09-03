@@ -4,8 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Copy, Share2, QrCode, Globe, Trash2 } from "lucide-react";
 
-const THEME = { primary: "#432DD7" };
-
 interface FormActionsProps {
   slug: string;
 }

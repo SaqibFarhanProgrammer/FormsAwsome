@@ -3,16 +3,16 @@
 import { FileText } from "lucide-react";
 import FormCard from "@/features/form-builder/components/FormCard";
 
-interface Form {
-  id: string;
-  title: string;
-  description: string;
-  status: "active" | "draft" | "archived";
-  submissions: number;
-  views: number;
-  createdAt: string;
-  updatedAt: string;
-}
+// interface Form {
+//   id: string;
+//   title: string;
+//   description: string;
+//   status: "active" | "draft" | "archived";
+//   submissions: number;
+//   views: number;
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 interface FormsGridProps {
   searchQuery: string;

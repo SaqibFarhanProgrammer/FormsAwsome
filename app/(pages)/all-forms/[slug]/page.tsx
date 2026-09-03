@@ -9,7 +9,5 @@ export default async function SingleFormPage({ params }: PageProps) {
   const slug = (await params).slug;
   const singleFormData = await getSingleFormService(slug);
 
-
-
   return <SingleFormView formData={singleFormData} />;
 }
