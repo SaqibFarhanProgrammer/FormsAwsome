@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
+import { cookies } from "next/headers";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
@@ -74,3 +75,13 @@ export const generateVerificationToken = (email: string, name?: string): string 
 export const verifyVerificationToken = (token: string): VerificationTokenPayload => {
   return jwt.verify(token, VERIFICATION_TOKEN_SECRET) as VerificationTokenPayload;
 };
+
+export async function getUserIdFromToken() {
+  const cookiesList = await cookies();
+  const accessToken = cookiesList.get("accessToken")?.value;
+  if (!accessToken) {
+    throw new Error("Access token not found");
+  }
+  const payload = verifyAccessToken(accessToken);
+  return payload.userId;
+}

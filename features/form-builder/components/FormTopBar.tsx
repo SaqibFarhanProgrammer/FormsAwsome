@@ -3,12 +3,13 @@
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ArrowLeft, Pencil, Eye, Link } from "lucide-react";
+import { FormState } from "../types/form-builder.types";
 
 const THEME = { primary: "#432DD7" };
 
 interface FormTopBarProps {
   title: string;
-  state: "active" | "draft";
+  state: FormState;
   slug: string;
 }
 
@@ -32,11 +33,11 @@ export function FormTopBar({ title, state, slug }: FormTopBarProps) {
             variant="secondary"
             className="rounded-lg text-xs font-medium px-2 py-0.5"
             style={{
-              backgroundColor: state === "active" ? "#dcfce7" : "#fef3c7",
-              color: state === "active" ? "#166534" : "#92400e",
+              backgroundColor: state === FormState.PUBLISHED ? "#dcfce7" : "#fef3c7",
+              color: state === FormState.PUBLISHED ? "#166534" : "#92400e",
             }}
           >
-            {state === "active" ? "Active" : "Draft"}
+            {state === FormState.PUBLISHED ? "Published" : "Draft"}
           </Badge>
         </div>
       </div>

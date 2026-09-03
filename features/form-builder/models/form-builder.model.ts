@@ -22,7 +22,7 @@ export type FormField = {
 export type FormType = {
   title: string;
   description?: string;
-  userId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId | string;
   slug: string;
   version: number;
   fields: FormField[];

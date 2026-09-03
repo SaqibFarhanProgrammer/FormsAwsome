@@ -8,17 +8,21 @@ import { FormStats } from "./FormStats";
 import { FormActions } from "./FormActions";
 import { FormPreview } from "./FormPreview";
 import { FormFieldsList } from "./FormFieldsList";
+import { FormType } from "../models/form-builder.model";
 
-export function SingleFormView() {
+export function SingleFormView({ formData }: { formData:FormType }) {
   const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields">("preview");
+
+
+
 
   return (
     <div className="min-h-screen bg-background">
       {/* Top Bar */}
       <FormTopBar
-        title={singleFormData.title}
-        state={singleFormData.state}
-        slug={singleFormData.slug}
+        title={formData.title}
+        state={formData.state}
+        slug={formData.slug}
       />
 
       {/* Main Content */}
@@ -51,17 +55,17 @@ export function SingleFormView() {
             </div>
 
             {/* Tab Content */}
-            {activeTab === "preview" && <FormPreview fields={singleFormData.fields} />}
+            {activeTab === "preview" && <FormPreview fields={formData.fields} />}
             {activeTab === "submissions" && (
               <FormSubmissions submissions={singleFormData.submissions} />
             )}
-            {activeTab === "fields" && <FormFieldsList fields={singleFormData.fields} />}
+            {activeTab === "fields" && <FormFieldsList fields={formData.fields} />}
           </div>
 
           {/* Right Column - 1/3 Stats & Actions */}
           <div className="space-y-4">
             <FormStats stats={singleFormData.stats} />
-            <FormActions slug={singleFormData.slug} />
+            <FormActions slug={formData.slug} />
           </div>
         </div>
       </div>

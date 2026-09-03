@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { AppError } from "@/lib/auth/appError";
 import { connectDB } from "@/core/db/connectDb";
-import { verifyAccessToken } from "@/lib/auth/jwt.lib";
+import { getUserIdFromToken, verifyAccessToken } from "@/lib/auth/jwt.lib";
 import { cookies } from "next/headers";
 import {
   DeleteDataFromRedis,
@@ -148,12 +148,21 @@ export async function getSingleFormService(formIdOrSlug: string) {
   //   }
   // }
 
+  const userid = await getUserIdFromToken();
+
   await connectDB();
 
   let form = null;
 
+  console.log(formIdOrSlug);
+  
   try {
-    form = await Form.findById(formIdOrSlug);
+    const form = await Form.findOne({
+      userId: userid,
+      $or: [{ slug: formIdOrSlug }],
+    });
+    console.log(form);
+    
   } catch (error) {
     form = await Form.findOne({ slug: formIdOrSlug });
   }
@@ -172,6 +181,7 @@ export async function getSingleFormService(formIdOrSlug: string) {
     description: form.description,
     slug: form.slug,
     version: form.version,
+    userId: form.userId.toString(),
     fields: form.fields,
     settings: form.settings,
     state: form.state,

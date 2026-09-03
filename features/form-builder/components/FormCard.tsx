@@ -17,6 +17,7 @@ import {
   Send,
   Trash2,
 } from "lucide-react";
+import Link from "next/link";
 
 function getStatusBadge(status: string) {
   switch (status) {
@@ -49,6 +50,7 @@ function getStatusBadge(status: string) {
 
 function FormCard({ form }: { form: any }) {
   return (
+    <Link href={`/all-forms/${form.slug}`} className="w-full">
     <Card
       key={form.id}
       className="rounded-2xl border-border bg-card hover:shadow-md hover:border-primary/20 transition-all duration-200 group cursor-pointer"
@@ -111,6 +113,7 @@ function FormCard({ form }: { form: any }) {
         </div>
       </CardContent>
     </Card>
+    </Link>
   );
 }
 
