@@ -13,6 +13,7 @@ import {
 import { Submission } from "@/features/submissions/models/submission.model";
 import { FormState } from "@/features/form-builder/types/form-builder.types";
 import { Form } from "@/features/form-builder/models/form-builder.model";
+import type { FormField } from "@/features/form-builder/models/form-builder.model";
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
@@ -146,23 +147,19 @@ export async function getSingleFormService(formIdOrSlug: string) {
   //   if (cachedForm) {
   //     return JSON.parse(cachedForm);
   //   }
-  // }
+  //      const userid = await getUserIdFromToken();
 
   const userid = await getUserIdFromToken();
-
   await connectDB();
 
   let form = null;
 
-  console.log(formIdOrSlug);
-
   try {
-    const form = await Form.findOne({
+    form = await Form.findOne({
       userId: userid,
       $or: [{ slug: formIdOrSlug }],
     });
-    console.log(form);
-  } catch (error) {
+  } catch {
     form = await Form.findOne({ slug: formIdOrSlug });
   }
 
@@ -175,14 +172,35 @@ export async function getSingleFormService(formIdOrSlug: string) {
   }
 
   const formData = {
-    _id: form._id.toString(),
+    _id: form._id!.toString(),
     title: form.title,
     description: form.description,
     slug: form.slug,
     version: form.version,
     userId: form.userId.toString(),
-    fields: form.fields,
-    settings: form.settings,
+    fields: form.fields.map((field: FormField) => ({
+      id: field.id,
+      type: field.type,
+      label: field.label,
+      placeholder: field.placeholder,
+      helperText: field.helperText,
+      options: field.options?.map((option: NonNullable<FormField["options"]>[number]) => ({
+        label: option.label,
+        value: option.value,
+      })),
+      validation: {
+        required: field.validation.required,
+        min: field.validation.min,
+        max: field.validation.max,
+        pattern: field.validation.pattern,
+      },
+    })),
+    settings: {
+      submitButtonText: form.settings.submitButtonText,
+      successMessage: form.settings.successMessage,
+      redirectUrl: form.settings.redirectUrl,
+      notifyEmail: form.settings.notifyEmail,
+    },
     state: form.state,
     createdAt: form.createdAt.toString(),
     updatedAt: form.updatedAt.toString(),

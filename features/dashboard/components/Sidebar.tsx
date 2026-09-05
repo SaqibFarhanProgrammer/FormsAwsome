@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Plus,
@@ -28,31 +30,49 @@ const navItems = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-type SidebarProps = {
-  collapsed: boolean;
-  onToggle: () => void;
-};
-
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar() {
+  const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const data = useSelector((state: RootState) => state.profile);
 
   return (
-    <aside
+    <motion.aside
+      initial={false}
+      animate={{
+        width: collapsed ? 72 : 256,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      }}
       className={cn(
-        "fixed inset-y-0 left-0 z-40 border-r border-border bg-sidebar flex h-screen flex-col transition-[width] duration-300",
-        collapsed ? "w-18" : "w-64",
+        "peer fixed inset-y-0 left-0 z-40 border-r border-border bg-sidebar flex h-screen flex-col overflow-hidden",
       )}
+      data-collapsed={collapsed}
     >
+      {/* Header */}
       <div
         className={cn(
-          "flex h-16 items-center border-b border-sidebar-border",
+          "flex h-16 items-center border-b border-sidebar-border shrink-0",
           collapsed ? "justify-center px-2" : "justify-between px-4",
         )}
       >
-        {!collapsed && (
-          <span className="text-lg  text-[#432DD7] font-semibold tracking-tight">FormBuilder</span>
-        )}
+        <AnimatePresence mode="wait">
+          {!collapsed && (
+            <motion.span
+              key="logo"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }}
+              className="text-lg text-[#432DD7] font-semibold tracking-tight whitespace-nowrap"
+            >
+              FormBuilder
+            </motion.span>
+          )}
+        </AnimatePresence>
+
         <Tooltip>
           <TooltipTrigger
             render={
@@ -62,9 +82,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 aria-label={collapsed ? "Open sidebar" : "Collapse sidebar"}
               />
             }
-            onClick={onToggle}
+            onClick={() => setCollapsed((value) => !value)}
           >
-            <PanelLeft size={18} />
+            <motion.div
+              animate={{ rotate: collapsed ? 180 : 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <PanelLeft size={18} />
+            </motion.div>
           </TooltipTrigger>
           <TooltipContent side="right">
             {collapsed ? "Open sidebar" : "Collapse sidebar"}
@@ -72,8 +97,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </Tooltip>
       </div>
 
-      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
+      {/* Nav Items */}
+      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto overflow-x-hidden">
+        {navItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
           return (
@@ -92,8 +118,40 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   />
                 }
               >
-                <Icon size={18} />
-                {!collapsed && <span>{item.label}</span>}
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <Icon size={18} />
+                </motion.div>
+
+                <AnimatePresence mode="wait">
+                  {!collapsed && (
+                    <motion.span
+                      key={`label-${item.href}`}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -8 }}
+                      transition={{
+                        duration: 0.2,
+                        delay: index * 0.03,
+                      }}
+                      className="whitespace-nowrap"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+
+                {/* Active indicator dot */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeIndicator"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#432DD7] rounded-r-full"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
               </TooltipTrigger>
               {collapsed && <TooltipContent side="right">{item.label}</TooltipContent>}
             </Tooltip>
@@ -101,19 +159,33 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         })}
       </nav>
 
-      <div className="p-4 border-t border-sidebar-border">
+      {/* Footer Profile */}
+      <div className="p-4 border-t border-sidebar-border shrink-0">
         <div className="flex items-center gap-3 px-2">
-          <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
-            <img src={data.image!} alt="" />
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="text-sm font-medium truncate">{data.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{data.email}</p>
-            </div>
-          )}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden"
+          >
+            <img src={data.image!} alt="" className="w-full h-full object-cover" />
+          </motion.div>
+
+          <AnimatePresence mode="wait">
+            {!collapsed && (
+              <motion.div
+                key="profile-info"
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.25 }}
+                className="min-w-0 overflow-hidden"
+              >
+                <p className="text-sm font-medium truncate">{data.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{data.email}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-    </aside>
+    </motion.aside>
   );
 }

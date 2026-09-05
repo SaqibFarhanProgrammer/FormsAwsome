@@ -8,7 +8,7 @@ import { FormStats } from "./FormStats";
 import { FormActions } from "./FormActions";
 import { FormPreview } from "./FormPreview";
 import { FormFieldsList } from "./FormFieldsList";
-import { FormType } from "../models/form-builder.model";
+import type { FormType } from "../models/form-builder.model";
 
 export function SingleFormView({ formData }: { formData: FormType }) {
   const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields">("preview");

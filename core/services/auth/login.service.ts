@@ -27,7 +27,7 @@ export async function LoginUserService(request: NextRequest) {
 
   const isPasswordValid = await comparePassword(password, user.passwordHash);
   if (!isPasswordValid) {
-    throw new AppError("Invalid email or password", 401);
+    throw new AppError("Invalid password", 401);
   }
 
   if (!user.emailVerified) {

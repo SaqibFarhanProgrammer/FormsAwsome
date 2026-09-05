@@ -1,5 +1,7 @@
 export interface ProfileDataType {
-  name: string | null;
-  email: string | null;
-  image: string | null;
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+  createdAt: string;
 }

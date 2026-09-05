@@ -20,6 +20,7 @@ export type FormField = {
 };
 
 export type FormType = {
+  _id?: string | mongoose.Types.ObjectId;
   title: string;
   description?: string;
   userId: mongoose.Types.ObjectId | string;

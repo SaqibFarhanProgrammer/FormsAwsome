@@ -5,8 +5,9 @@ import { Mail, Clock, Pencil, Settings, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { ProfileDataType } from "../types/types";
 
-export function ProfileHeader({ data }: { data: any }) {
+export function ProfileHeader({ data }: { data: ProfileDataType }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
