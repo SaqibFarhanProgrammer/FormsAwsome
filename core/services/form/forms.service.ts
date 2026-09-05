@@ -4,16 +4,12 @@ import { AppError } from "@/lib/auth/appError";
 import { connectDB } from "@/core/db/connectDb";
 import { getUserIdFromToken, verifyAccessToken } from "@/lib/auth/jwt.lib";
 import { cookies } from "next/headers";
-import {
-  DeleteDataFromRedis,
-  GetDataFromRedis,
-  IsDataExitsInRedis,
-  SetDataToRedisWithTTL,
-} from "@/lib/redis/redis";
+import { DeleteDataFromRedis, SetDataToRedisWithTTL } from "@/lib/redis/redis";
 import { Submission } from "@/features/submissions/models/submission.model";
 import { FormState } from "@/features/form-builder/types/form-builder.types";
 import { Form } from "@/features/form-builder/models/form-builder.model";
 import type { FormField } from "@/features/form-builder/models/form-builder.model";
+import { nanoid } from "nanoid";
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
@@ -61,7 +57,7 @@ export async function createFormService(request: NextRequest) {
   });
 
   const formData = {
-    id: form._id,
+    id: form._id.toString(),
     title: form.title,
     description: form.description,
     slug: form.slug,
@@ -222,43 +218,42 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
   const { title, description, fields, settings, state } = body;
 
   const userid = await getUserIdFromToken();
+  const newSlug = title.split(" ").join("-").toLowerCase() + userid + nanoid();
 
   await connectDB();
 
   // Find form by ID or slug
   const isFormExit = await Form.findOne({ slug: formIdOrSlug });
-  let form;
-  if (!isFormExit) {
-    form = await Form.findOne({ slug: formIdOrSlug });
-  }
 
-  if (!form) {
+  if (!isFormExit) {
     throw new AppError("Form not found", 404);
   }
 
   // Check if user owns the form
-  if (form.userId.toString() !== userid) {
+  if (isFormExit.userId.toString() !== userid) {
     throw new AppError("Unauthorized to update this form", 403);
   }
 
   // Update fields
   if (title !== undefined) {
-    form.title = title.trim();
+    isFormExit.title = title.trim();
   }
 
+  isFormExit.slug = newSlug;
+
   if (description !== undefined) {
-    form.description = description?.trim() || "";
+    isFormExit.description = description?.trim() || "";
   }
 
   if (fields !== undefined) {
     if (!Array.isArray(fields)) {
       throw new AppError("Fields must be an array", 400);
     }
-    form.fields = fields;
+    isFormExit.fields = fields;
   }
 
   if (settings !== undefined) {
-    form.settings = {
+    isFormExit.settings = {
       submitButtonText: settings?.submitButtonText || "Submit",
       successMessage: settings?.successMessage || "Thank you for your submission!",
       redirectUrl: settings?.redirectUrl || null,
@@ -267,30 +262,30 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
   }
 
   if (state !== undefined) {
-    form.state = state;
+    isFormExit.state = state;
   }
 
   // Increment version
-  form.version += 1;
+  isFormExit.version += 1;
 
-  await form.save();
+  await isFormExit.save();
 
   const formData = {
-    id: form._id,
-    title: form.title,
-    description: form.description,
-    slug: form.slug,
-    version: form.version,
-    fields: form.fields,
-    settings: form.settings,
-    state: form.state,
-    createdAt: form.createdAt,
-    updatedAt: form.updatedAt,
+    id: isFormExit._id,
+    title: isFormExit.title,
+    description: isFormExit.description,
+    slug: isFormExit.slug,
+    version: isFormExit.version,
+    fields: isFormExit.fields,
+    settings: isFormExit.settings,
+    state: isFormExit.state,
+    createdAt: isFormExit.createdAt,
+    updatedAt: isFormExit.updatedAt,
   };
 
   // Clear old cache and set new cache
-  const cacheKeyById = `form:${form._id}`;
-  const cacheKeyBySlug = `form:slug:${form.slug}`;
+  const cacheKeyById = `form:${isFormExit._id}`;
+  const cacheKeyBySlug = `form:slug:${isFormExit.slug}`;
 
   await SetDataToRedisWithTTL(cacheKeyById, JSON.stringify(formData), 86400);
   await SetDataToRedisWithTTL(cacheKeyBySlug, JSON.stringify(formData), 86400);
@@ -377,15 +372,15 @@ export async function getPublicFormService(slug: string) {
     throw new AppError("Slug is required", 400);
   }
 
-  const cacheKey = `public:form:${slug}`;
-  const cacheExists = await IsDataExitsInRedis(cacheKey);
+  // const cacheKey = `public:form:${slug}`;
+  // const cacheExists = await IsDataExitsInRedis(cacheKey);
 
-  if (cacheExists) {
-    const cachedForm = await GetDataFromRedis(cacheKey);
-    if (cachedForm) {
-      return JSON.parse(cachedForm);
-    }
-  }
+  // if (cacheExists) {
+  //   const cachedForm = await GetDataFromRedis(cacheKey);
+  //   if (cachedForm) {
+  //     return JSON.parse(cachedForm);
+  //   }
+  // }
 
   await connectDB();
   const form = await Form.findOne({
@@ -398,16 +393,37 @@ export async function getPublicFormService(slug: string) {
   }
 
   const formData = {
-    id: form._id,
+    id: form._id.toString(),
     title: form.title,
     description: form.description,
     slug: form.slug,
-    fields: form.fields,
-    settings: form.settings,
+    fields: form.fields.map((field: FormField) => ({
+      id: field.id,
+      type: field.type,
+      label: field.label,
+      placeholder: field.placeholder,
+      helperText: field.helperText,
+      options: field.options?.map((option: NonNullable<FormField["options"]>[number]) => ({
+        label: option.label,
+        value: option.value,
+      })),
+      validation: {
+        required: field.validation.required,
+        min: field.validation.min,
+        max: field.validation.max,
+        pattern: field.validation.pattern,
+      },
+    })),
+    settings: {
+      submitButtonText: form.settings.submitButtonText,
+      successMessage: form.settings.successMessage,
+      redirectUrl: form.settings.redirectUrl,
+      notifyEmail: form.settings.notifyEmail,
+    },
   };
 
   // Cache for 1 hour
-  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formData), 3600 * 5);
+  // await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formData), 3600 * 5);
 
   return formData;
 }

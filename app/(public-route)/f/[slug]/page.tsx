@@ -1,7 +1,7 @@
+import { getPublicFormService } from "@/core/services/form/forms.service";
 import FormUI, {
   type FormData as PublicFormData,
 } from "@/features/form-builder/components/form-ui";
-import { notFound } from "next/navigation";
 
 const dummyFormData: PublicFormData = {
   _id: "dummy-form-for-testing",
@@ -49,10 +49,12 @@ interface FormPageProps {
 export default async function FormPage({ params }: FormPageProps) {
   const { slug } = await params;
 
+  const FormData = await getPublicFormService(slug);
+
   return (
     <main className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
       <FormUI
-        formData={dummyFormData}
+        formData={FormData}
         onSubmit={async (values) => {
           "use server";
           await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/forms/${slug}/submit`, {

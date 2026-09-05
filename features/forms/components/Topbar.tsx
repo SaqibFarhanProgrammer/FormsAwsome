@@ -51,7 +51,7 @@ export function TopBar() {
         const slug = result.data?.slug;
         if (slug) {
           dispatch(setFormSlug(slug));
-          router.replace(`/create?slug=${encodeURIComponent(slug)}`);
+          router.replace(`/create?slug=${slug}`);
         }
         dispatch(
           showAlert({
@@ -63,19 +63,15 @@ export function TopBar() {
 
       console.log("Form created:", result);
     } catch (error) {
-      let message;
-      if (error instanceof AppError) {
-        {
-          message = error.message || "An error occurred";
-        }
-        console.error("Create form failed:", error);
-        dispatch(
-          showAlert({
-            message: message,
-            type: "danger",
-          }),
-        );
-      }
+      const message =
+        error instanceof AppError
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : "Unable to create the form. Please try again.";
+
+      console.error("Create form failed:", error);
+      dispatch(showAlert({ message, type: "danger" }));
     }
   };
 

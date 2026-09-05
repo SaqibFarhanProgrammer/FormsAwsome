@@ -35,6 +35,7 @@ import { useState } from "react";
 import { AppError } from "@/lib/auth/appError";
 import { cn } from "@/lib/utils";
 import { showAlert } from "@/redux/features/global/alertSlice";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const iconMap: Record<string, React.ElementType> = {
   heading: Heading1,
@@ -88,10 +89,15 @@ export function FormCanvas({
   const dispatch = useDispatch();
   const title = useSelector((state: RootState) => state.form.formTitle);
   const description = useSelector((state: RootState) => state.form.formDescription);
-  const slug = useSelector((state: RootState) => state.form.formSlug);
   const settings = useSelector((state: RootState) => state.form.settings);
   const [uiError, setUiError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  const slug = searchParams.get("slug");
+
+  const router = useRouter();
 
   async function handleUpdateForm() {
     if (!slug) {
@@ -109,7 +115,7 @@ export function FormCanvas({
     setUiError("");
 
     try {
-      const res = await axios.put(`/api/forms/${encodeURIComponent(slug)}`, {
+      const res = await axios.put(`/api/forms/${slug}`, {
         title,
         description,
         fields: fields ? fields : [],
@@ -123,14 +129,26 @@ export function FormCanvas({
         }),
       );
 
-      console.log(res);
-    } catch (error: any) {
+      router.replace(`/create?slug=${res.data.form.slug}`);
+    } catch (error: unknown) {
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : error instanceof AppError
+          ? error.message
+          : "An error occurred";
+
       if (error instanceof AppError) {
         console.error("AppError:", error.message);
-        setUiError(error.message);
+      } else {
+        console.error("Update form failed:", error);
       }
-      const errorMessage = error.response?.data?.message || error.message || "An error occurred";
       setUiError(errorMessage);
+      dispatch(
+        showAlert({
+          message: errorMessage,
+          type: "danger",
+        }),
+      );
     } finally {
       setIsSaving(false);
     }

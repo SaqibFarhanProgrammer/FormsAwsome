@@ -39,7 +39,7 @@ export async function GetProfileService() {
   }
 
   const profileData = {
-    id: user._id,
+    id: user._id.toString(),
     name: user.name,
     email: user.email,
     image: user.image,

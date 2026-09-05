@@ -79,11 +79,12 @@ export function LoginForm() {
           return;
         }
 
-        router.push(loginData?.redirectUrl || "/profile");
+        router.replace(loginData?.redirectUrl || "/dashboard");
       }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Invalid email or password. Please try again.";
+    } catch (error: unknown) {
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || "Invalid email or password. Please try again."
+        : "Invalid email or password. Please try again.";
       setAppError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -91,7 +92,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-[420px]">
+    <div className="w-full max-w-105">
       <div className="mb-8 flex items-center justify-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#432DD7]">
           <svg

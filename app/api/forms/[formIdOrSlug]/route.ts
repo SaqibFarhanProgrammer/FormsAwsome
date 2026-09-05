@@ -34,7 +34,7 @@ export async function PUT(
       {
         success: true,
         message: "Form updated successfully",
-        data,
+        form: data,
       },
       { status: 200 },
     );

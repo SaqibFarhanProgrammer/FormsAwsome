@@ -19,15 +19,16 @@ import { RootState } from "@/redux/store";
 export function FormBuilder() {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
-  const { fields, selectedFieldId } = useSelector((state: RootState) => state.form);
+  const { fields, selectedFieldId, formSlug } = useSelector((state: RootState) => state.form);
   const [propertiesOpen, setPropertiesOpen] = useState(false);
 
   useEffect(() => {
     const slug = searchParams.get("slug");
-    if (slug) {
+
+    if (slug && slug !== formSlug) {
       dispatch(setFormSlug(slug));
     }
-  }, [dispatch, searchParams]);
+  }, [formSlug, searchParams]);
 
   const handleAddField = (type: string, label: string) => {
     dispatch(

@@ -47,7 +47,6 @@ export async function proxy(req: NextRequest) {
   }
 
   // Verify refresh token
-  console.log("Access token missing → checking refresh token");
 
   const verifiedRefreshToken = verifyRefreshToken(refreshToken);
 
@@ -60,7 +59,6 @@ export async function proxy(req: NextRequest) {
   }
 
   // Generate new access token
-  console.log("Refresh token valid → generating access token");
 
   const newAccessToken = generateAccessToken(verifiedRefreshToken);
 

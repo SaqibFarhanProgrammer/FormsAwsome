@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import axios from "axios";
 import { connectDB } from "@/core/db/connectDb";
 import { User } from "@/models/user.model";
-import { generateAccessToken, generateRefreshToken } from "@/lib/auth/jwt.lib";
+import { generateTokens } from "@/lib/auth/jwt.lib";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -51,12 +51,11 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // 4. Custom JWT Tokens generate karein
-    const appAccessToken = generateAccessToken({ id: existingUser._id, email: existingUser.email });
-    const appRefreshToken = generateRefreshToken({
-      userId: existingUser._id,
-      email: existingUser.email,
-    });
+    // 4. Use the same token payload as password login.
+    const { accessToken: appAccessToken, refreshToken: appRefreshToken } = generateTokens(
+      existingUser._id,
+      existingUser.email,
+    );
 
     const response = NextResponse.redirect(new URL("/dashboard", req.url));
 
@@ -77,7 +76,7 @@ export async function GET(req: NextRequest) {
     });
 
     return response;
-  } catch (error) {
+  } catch {
     return NextResponse.redirect(new URL("/auth/login?error=OAuthFailed", req.url));
   }
 }

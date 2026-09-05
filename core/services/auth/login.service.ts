@@ -47,7 +47,7 @@ export async function LoginUserService(request: NextRequest) {
       requiresVerification: true,
       verifyUrl: `/auth/verify-email?email=${encodedEmail}&token=${verificationToken}`,
       user: {
-        id: user._id,
+        id: user._id.toString(),
         name: user.name,
         email: user.email,
         emailVerified: false,
@@ -63,7 +63,7 @@ export async function LoginUserService(request: NextRequest) {
   const cookieStore = await cookies();
   cookieStore.set("accessToken", accessToken, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24, // 1 day
@@ -71,7 +71,7 @@ export async function LoginUserService(request: NextRequest) {
 
   cookieStore.set("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
@@ -79,7 +79,7 @@ export async function LoginUserService(request: NextRequest) {
 
   return {
     user: {
-      id: user._id,
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
     },

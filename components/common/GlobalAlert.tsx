@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { hideAlert } from "@/redux/features/global/alertSlice";
@@ -48,45 +48,41 @@ export function GlobalAlert() {
   const config = alertConfig[type] || alertConfig.success;
   const Icon = config.icon;
 
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    window.setTimeout(() => {
+      dispatch(hideAlert());
+    }, 300);
+  }, [dispatch]);
+
   // ─── Slide In Animation ──────────────────────────────────────────
   useEffect(() => {
-    if (message) {
-      setIsVisible(true);
+    if (!message) return;
+
+    const animationFrame = requestAnimationFrame(() => {
       setProgress(100);
-    }
+      setIsVisible(true);
+    });
+
+    return () => cancelAnimationFrame(animationFrame);
   }, [message]);
 
   // ─── Auto Dismiss Timer ──────────────────────────────────────────
   useEffect(() => {
-    if (!message) return;
+    if (!message || duration <= 0) return;
 
-    const startTime = Date.now();
-    const endTime = startTime + duration;
-
-    const progressInterval = setInterval(() => {
-      const now = Date.now();
-      const remaining = Math.max(0, endTime - now);
-      const pct = (remaining / duration) * 100;
-      setProgress(pct);
-    }, 16); // ~60fps
-
-    const timer = setTimeout(() => {
-      handleClose();
-    }, duration);
+    const startedAt = Date.now();
+    const interval = window.setInterval(() => {
+      const elapsed = Date.now() - startedAt;
+      setProgress(Math.max(0, 100 - (elapsed / duration) * 100));
+    }, 50);
+    const timeout = window.setTimeout(handleClose, duration);
 
     return () => {
-      clearTimeout(timer);
-      clearInterval(progressInterval);
+      window.clearInterval(interval);
+      window.clearTimeout(timeout);
     };
-  }, [message, duration]);
-
-  // ─── Handle Close ──────────────────────────────────────────────────
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      dispatch(hideAlert());
-    }, 300); // Wait for exit animation
-  };
+  }, [duration, handleClose, message]);
 
   if (!message) return null;
 
