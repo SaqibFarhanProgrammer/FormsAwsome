@@ -13,7 +13,10 @@ import { PropertiesPanel } from "./PropertiesPanel";
 import { TopBar } from "./Topbar";
 import { FormCanvas } from "./FormCanvas";
 import { ElementsSidebar } from "./ElementsSidebar";
-import { selectFormSlug, selectSelectedFieldId } from "@/redux/features/form-builder/form.selectors";
+import {
+  selectFormSlug,
+  selectSelectedFieldId,
+} from "@/redux/features/form-builder/form.selectors";
 
 /**
  * FormBuilder Component

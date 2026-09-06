@@ -3,17 +3,20 @@
 import { Card, CardContent } from "@/components/ui/Card";
 import { useDispatch, useSelector } from "react-redux";
 import { updateFormMeta } from "@/redux/features/form-builder/form.slice";
-import { selectFormTitle, selectFormDescription } from "@/redux/features/form-builder/form.selectors";
+import {
+  selectFormTitle,
+  selectFormDescription,
+} from "@/redux/features/form-builder/form.selectors";
 
 /**
  * FormMeta Component
- * 
+ *
  * Handles form title and description input.
- * 
+ *
  * Redux Subscriptions:
  * - formTitle (via selectFormTitle)
  * - formDescription (via selectFormDescription)
- * 
+ *
  * Re-renders only when title or description change, not when fields change.
  */
 export function FormMeta() {

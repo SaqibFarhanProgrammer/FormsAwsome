@@ -22,7 +22,8 @@ export const selectFieldById = (state: RootState, fieldId: string | null) =>
   fieldId ? state.form.fields.find((f) => f.id === fieldId) : null;
 
 // Selection selectors
-export const selectSelectedFieldId = (state: RootState): string | null => state.form.selectedFieldId;
+export const selectSelectedFieldId = (state: RootState): string | null =>
+  state.form.selectedFieldId;
 
 export const selectSelectedField = (state: RootState) => {
   const { fields, selectedFieldId } = state.form;

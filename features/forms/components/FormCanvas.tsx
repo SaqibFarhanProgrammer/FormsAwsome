@@ -80,11 +80,7 @@ interface FormCanvasProps {
  * re-render when their specific field data changes, not when other
  * fields or form metadata changes.
  */
-export function FormCanvas({
-  selectedFieldId,
-  onSelectField,
-  onRemoveField,
-}: FormCanvasProps) {
+export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: FormCanvasProps) {
   const dispatch = useDispatch();
 
   // Subscribe only to data needed for save functionality
