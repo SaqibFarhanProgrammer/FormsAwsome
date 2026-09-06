@@ -51,7 +51,7 @@ export type FieldType =
 
 export interface FormFieldType {
   id: string;
-  type: FieldType;
+  type: string;
   label: string;
   placeholder?: string;
   required: boolean;
@@ -115,8 +115,8 @@ export const FormFieldItem = memo(function FormFieldItem({
   onSelect,
   onRemove,
 }: FormFieldItemProps) {
-  const Icon = iconMap[field.type];
-  const typeLabel = labelMap[field.type];
+  const _Icon = iconMap[field.type as FieldType] || Type;
+  const typeLabel = labelMap[field.type as FieldType] || field.type;
 
   return (
     <TooltipProvider>
@@ -152,7 +152,7 @@ export const FormFieldItem = memo(function FormFieldItem({
             {/* Field Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                {/* <Icon className="w-4 h-4 text-primary" /> */}
+                <_Icon className="w-4 h-4 text-primary" />
                 <p className="text-sm font-medium truncate text-foreground">{field.label}</p>
                 {field.required && (
                   <span className="text-xs font-semibold text-destructive">*</span>

@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 },
     );
-  } catch (error: any) {
-    CatchErrorFunctionForRoute(error, "REGISTER USER ERROR");
+  } catch (error: unknown) {
+    return CatchErrorFunctionForRoute(
+      error instanceof Error ? error : new Error("Unable to register user"),
+      "REGISTER USER ERROR",
+    );
   }
 }

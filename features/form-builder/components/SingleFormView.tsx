@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FormTopBar } from "./FormTopBar";
-import { singleFormData } from "./FormData";
 import { FormSubmissions } from "./FormSubmissions";
 import { FormStats } from "./FormStats";
 import { FormActions } from "./FormActions";
@@ -12,6 +12,42 @@ import type { FormType } from "../models/form-builder.model";
 
 export function SingleFormView({ formData }: { formData: FormType }) {
   const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields">("preview");
+  const [submissions, setSubmissions] = useState<SubmissionViewModel[]>([]);
+  const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch(`/api/forms/${formData.slug}/submissions`)
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load submissions");
+        const result = await response.json();
+        if (!cancelled) {
+          setSubmissions((result.data ?? []).map(toSubmissionViewModel));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setSubmissions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingSubmissions(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [formData.slug]);
+
+  const stats = {
+    totalSubmissions: submissions.length,
+    totalViews: 0,
+    conversionRate: 0,
+    avgTime: "—",
+    lastSubmission: submissions[0]?.date || "No submissions yet",
+    todaySubmissions: submissions.filter((submission) => isToday(submission.createdAt)).length,
+    weekSubmissions: submissions.filter((submission) => isThisWeek(submission.createdAt)).length,
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,7 +65,7 @@ export function SingleFormView({ formData }: { formData: FormType }) {
                 { id: "preview" as const, label: "Preview" },
                 {
                   id: "submissions" as const,
-                  label: `Submissions (${singleFormData.stats.totalSubmissions})`,
+                  label: `Submissions (${isLoadingSubmissions ? "..." : submissions.length})`,
                 },
                 { id: "fields" as const, label: "Fields" },
               ].map((tab) => (
@@ -49,19 +85,61 @@ export function SingleFormView({ formData }: { formData: FormType }) {
 
             {/* Tab Content */}
             {activeTab === "preview" && <FormPreview fields={formData.fields} />}
-            {activeTab === "submissions" && (
-              <FormSubmissions submissions={singleFormData.submissions} />
-            )}
+            {activeTab === "submissions" && <FormSubmissions submissions={submissions} />}
             {activeTab === "fields" && <FormFieldsList fields={formData.fields} />}
           </div>
 
           {/* Right Column - 1/3 Stats & Actions */}
           <div className="space-y-4">
-            <FormStats stats={singleFormData.stats} />
-            <FormActions slug={formData.slug} />
+            <FormStats stats={stats} />
+            <FormActions slug={formData.slug} onDeleted={() => router.push("/all-forms")} />
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+type SubmissionViewModel = {
+  id: string;
+  submittedBy: string;
+  email: string;
+  date: string;
+  createdAt: string;
+  status: "new";
+  values: Record<string, string>;
+};
+
+function toSubmissionViewModel(submission: {
+  id: string;
+  data: Record<string, unknown>;
+  createdAt: string;
+}): SubmissionViewModel {
+  const values = Object.fromEntries(
+    Object.entries(submission.data).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? value.join(", ") : String(value ?? ""),
+    ]),
+  );
+
+  return {
+    id: submission.id,
+    submittedBy: values.name || values.full_name || "Anonymous",
+    email: values.email || "No email",
+    date: new Date(submission.createdAt).toLocaleString(),
+    createdAt: submission.createdAt,
+    status: "new",
+    values,
+  };
+}
+
+function isToday(date: string) {
+  const value = new Date(date);
+  const today = new Date();
+  return value.toDateString() === today.toDateString();
+}
+
+function isThisWeek(date: string) {
+  const value = new Date(date).getTime();
+  return Date.now() - value <= 7 * 24 * 60 * 60 * 1000;
 }

@@ -48,7 +48,15 @@ export async function proxy(req: NextRequest) {
 
   // Verify refresh token
 
-  const verifiedRefreshToken = verifyRefreshToken(refreshToken);
+  let verifiedRefreshToken;
+  try {
+    verifiedRefreshToken = verifyRefreshToken(refreshToken);
+  } catch {
+    if (isProtectedRoute) {
+      return NextResponse.redirect(new URL("/auth/login", req.url));
+    }
+    return NextResponse.next();
+  }
 
   if (!verifiedRefreshToken) {
     if (isProtectedRoute) {

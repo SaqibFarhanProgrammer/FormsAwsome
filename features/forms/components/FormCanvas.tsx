@@ -3,25 +3,7 @@
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
-import {
-  Type,
-  AlignLeft,
-  ListFilter,
-  CheckSquare,
-  CircleDot,
-  Mail,
-  Phone,
-  Calendar,
-  Hash,
-  Link,
-  Upload,
-  Star,
-  ToggleLeft,
-  Heading1,
-  SeparatorHorizontal,
-  Plus,
-  AlertCircle,
-} from "lucide-react";
+import { Plus, AlertCircle, Type } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useState, useCallback } from "react";
@@ -36,24 +18,6 @@ import {
 } from "@/redux/features/form-builder/form.selectors";
 import { FormMeta } from "./FormMeta";
 import { FormFieldItem } from "./FormFieldItem";
-
-const iconMap: Record<string, React.ElementType> = {
-  heading: Heading1,
-  text: Type,
-  textarea: AlignLeft,
-  select: ListFilter,
-  checkbox: CheckSquare,
-  radio: CircleDot,
-  email: Mail,
-  phone: Phone,
-  number: Hash,
-  date: Calendar,
-  url: Link,
-  file: Upload,
-  rating: Star,
-  toggle: ToggleLeft,
-  divider: SeparatorHorizontal,
-};
 
 interface FormCanvasProps {
   selectedFieldId: string | null;

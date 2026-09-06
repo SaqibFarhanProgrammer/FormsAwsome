@@ -21,6 +21,9 @@ import {
 } from "@/redux/features/form-builder/form.selectors";
 import { useSelector as useFormCreateSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import axios from "axios";
+import { useState } from "react";
+import { QRCodeCanvas } from "qrcode.react";
 
 /**
  * TopBar Component
@@ -40,61 +43,113 @@ export function TopBar() {
   const settings = useSelector(selectFormSettings);
   const fields = useSelector(selectFormFields);
 
-  // Separate selector for create form loading state
+  const [isSaving, setIsSaving] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+
   const loading = useFormCreateSelector((state: RootState) => state.formCreate.isLoading);
 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const handleCreateForm = async () => {
+  const getPublicUrl = (formSlug: string) => `${window.location.origin}/f/${formSlug}`;
+
+  const createCurrentForm = async () => {
     if (!slug) {
-      dispatch(
-        showAlert({
-          message: "Form slug is missing. Please reopen the create page.",
-          type: "danger",
-        }),
-      );
-      return;
+      throw new Error("Form slug is missing. Please reopen the create page.");
     }
+
+    const result = await dispatch(
+      createForm({ title, description, fields: fields ?? [], slug, settings }),
+    ).unwrap();
+    const createdSlug = result.data?.slug || slug;
+    dispatch(setFormSlug(createdSlug));
+    router.replace(`/create?slug=${createdSlug}`);
+    return createdSlug;
+  };
+
+  const saveCurrentForm = async () => {
+    if (!slug) return createCurrentForm();
 
     try {
-      const result = await dispatch(
-        createForm({
-          title,
-          description,
-          fields: fields ?? [],
-          slug,
-          settings,
-        }),
-      ).unwrap();
-
-      if (result.success) {
-        const slug = result.data?.slug;
-        if (slug) {
-          dispatch(setFormSlug(slug));
-          router.replace(`/create?slug=${slug}`);
-        }
-        dispatch(
-          showAlert({
-            message: "Form created successfully",
-            type: "success",
-          }),
-        );
-      }
-
-      console.log("Form created:", result);
+      const response = await axios.put(`/api/forms/${slug}`, {
+        title,
+        description,
+        fields: fields ?? [],
+        settings,
+      });
+      const savedSlug = response.data.form?.slug || slug;
+      dispatch(setFormSlug(savedSlug));
+      router.replace(`/create?slug=${savedSlug}`);
+      return savedSlug;
     } catch (error) {
-      const message =
-        error instanceof AppError
-          ? error.message
-          : typeof error === "string"
-            ? error
-            : "Unable to create the form. Please try again.";
-
-      console.error("Create form failed:", error);
-      dispatch(showAlert({ message, type: "danger" }));
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return createCurrentForm();
+      }
+      throw error;
     }
   };
+
+  const handleCreateForm = async () => {
+    try {
+      setIsSaving(true);
+      await createCurrentForm();
+      dispatch(showAlert({ message: "Form created successfully", type: "success" }));
+    } catch (error) {
+      dispatch(showAlert({ message: getErrorMessage(error), type: "danger" }));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveForm = async () => {
+    try {
+      setIsSaving(true);
+      await saveCurrentForm();
+      dispatch(showAlert({ message: "Form saved successfully", type: "success" }));
+    } catch (error) {
+      dispatch(showAlert({ message: getErrorMessage(error), type: "danger" }));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handlePublishForm = async () => {
+    try {
+      setIsSaving(true);
+      const savedSlug = await saveCurrentForm();
+      const response = await axios.post("/api/forms/publish-form", { slug: savedSlug });
+      const publishedUrl = response.data.url || getPublicUrl(savedSlug);
+      setShareUrl(publishedUrl);
+      dispatch(showAlert({ message: "Form published successfully", type: "success" }));
+    } catch (error) {
+      dispatch(showAlert({ message: getErrorMessage(error), type: "danger" }));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleShare = () => {
+    if (!slug) {
+      dispatch(showAlert({ message: "Save the form before sharing it.", type: "warning" }));
+      return;
+    }
+    setShareUrl(getPublicUrl(slug));
+  };
+
+  const handlePreview = () => {
+    if (!slug) {
+      dispatch(showAlert({ message: "Save the form before previewing it.", type: "warning" }));
+      return;
+    }
+    window.open(getPublicUrl(slug), "_blank", "noopener,noreferrer");
+  };
+
+  const getErrorMessage = (error: unknown) =>
+    axios.isAxiosError(error)
+      ? error.response?.data?.message || error.message
+      : error instanceof AppError || error instanceof Error
+        ? error.message
+        : "Something went wrong. Please try again.";
 
   return (
     <div className="h-10 border-b border-border bg-card flex items-center justify-between px-6 flex-shrink-0">
@@ -111,23 +166,23 @@ export function TopBar() {
         </Link>
         <div className="h-6 w-px bg-border" />
         <div>
-          <h1 className="text-sm font-semibold">Untitled Form</h1>
+          <h1 className="text-sm font-semibold">{title || "Untitled Form"}</h1>
         </div>
         <Badge
           variant="secondary"
           className="rounded-lg text-xs bg-amber-50 text-amber-700 border-amber-200/50"
         >
-          Draft
+          {shareUrl ? "Published" : "Draft"}
         </Badge>
       </div>
 
       {/* Right */}
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" className="rounded-xl gap-2">
+        <Button variant="outline" size="sm" className="rounded-xl gap-2" onClick={handlePreview}>
           <Eye className="w-4 h-4" />
           Preview
         </Button>
-        <Button variant="outline" size="sm" className="rounded-xl gap-2">
+        <Button variant="outline" size="sm" className="rounded-xl gap-2" onClick={handleShare}>
           <Share2 className="w-4 h-4" />
           Share
         </Button>
@@ -136,7 +191,7 @@ export function TopBar() {
           onClick={handleCreateForm}
           className="rounded-xl px-5 py-2 gap-2"
           style={{ backgroundColor: "#432DD7" }}
-          disabled={loading}
+          disabled={loading || isSaving}
         >
           {loading ? <Spinner className="w-4 h-4 text-white" /> : <Save className="w-4 h-4" />}
           Create Form
@@ -145,6 +200,8 @@ export function TopBar() {
           size="sm"
           className="rounded-xl px-5 py-2 gap-2"
           style={{ backgroundColor: "#432DD7" }}
+          onClick={handleSaveForm}
+          disabled={isSaving}
         >
           <Save className="w-4 h-4" />
           Save Form
@@ -153,11 +210,68 @@ export function TopBar() {
           size="sm"
           className="rounded-xl px-5 py-2 gap-2"
           style={{ backgroundColor: "#432DD7" }}
+          onClick={handlePublishForm}
+          disabled={isSaving}
         >
           <Save className="w-4 h-4" />
           Publish
         </Button>
       </div>
+
+      {shareUrl && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
+            <div className="mb-5 flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Share your form</h2>
+                <p className="text-sm text-muted-foreground">Your form is live and ready.</p>
+              </div>
+              <button
+                className="text-muted-foreground"
+                onClick={() => setShareUrl(null)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="mb-4 flex justify-center rounded-xl bg-white p-4">
+              <QRCodeCanvas value={shareUrl} size={190} includeMargin />
+            </div>
+            <div className="mb-4 rounded-lg border bg-muted/30 px-3 py-2 text-xs break-all text-muted-foreground">
+              {shareUrl}
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(shareUrl);
+                  dispatch(showAlert({ message: "Form URL copied", type: "success" }));
+                }}
+              >
+                Copy URL
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => window.open(shareUrl, "_blank")}>
+                Open
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={async () => {
+                  if (navigator.share) {
+                    await navigator.share({ url: shareUrl, title });
+                  } else {
+                    await navigator.clipboard.writeText(shareUrl);
+                    dispatch(showAlert({ message: "Form URL copied", type: "success" }));
+                  }
+                }}
+              >
+                Share
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

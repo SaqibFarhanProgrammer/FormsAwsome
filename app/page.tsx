@@ -7,7 +7,7 @@ import { PricingSection } from "@/components/landing-page/PricingSections";
 import { SocialProof } from "@/components/landing-page/SociaProof";
 import { Testimonials } from "@/components/landing-page/Testimonials";
 
-export default function LandingPage() {
+export default async function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />

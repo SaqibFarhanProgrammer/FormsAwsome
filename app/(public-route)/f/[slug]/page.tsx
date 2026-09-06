@@ -1,46 +1,5 @@
 import { getPublicFormService } from "@/core/services/form/forms.service";
-import FormUI, {
-  type FormData as PublicFormData,
-} from "@/features/form-builder/components/form-ui";
-
-const dummyFormData: PublicFormData = {
-  _id: "dummy-form-for-testing",
-  title: "Customer Feedback Form",
-  description: "A test form for checking the public form experience.",
-  settings: {
-    submitButtonText: "Send Feedback",
-    successMessage: "Thanks for your feedback!",
-  },
-  fields: [
-    {
-      id: "name",
-      type: "short_text",
-      label: "Full name",
-      placeholder: "Enter your full name",
-      validation: { required: true },
-    },
-    {
-      id: "email",
-      type: "email",
-      label: "Email address",
-      placeholder: "you@example.com",
-      validation: { required: true },
-    },
-    {
-      id: "rating",
-      type: "rating",
-      label: "How would you rate your experience?",
-      validation: { required: true, min: 1, max: 5 },
-    },
-    {
-      id: "feedback",
-      type: "long_text",
-      label: "Your feedback",
-      placeholder: "Tell us what you think...",
-      validation: { required: true, min: 10 },
-    },
-  ],
-};
+import FormUI from "@/features/form-builder/components/form-ui";
 
 interface FormPageProps {
   params: Promise<{ slug: string }>;
@@ -48,22 +7,28 @@ interface FormPageProps {
 
 export default async function FormPage({ params }: FormPageProps) {
   const { slug } = await params;
+  let formData: Awaited<ReturnType<typeof getPublicFormService>> | null = null;
 
-  const FormData = await getPublicFormService(slug);
+  try {
+    formData = await getPublicFormService(slug);
+  } catch {}
+
+  if (!formData) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6">
+        <section className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <h1 className="text-xl font-semibold">Form unavailable</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            This form does not exist, has not been published, or its link is outdated.
+          </p>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <FormUI
-        formData={FormData}
-        onSubmit={async (values) => {
-          "use server";
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/forms/${slug}/submit`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(values),
-          });
-        }}
-      />
+      <FormUI formData={formData} submitUrl={`/api/f/${slug}`} />
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import { UAParser } from "ua-parser-js";
 import type { Metadata } from "next";
 import { Geist, Inter } from "next/font/google";
 import "./globals.css";

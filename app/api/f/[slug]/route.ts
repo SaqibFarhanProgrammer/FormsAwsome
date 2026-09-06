@@ -1,7 +1,7 @@
 // app/api/f/[slug]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
-import { getPublicFormService } from "@/core/services/form/forms.service";
+import { getPublicFormService, submitFormService } from "@/core/services/form/forms.service";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
@@ -15,29 +15,33 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
       { status: 200 },
     );
-  } catch (error: any) {
-    return CatchErrorFunctionForRoute(error, "GET PUBLIC FORM ERROR");
+  } catch (error: unknown) {
+    return CatchErrorFunctionForRoute(
+      error instanceof Error ? error : new Error("Unknown public form error"),
+      "GET PUBLIC FORM ERROR",
+    );
   }
 }
 
-// export async function POST(
-//   request: NextRequest,
-//   { params }: { params: Promise<{ slug: string }> }
-// ) {
-//   try {
-//     const { slug } = await params;
-//     const body = await request.json();
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  try {
+    const { slug } = await params;
+    const data = await submitFormService(slug, await request.json(), {
+      ip: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+      userAgent: request.headers.get("user-agent") || undefined,
+    });
 
-//     const data = await submitFormService(slug, body);
-//     return NextResponse.json(
-//       {
-//         success: true,
-//         message: "Form submitted successfully",
-//         data,
-//       },
-//       { status: 201 }
-//     );
-//   } catch (error: any) {
-//     return CatchErrorFunctionForRoute(error, "SUBMIT FORM ERROR");
-//   }
-// }
+    return NextResponse.json(
+      { success: true, message: "Form submitted successfully", data },
+      { status: 201 },
+    );
+  } catch (error: unknown) {
+    return CatchErrorFunctionForRoute(
+      error instanceof Error ? error : new Error("Unknown submission error"),
+      "SUBMIT FORM ERROR",
+    );
+  }
+}

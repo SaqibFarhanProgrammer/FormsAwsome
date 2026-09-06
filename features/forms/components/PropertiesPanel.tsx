@@ -6,11 +6,15 @@ import { Label } from "@/components/ui/Label";
 import { Switch } from "@/components/ui/Switch";
 import { Button } from "@/components/ui/Button";
 import { Separator } from "@/components/ui/Separator";
+import { QRCodeCanvas } from "qrcode.react";
+
 import {
   FormSettings,
   updateField,
   updateFormMeta,
   updateFormSettings,
+  duplicateField,
+  removeField,
 } from "@/redux/features/form-builder/form.slice";
 import { Settings, Trash2, Copy, Eye, QrCode, Plus, X, ChevronRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +25,7 @@ import {
   selectFormSettings,
 } from "@/redux/features/form-builder/form.selectors";
 import { useCallback } from "react";
+import { showAlert } from "@/redux/features/global/alertSlice";
 
 interface PropertiesPanelProps {
   onClose: () => void;
@@ -43,13 +48,13 @@ interface PropertiesPanelProps {
 export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
   const dispatch = useDispatch();
 
-  // Subscribe narrowly to just the selected field
   const selectedField = useSelector(selectSelectedField);
 
   // Only subscribe when needed for form settings
   const formTitle = useSelector(selectFormTitle);
   const formDescription = useSelector(selectFormDescription);
   const settings = useSelector(selectFormSettings);
+  const formSlug = useSelector((state: import("@/redux/store").RootState) => state.form.formSlug);
 
   // Memoize the update callback to avoid unnecessary re-renders of dependents
   const handleUpdateField = useCallback(
@@ -76,6 +81,7 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
           title={formTitle}
           description={formDescription}
           settings={settings}
+          slug={formSlug}
           onUpdateMeta={(updates) => dispatch(updateFormMeta(updates))}
           onUpdateSettings={(updates) => dispatch(updateFormSettings(updates))}
         />
@@ -204,48 +210,53 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
 
       <Separator />
 
-      <Card className="rounded-xl border-border bg-muted/30">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <QrCode className="w-4 h-4 text-primary" />
-            QR Code
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="w-full aspect-square rounded-xl bg-white border border-border flex items-center justify-center">
-            <div className="grid grid-cols-5 gap-0.5 w-24 h-24">
-              {Array.from({ length: 25 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-full aspect-square ${
-                    [0, 1, 2, 3, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24].includes(i)
-                      ? "bg-foreground"
-                      : "bg-transparent"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground text-center">Scan to preview this form</p>
-        </CardContent>
-      </Card>
-
       {/* Actions */}
       <div className="space-y-2">
-        <Button variant="default" className="rounded-xl w-full gap-2 text-xs">
+        <Button
+          variant="default"
+          className="rounded-xl w-full gap-2 text-xs"
+          onClick={() =>
+            dispatch(
+              showAlert({
+                message: "Use Publish in the top bar to publish this form.",
+                type: "warning",
+              }),
+            )
+          }
+        >
           Publish Form
         </Button>
-        <Button variant="outline" className="rounded-xl w-full gap-2 text-xs">
+        <Button
+          variant="outline"
+          className="rounded-xl w-full gap-2 text-xs"
+          onClick={() => dispatch(duplicateField(selectedField.id))}
+        >
           <Copy className="w-3.5 h-3.5" />
           Duplicate Field
         </Button>
-        <Button variant="outline" className="rounded-xl w-full gap-2 text-xs">
+        <Button
+          variant="outline"
+          className="rounded-xl w-full gap-2 text-xs"
+          onClick={() =>
+            dispatch(
+              showAlert({
+                message: "Field preview is available in the Preview button.",
+                type: "success",
+              }),
+            )
+          }
+        >
           <Eye className="w-3.5 h-3.5" />
           Preview Field
         </Button>
         <Button
           variant="outline"
           className="rounded-xl w-full gap-2 text-xs text-destructive border-destructive/20 hover:bg-destructive/5 hover:text-destructive"
+          onClick={() => {
+            dispatch(removeField(selectedField.id));
+            onClose();
+            dispatch(showAlert({ message: "Field deleted", type: "success" }));
+          }}
         >
           <Trash2 className="w-3.5 h-3.5" />
           Delete Field
@@ -286,12 +297,14 @@ function FormSettingsPanel({
   title,
   description,
   settings,
+  slug,
   onUpdateMeta,
   onUpdateSettings,
 }: {
   title: string;
   description: string;
   settings: FormSettings;
+  slug: string | null;
   onUpdateMeta: (updates: { title?: string; description?: string }) => void;
   onUpdateSettings: (updates: Partial<FormSettings>) => void;
 }) {
@@ -344,6 +357,41 @@ function FormSettingsPanel({
         placeholder="you@example.com"
         onChange={(value) => onUpdateSettings({ notifyEmail: value })}
       />
+      {slug && <FormShareCard slug={slug} />}
     </div>
+  );
+}
+
+function FormShareCard({ slug }: { slug: string }) {
+  const dispatch = useDispatch();
+  const url = typeof window === "undefined" ? `/f/${slug}` : `${window.location.origin}/f/${slug}`;
+
+  return (
+    <Card className="rounded-xl border-border bg-muted/30">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <QrCode className="w-4 h-4 text-primary" />
+          Form QR Code
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex justify-center rounded-lg bg-white p-3">
+          <QRCodeCanvas value={url} size={150} includeMargin />
+        </div>
+        <p className="break-all text-center text-xs text-muted-foreground">{url}</p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full gap-2"
+          onClick={() => {
+            navigator.clipboard.writeText(url);
+            dispatch(showAlert({ message: "Form URL copied", type: "success" }));
+          }}
+        >
+          <Copy className="h-3.5 w-3.5" />
+          Copy form URL
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

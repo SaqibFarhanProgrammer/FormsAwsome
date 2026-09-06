@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -24,7 +24,7 @@ interface Submission {
   details: { label: string; value: string }[];
 }
 
-const submissionsData: Submission[] = [
+const _submissionsData: Submission[] = [
   {
     id: "1",
     form: "Contact Form",
@@ -280,7 +280,18 @@ function getStatusBadge(status: Submission["status"]) {
 }
 
 export function SubmissionsTable() {
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/submissions")
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load submissions");
+        const result = await response.json();
+        setSubmissions(result.data ?? []);
+      })
+      .catch(() => setSubmissions(_submissionsData));
+  }, []);
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
@@ -315,7 +326,7 @@ export function SubmissionsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {submissionsData.map((submission) => (
+            {submissions.map((submission) => (
               <React.Fragment key={submission.id}>
                 <TableRow
                   className="cursor-pointer hover:bg-muted/30 transition-colors border-border"
@@ -417,7 +428,7 @@ export function SubmissionsTable() {
       {/* Bottom Info Bar */}
       <div className="border-t border-border px-6 py-3 bg-card flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing all {submissionsData.length} submissions
+          Showing all {submissions.length} submissions
         </p>
       </div>
     </Card>

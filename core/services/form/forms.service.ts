@@ -9,7 +9,7 @@ import { Submission } from "@/features/submissions/models/submission.model";
 import { FormState } from "@/features/form-builder/types/form-builder.types";
 import { Form } from "@/features/form-builder/models/form-builder.model";
 import type { FormField } from "@/features/form-builder/models/form-builder.model";
-import { nanoid } from "nanoid";
+import { Types } from "mongoose";
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
@@ -218,7 +218,6 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
   const { title, description, fields, settings, state } = body;
 
   const userid = await getUserIdFromToken();
-  const newSlug = title.split(" ").join("-").toLowerCase() + userid + nanoid();
 
   await connectDB();
 
@@ -238,8 +237,6 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
   if (title !== undefined) {
     isFormExit.title = title.trim();
   }
-
-  isFormExit.slug = newSlug;
 
   if (description !== undefined) {
     isFormExit.description = description?.trim() || "";
@@ -383,12 +380,13 @@ export async function getPublicFormService(slug: string) {
   // }
 
   await connectDB();
-  const form = await Form.findOne({
-    slug,
-    state: FormState.PUBLISHED,
-  });
+  const form = await Form.findOne({ slug });
 
   if (!form) {
+    throw new AppError("Form not found or not published", 404);
+  }
+
+  if (form.state !== FormState.PUBLISHED && !(await isFormOwner(form.userId.toString()))) {
     throw new AppError("Form not found or not published", 404);
   }
 
@@ -426,4 +424,157 @@ export async function getPublicFormService(slug: string) {
   // await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formData), 3600 * 5);
 
   return formData;
+}
+
+export async function submitFormService(
+  slug: string,
+  data: Record<string, unknown>,
+  meta: { ip?: string; userAgent?: string } = {},
+) {
+  if (!slug || !data || typeof data !== "object" || Array.isArray(data)) {
+    throw new AppError("A valid form submission is required", 400);
+  }
+
+  await connectDB();
+  const form = await Form.findOne({ slug });
+
+  if (!form) {
+    throw new AppError("Form not found or not published", 404);
+  }
+
+  if (form.state !== FormState.PUBLISHED && !(await isFormOwner(form.userId.toString()))) {
+    throw new AppError("Form not found or not published", 404);
+  }
+
+  const allowedFieldIds = new Set(form.fields.map((field: FormField) => field.id));
+  const unknownFieldId = Object.keys(data).find((fieldId) => !allowedFieldIds.has(fieldId));
+  if (unknownFieldId) {
+    throw new AppError("Submission contains an invalid field", 400);
+  }
+
+  for (const field of form.fields) {
+    const value = data[field.id];
+    const isEmpty = value === undefined || value === null || value === "";
+
+    if (field.validation.required && isEmpty) {
+      throw new AppError(`${field.label} is required`, 400);
+    }
+
+    if (!isEmpty && typeof value === "string") {
+      if (field.validation.min !== undefined && value.length < field.validation.min) {
+        throw new AppError(`${field.label} is too short`, 400);
+      }
+      if (field.validation.max !== undefined && value.length > field.validation.max) {
+        throw new AppError(`${field.label} is too long`, 400);
+      }
+      if (field.validation.pattern && !new RegExp(field.validation.pattern).test(value)) {
+        throw new AppError(`${field.label} has an invalid format`, 400);
+      }
+    }
+  }
+
+  const submission = await Submission.create({
+    formId: form._id,
+    formVersion: form.version,
+    data,
+    meta,
+  });
+
+  return {
+    id: submission._id.toString(),
+    message: form.settings.successMessage || "Thank you for your submission!",
+  };
+}
+
+async function isFormOwner(formUserId: string) {
+  try {
+    return (await getUserIdFromToken()).toString() === formUserId;
+  } catch {
+    return false;
+  }
+}
+
+export async function getUserSubmissionsService() {
+  const userId = await getUserIdFromToken();
+  await connectDB();
+
+  const forms = await Form.find({ userId }).select("_id title fields").lean();
+  const formIds = forms.map((form) => form._id);
+  const formMap = new Map(forms.map((form) => [form._id.toString(), form]));
+  const submissions = await Submission.find({ formId: { $in: formIds } })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return submissions.map((submission) => {
+    const form = formMap.get(submission.formId.toString());
+    const details = Object.entries(submission.data).map(([fieldId, value]) => ({
+      label: form?.fields.find((field: FormField) => field.id === fieldId)?.label || fieldId,
+      value: Array.isArray(value) ? value.join(", ") : String(value ?? ""),
+    }));
+    const name = details.find((detail) => detail.label.toLowerCase() === "name")?.value || "-";
+    const email = details.find((detail) => detail.label.toLowerCase() === "email")?.value || "-";
+
+    return {
+      id: submission._id.toString(),
+      form: form?.title || "Deleted form",
+      name,
+      email,
+      date: submission.createdAt.toISOString(),
+      status: "new" as const,
+      details,
+    };
+  });
+}
+
+export async function getFormSubmissionsService(formIdOrSlug: string) {
+  const userId = await getUserIdFromToken();
+  await connectDB();
+
+  const form = await findOwnedForm(formIdOrSlug, userId.toString());
+  const submissions = await Submission.find({ formId: form._id }).sort({ createdAt: -1 }).lean();
+
+  return submissions.map((submission) => ({
+    id: submission._id.toString(),
+    formId: form._id.toString(),
+    form: form.title,
+    data: submission.data,
+    meta: submission.meta,
+    createdAt: submission.createdAt,
+  }));
+}
+
+export async function getSubmissionService(submissionId: string) {
+  const userId = await getUserIdFromToken();
+  await connectDB();
+
+  const submission = await Submission.findById(submissionId).lean();
+  if (!submission) {
+    throw new AppError("Submission not found", 404);
+  }
+
+  const form = await findOwnedForm(submission.formId.toString(), userId.toString());
+  return {
+    id: submission._id.toString(),
+    formId: form._id.toString(),
+    form: form.title,
+    data: submission.data,
+    meta: submission.meta,
+    createdAt: submission.createdAt,
+  };
+}
+
+async function findOwnedForm(formIdOrSlug: string, userId: string) {
+  const form = await Form.findOne({
+    userId,
+    $or: [
+      { slug: formIdOrSlug },
+      ...(Types.ObjectId.isValid(formIdOrSlug) ? [{ _id: formIdOrSlug }] : []),
+    ],
+  });
+
+  if (!form) {
+    throw new AppError("Form not found", 404);
+  }
+
+  return form;
 }

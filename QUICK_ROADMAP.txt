@@ -3,25 +3,25 @@
 ║                     Current Status & Next Steps                                ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
 
-📊 CURRENT STATUS:
-✅ Completed:
-   - App Router structure
-   - UI Component Library (all major components)
-   - Redux store
-   - Database connection
-   - Landing page
+📊 CURRENT STATUS (MVP):
+✅ Implemented:
+   - App Router, UI library, Redux store, MongoDB connection, landing page
+   - Email/password register, login, verification, logout, protected route proxy
+   - Canonical form APIs: GET/POST /api/forms, GET/PUT /api/forms/[id-or-slug]
+   - Form delete/archive/publish APIs with owner checks
+   - Form builder fields, properties, stable slugs, draft save and publish flow
+   - Public form rendering and validated submissions at /f/[slug]
+   - Submission APIs, owner-scoped dashboard data, QR/share/copy URL flow
+   - Canonical profile and submission detail endpoints
 
-🔄 In Progress:
-   - Auth pages (routes exist but incomplete)
-   - Dashboard layout
-   - Form builder structure
+🔄 MVP Hardening:
+   - End-to-end browser testing against configured MongoDB and mail provider
+   - Replace remaining dashboard placeholder analytics/table data
+   - Add pagination/export and submission status mutations
 
-❌ Not Started:
-   - Complete auth system
-   - Form backend APIs
-   - Drag & drop builder
-   - Analytics
-   - Advanced features
+⏸️ Deferred after MVP:
+   - OAuth providers, password reset, billing, payments, webhooks
+   - Advanced analytics, collaboration, integrations, file storage
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -300,8 +300,8 @@ Full Project: ~7-8 weeks (including Phase 8)
 ═══════════════════════════════════════════════════════════════════════════════
 
 🎯 CURRENT PRIORITY:
-► PHASE 1: AUTHENTICATION SYSTEM
+► MVP HARDENING & RELEASE CHECKS
 
-START HERE: Setup NextAuth.js configuration
+START HERE: Run production build and browser-test auth → create → publish → submit → submissions.
 
 ═══════════════════════════════════════════════════════════════════════════════

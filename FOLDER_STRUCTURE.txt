@@ -1,0 +1,154 @@
+FORMSAWESOME - MVP FOLDER STRUCTURE
+====================================
+
+This project uses Next.js 16.3.3 App Router with feature-based application code.
+
+ROOT
+----
+app/              Next.js routes, pages, layouts, and API route handlers
+components/       Shared UI and reusable visual components
+config/            Application configuration
+core/              Server-side business logic and infrastructure
+features/         Feature-owned components, models, schemas, services, and types
+lib/              Small cross-feature utilities and shared integrations
+models/           Shared Mongoose models
+providers/        React context and application providers
+public/           Static assets, images, icons, and fonts
+redux/            Redux store and feature slices
+tests/            Unit and integration tests
+types/            Global TypeScript declarations
+utils/             Small generic utilities
+proxy.ts          Route protection and refresh-token handling
+
+APP ROUTES
+----------
+app/layout.tsx                    Root layout, Redux provider, global alert
+app/page.tsx                      Landing page
+app/(pages)/layout.tsx            Authenticated dashboard shell
+app/(pages)/dashboard/            Dashboard home
+app/(pages)/all-forms/            Forms list and single-form detail
+app/(pages)/analytics/            Analytics dashboard
+app/(pages)/profile/              User profile
+app/(pages)/settings/             User settings
+app/(pages)/submissions/          All submissions
+app/(public-route)/f/[slug]/      Public form renderer and submission UI
+app/create/                       Form builder route
+app/auth/login/                   Login page
+app/auth/register/                Registration page
+app/auth/verify-email/            Email verification page
+
+API ROUTES
+----------
+app/api/auth/register/            Register user
+app/api/auth/login/               Login and token cookies
+app/api/auth/logout/              Clear auth cookies
+app/api/auth/verify-email/         Verify email
+app/api/auth/resend-verification/ Resend verification email
+app/api/auth/get-ip/              Request IP metadata
+app/api/auth/get-user-det/        User-agent/device metadata
+app/api/auth/google/              Google OAuth start/callback
+
+app/api/forms/                    Canonical GET list and POST create
+app/api/forms/[formIdOrSlug]/     Get and update one owned form
+app/api/forms/[formIdOrSlug]/submissions/
+                                  List submissions for one owned form
+app/api/forms/create/              Legacy create endpoint
+app/api/forms/get-all-forms/       Legacy list endpoint
+app/api/forms/update/              Legacy update endpoint
+app/api/forms/delete/              Delete form and submissions
+app/api/forms/archive/             Archive form
+app/api/forms/publish-form/        Publish form and return public URL
+
+app/api/f/[slug]/                 Public form GET and POST submission
+app/api/submissions/              Authenticated submissions list
+app/api/submissions/[submissionId]/
+                                  Authenticated submission detail
+app/api/profile/                  Canonical profile endpoint
+app/api/profile/get-profile/      Legacy profile endpoint
+
+FEATURE OWNERSHIP
+-----------------
+features/auth/
+  Auth UI, auth services, and auth-specific types
+
+features/dashboard/
+  Dashboard shell, sidebar, forms list, dashboard tables, quick actions
+
+features/form-builder/
+  Builder field types, models, schemas, services, store, and utilities
+  components/                    Builder and form detail UI
+  components/SingleFormView.tsx   Form detail page tabs and live submission data
+  components/FormPreview.tsx      Read-only form preview
+  components/FormSubmissions.tsx Submission list and expandable details
+  components/FormActions.tsx     Share URL, QR code, delete form actions
+  components/FormTopBar.tsx      Back, copy URL, preview, edit actions
+
+features/forms/
+  Form creation/list UI and the main editor experience
+  components/FormBuilder.tsx     Builder shell
+  components/Topbar.tsx          Create, save, publish, share actions
+  components/FormCanvas.tsx      Field canvas and save UI
+  components/PropertiesPanel.tsx Field and form settings editor
+
+features/submissions/
+  Submission model, types, list filters, and submission UI
+
+features/anylatics/
+  Analytics cards and charts
+
+features/profile/                  Profile components and types
+features/settings/                 Settings components
+features/node-mailer/              Email templates and mail configuration
+
+SERVER LAYERS
+------------
+core/db/                         Database connection and global DB declarations
+core/services/auth/              Authentication business services
+core/services/form/              Form CRUD, public form, and submission services
+core/services/profile/           Profile business services
+
+features/*/models/               Feature-owned Mongoose models
+features/*/schemas/              Zod or validation schemas
+features/*/services/             Feature-specific client/server services
+features/*/types/                Feature-specific TypeScript contracts
+
+STATE AND SHARED CODE
+---------------------
+redux/store.ts                   Root Redux store
+redux/features/form-builder/    Builder state, selectors, and field actions
+redux/features/create-form/     Create-form async state
+redux/features/global/           Global alerts
+redux/features/profile/          Profile state
+components/ui/                   Shared UI primitives
+components/common/               App-wide components such as GlobalAlert
+providers/ReduxProvider.tsx      Redux provider boundary
+lib/auth/                        JWT, auth cookies, Redis auth helpers
+lib/utils.ts                     cn() and shared class helpers
+utils/                           Generic error/date/profile helpers
+
+WHERE NEW CODE GOES
+-------------------
+1. A URL/page belongs in app/.
+2. An API handler belongs beside its URL in app/api/.
+3. Business rules and database orchestration belong in core/services/.
+4. Feature UI belongs in features/<feature>/components/.
+5. Feature models, schemas, services, and types stay inside that feature.
+6. Reusable visual primitives belong in components/ui/.
+7. Cross-feature Redux state belongs in redux/features/.
+8. Do not put business logic directly in page.tsx or a UI component.
+9. Keep public form access at /f/[slug] and public submission at /api/f/[slug].
+10. Keep form slugs stable after creation; saving must never invalidate shared URLs.
+
+MVP FLOW
+--------
+Auth -> Create form -> Add fields -> Save draft -> Publish
+     -> Public URL /f/[slug] -> Submit response
+     -> Owner submissions -> Form detail /all-forms/[slug]
+
+QUALITY CHECKS
+--------------
+pnpm exec tsc --noEmit
+pnpm exec eslint <changed-files>
+pnpm build
+
+Do not place generated .next/ output, secrets, or node_modules code in this structure.

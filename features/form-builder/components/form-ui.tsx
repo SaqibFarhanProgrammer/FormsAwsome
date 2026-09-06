@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -494,17 +494,19 @@ function RenderField({
 
 interface FormUIProps {
   formData: FormData;
-  onSubmit: (data: Record<string, unknown>) => void | Promise<void>;
+  submitUrl: string;
   className?: string;
   isSubmitting?: boolean;
 }
 
 export default function FormUI({
   formData,
-  onSubmit,
+  submitUrl,
   className,
   isSubmitting = false,
 }: FormUIProps) {
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const schema = useMemo(() => buildSchema(formData.fields), [formData.fields]);
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -515,7 +517,25 @@ export default function FormUI({
   const { register, handleSubmit, setValue, watch, formState } = form;
 
   const submit = async (values: z.infer<typeof schema>) => {
-    await onSubmit(values as Record<string, unknown>);
+    setSubmitMessage(null);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch(submitUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(result?.message || "Unable to submit the form");
+      }
+
+      setSubmitMessage(result?.data?.message || "Thank you for your submission!");
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Unable to submit the form");
+    }
   };
 
   return (
@@ -557,6 +577,12 @@ export default function FormUI({
               formData.settings.submitButtonText || "Submit"
             )}
           </Button>
+          {submitMessage && (
+            <p className="mt-3 text-center text-sm text-emerald-600">{submitMessage}</p>
+          )}
+          {submitError && (
+            <p className="mt-3 text-center text-sm text-destructive">{submitError}</p>
+          )}
         </div>
       </form>
     </div>

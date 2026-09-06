@@ -78,6 +78,21 @@ const formSlice = createSlice({
       state.selectedFieldId = newField.id;
       state.isDirty = true;
     },
+    duplicateField: (state, action: PayloadAction<string>) => {
+      const field = state.fields.find((item) => item.id === action.payload);
+      if (!field) return;
+
+      const duplicate = {
+        ...field,
+        id: nanoid(),
+        label: `${field.label} Copy`,
+        order: state.fields.length,
+        options: field.options ? [...field.options] : [],
+      };
+      state.fields.push(duplicate);
+      state.selectedFieldId = duplicate.id;
+      state.isDirty = true;
+    },
     removeField: (state, action: PayloadAction<string>) => {
       const index = state.fields.findIndex((f) => f.id === action.payload);
       if (index !== -1) {
@@ -98,7 +113,9 @@ const formSlice = createSlice({
     updateField: (state, action: PayloadAction<{ id: string } & Partial<FormFieldType>>) => {
       const field = state.fields.find((f) => f.id === action.payload.id);
       if (field) {
-        const { id, order, ...updates } = action.payload;
+        const updates = Object.fromEntries(
+          Object.entries(action.payload).filter(([key]) => key !== "id" && key !== "order"),
+        ) as Partial<FormFieldType>;
         Object.assign(field, updates);
         state.isDirty = true;
       }
@@ -136,6 +153,7 @@ const formSlice = createSlice({
 
 export const {
   addField,
+  duplicateField,
   removeField,
   reorderFields,
   selectField,
