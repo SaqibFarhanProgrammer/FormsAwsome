@@ -10,6 +10,7 @@ import { FormState } from "@/features/form-builder/types/form-builder.types";
 import { Form } from "@/features/form-builder/models/form-builder.model";
 import type { FormField } from "@/features/form-builder/models/form-builder.model";
 import { Types } from "mongoose";
+import { nanoid } from "@reduxjs/toolkit";
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
@@ -218,6 +219,7 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
   const { title, description, fields, settings, state } = body;
 
   const userid = await getUserIdFromToken();
+  const newSlug = title.toLowerCase().replace(/ /g, "-") + "-" + userid + nanoid(); // Generate a new slug based on the title and user ID
 
   await connectDB();
 
@@ -258,6 +260,8 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
     };
   }
 
+  isFormExit.slug = newSlug; // Update slug to the new generated slug
+
   if (state !== undefined) {
     isFormExit.state = state;
   }
@@ -271,7 +275,7 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
     id: isFormExit._id,
     title: isFormExit.title,
     description: isFormExit.description,
-    slug: isFormExit.slug,
+    slug: newSlug, // Return the new slug
     version: isFormExit.version,
     fields: isFormExit.fields,
     settings: isFormExit.settings,

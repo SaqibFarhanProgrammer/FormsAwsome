@@ -1,12 +1,6 @@
 import mongoose from "mongoose";
 
-export type DeviceType =
-  | "mobile"
-  | "tablet"
-  | "desktop"
-  | "tv"
-  | "bot"
-  | "unknown";
+export type DeviceType = "mobile" | "tablet" | "desktop" | "tv" | "bot" | "unknown";
 
 export type FormViewType = {
   formId: mongoose.Types.ObjectId | string;
