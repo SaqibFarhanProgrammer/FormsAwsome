@@ -12,6 +12,47 @@ import type { FormField } from "@/features/form-builder/models/form-builder.mode
 import { Types } from "mongoose";
 import { nanoid } from "@reduxjs/toolkit";
 
+type IncomingField = {
+  id: string;
+  type: string;
+  label: string;
+  placeholder?: string;
+  helperText?: string;
+  required?: boolean;
+  validation?: FormField["validation"];
+  options?: string[] | { label?: string; value?: string }[];
+  defaultValue?: string | number | boolean;
+  logic?: FormField["logic"];
+};
+
+function normalizeFields(fields: IncomingField[]) {
+  return fields.map((field) => ({
+    id: field.id,
+    type: field.type,
+    label: field.label,
+    placeholder: field.placeholder,
+    helperText: field.helperText,
+    defaultValue: field.defaultValue,
+    logic: field.logic,
+    options: Array.isArray(field.options)
+      ? field.options.map((option) =>
+          typeof option === "string"
+            ? { label: option, value: option }
+            : {
+                label: option.label ?? option.value ?? "",
+                value: option.value ?? option.label ?? "",
+              },
+        )
+      : [],
+    validation: {
+      required: field.validation?.required ?? field.required ?? false,
+      min: field.validation?.min,
+      max: field.validation?.max,
+      pattern: field.validation?.pattern,
+    },
+  }));
+}
+
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
   const { title, description, slug, fields, settings } = body;
@@ -48,7 +89,7 @@ export async function createFormService(request: NextRequest) {
     description: description?.trim() || "",
     userId,
     slug: slug.toLowerCase().trim(),
-    fields,
+    fields: normalizeFields(fields),
     settings: {
       submitButtonText: settings?.submitButtonText || "Submit",
       successMessage: settings?.successMessage || "Thank you for your submission!",
@@ -248,7 +289,7 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
     if (!Array.isArray(fields)) {
       throw new AppError("Fields must be an array", 400);
     }
-    isFormExit.fields = fields;
+    isFormExit.fields = normalizeFields(fields);
   }
 
   if (settings !== undefined) {

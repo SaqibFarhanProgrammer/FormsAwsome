@@ -49,7 +49,7 @@ export function ElementsSidebar({ onAddField }: ElementsSidebarProps) {
         <p className="text-xs text-muted-foreground mt-0.5">Click to add to canvas</p>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="">
         {elements.map((element) => {
           const Icon = element.icon;
           return (
@@ -59,7 +59,7 @@ export function ElementsSidebar({ onAddField }: ElementsSidebarProps) {
               className="w-full justify-start gap-3 h-11 rounded-xl text-sm font-normal hover:bg-primary/5 hover:text-primary transition-colors"
               onClick={() => onAddField(element.type, element.label)}
             >
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg  flex items-center justify-center flex-shrink-0">
                 <Icon className="w-4 h-4 text-primary" />
               </div>
               <span>{element.label}</span>

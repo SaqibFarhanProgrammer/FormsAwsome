@@ -10,21 +10,34 @@ import { QRCodeCanvas } from "qrcode.react";
 
 import {
   FormSettings,
+  FormFieldType,
   updateField,
   updateFormMeta,
   updateFormSettings,
   duplicateField,
   removeField,
 } from "@/redux/features/form-builder/form.slice";
-import { Settings, Trash2, Copy, Eye, QrCode, Plus, X, ChevronRight } from "lucide-react";
+import {
+  Settings,
+  Trash2,
+  Copy,
+  Eye,
+  QrCode,
+  Plus,
+  X,
+  ChevronRight,
+  ChevronDown,
+  Share2,
+} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectSelectedField,
   selectFormTitle,
   selectFormDescription,
   selectFormSettings,
+  selectFormFields,
 } from "@/redux/features/form-builder/form.selectors";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { showAlert } from "@/redux/features/global/alertSlice";
 
 interface PropertiesPanelProps {
@@ -49,6 +62,7 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
   const dispatch = useDispatch();
 
   const selectedField = useSelector(selectSelectedField);
+  const formFields = useSelector(selectFormFields);
 
   // Only subscribe when needed for form settings
   const formTitle = useSelector(selectFormTitle);
@@ -136,21 +150,22 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
             />
           </div>
         )}
-
-        {/* Required Toggle */}
-        <div className="flex items-center justify-between py-2">
-          <div className="space-y-0.5">
-            <Label className="text-sm font-medium">Required</Label>
-            <p className="text-xs text-muted-foreground">Make this field mandatory</p>
-          </div>
-          <Switch
-            checked={selectedField.required}
-            onCheckedChange={(checked) =>
-              handleUpdateField(selectedField.id, { required: checked })
-            }
-          />
-        </div>
       </div>
+
+      <Separator />
+
+      <FieldSettingsPanel
+        field={selectedField}
+        fields={formFields}
+        onUpdate={(updates) => handleUpdateField(selectedField.id, updates)}
+      />
+
+      <Separator />
+
+      <FormSettingsAccordion
+        settings={settings}
+        onUpdateSettings={(updates) => dispatch(updateFormSettings(updates))}
+      />
 
       <Separator />
 
@@ -210,6 +225,8 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
 
       <Separator />
 
+      {formSlug && <FormShareCard slug={formSlug} />}
+
       {/* Actions */}
       <div className="space-y-2">
         <Button
@@ -266,6 +283,139 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
   );
 }
 
+function FieldSettingsPanel({
+  field,
+  fields,
+  onUpdate,
+}: {
+  field: FormFieldType;
+  fields: FormFieldType[];
+  onUpdate: (updates: Partial<FormFieldType>) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(true);
+  const sourceFields = fields.filter((item) => item.id !== field.id && item.type !== "divider");
+
+  return (
+    <div className="rounded-xl border border-border bg-muted/20">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between p-3 text-left"
+        onClick={() => setIsOpen((open) => !open)}
+        aria-expanded={isOpen}
+      >
+        <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
+          <Settings className="h-4 w-4 text-primary" />
+          Field Settings
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="space-y-4 border-t border-border p-3">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">Required</Label>
+              <p className="text-xs text-muted-foreground">Respondents must fill this field</p>
+            </div>
+            <Switch
+              checked={field.required}
+              onCheckedChange={(required) => onUpdate({ required })}
+            />
+          </div>
+
+          {!["heading", "divider", "checkbox", "radio", "toggle", "rating", "file"].includes(
+            field.type,
+          ) && (
+            <FormSettingInput
+              label="Default value"
+              value={String(field.defaultValue ?? "")}
+              placeholder="Value shown before typing"
+              onChange={(defaultValue) => onUpdate({ defaultValue })}
+            />
+          )}
+
+          <div className="space-y-3 border-t border-border pt-3">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-sm font-medium">Conditional request</Label>
+                <p className="text-xs text-muted-foreground">
+                  Show this field only when a rule matches
+                </p>
+              </div>
+              <Switch
+                checked={field.logic?.enabled ?? false}
+                disabled={sourceFields.length === 0}
+                onCheckedChange={(enabled) =>
+                  onUpdate({
+                    logic: {
+                      enabled,
+                      sourceFieldId: field.logic?.sourceFieldId || sourceFields[0]?.id || "",
+                      operator: field.logic?.operator || "equals",
+                      value: field.logic?.value || "",
+                    },
+                  })
+                }
+              />
+            </div>
+
+            {field.logic?.enabled && sourceFields.length > 0 && (
+              <div className="space-y-3">
+                <label className="block space-y-2">
+                  <span className="text-xs font-medium uppercase tracking-wider">When field</span>
+                  <select
+                    value={field.logic.sourceFieldId}
+                    onChange={(event) =>
+                      onUpdate({ logic: { ...field.logic!, sourceFieldId: event.target.value } })
+                    }
+                    className="h-9 w-full rounded-xl border border-border bg-background px-3 text-sm"
+                  >
+                    {sourceFields.map((sourceField) => (
+                      <option key={sourceField.id} value={sourceField.id}>
+                        {sourceField.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block space-y-2">
+                  <span className="text-xs font-medium uppercase tracking-wider">Condition</span>
+                  <select
+                    value={field.logic.operator}
+                    onChange={(event) =>
+                      onUpdate({
+                        logic: {
+                          ...field.logic!,
+                          operator: event.target.value as FormFieldType["logic"] extends infer Logic
+                            ? Logic extends { operator: infer Operator }
+                              ? Operator
+                              : never
+                            : never,
+                        },
+                      })
+                    }
+                    className="h-9 w-full rounded-xl border border-border bg-background px-3 text-sm"
+                  >
+                    <option value="equals">Equals</option>
+                    <option value="not_equals">Does not equal</option>
+                    <option value="contains">Contains</option>
+                  </select>
+                </label>
+                <FormSettingInput
+                  label="Value"
+                  value={field.logic.value}
+                  placeholder="Enter matching value"
+                  onChange={(value) => onUpdate({ logic: { ...field.logic!, value } })}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function FormSettingInput({
   label,
   value,
@@ -289,6 +439,63 @@ function FormSettingInput({
         onChange={(event) => onChange(event.target.value)}
         className="rounded-xl h-9 text-sm"
       />
+    </div>
+  );
+}
+
+function FormSettingsAccordion({
+  settings,
+  onUpdateSettings,
+}: {
+  settings: FormSettings;
+  onUpdateSettings: (updates: Partial<FormSettings>) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="rounded-xl border border-border bg-muted/20">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between p-3 text-left"
+        onClick={() => setIsOpen((open) => !open)}
+        aria-expanded={isOpen}
+      >
+        <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
+          <Settings className="h-4 w-4 text-primary" />
+          Form Settings
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="space-y-4 border-t border-border p-3">
+          <FormSettingInput
+            label="Submit button text"
+            value={settings.submitButtonText}
+            onChange={(value) => onUpdateSettings({ submitButtonText: value })}
+          />
+          <FormSettingInput
+            label="Success message"
+            value={settings.successMessage}
+            onChange={(value) => onUpdateSettings({ successMessage: value })}
+          />
+          <FormSettingInput
+            label="Redirect URL (optional)"
+            value={settings.redirectUrl}
+            placeholder="https://example.com/thanks"
+            onChange={(value) => onUpdateSettings({ redirectUrl: value })}
+          />
+          <FormSettingInput
+            label="Notification email (optional)"
+            type="email"
+            value={settings.notifyEmail}
+            placeholder="you@example.com"
+            onChange={(value) => onUpdateSettings({ notifyEmail: value })}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -364,33 +571,56 @@ function FormSettingsPanel({
 
 function FormShareCard({ slug }: { slug: string }) {
   const dispatch = useDispatch();
+  const [showQr, setShowQr] = useState(false);
   const url = typeof window === "undefined" ? `/f/${slug}` : `${window.location.origin}/f/${slug}`;
+
+  const copyUrl = async () => {
+    await navigator.clipboard.writeText(url);
+    dispatch(showAlert({ message: "Form URL copied", type: "success" }));
+  };
+
+  const shareForm = async () => {
+    if (navigator.share) {
+      await navigator.share({ title: "Share form", url });
+      return;
+    }
+    await copyUrl();
+  };
 
   return (
     <Card className="rounded-xl border-border bg-muted/30">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <QrCode className="w-4 h-4 text-primary" />
-          Form QR Code
+          <Share2 className="w-4 h-4 text-primary" />
+          Share Form
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="flex justify-center rounded-lg bg-white p-3">
-          <QRCodeCanvas value={url} size={150} includeMargin />
-        </div>
         <p className="break-all text-center text-xs text-muted-foreground">{url}</p>
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full gap-2"
-          onClick={() => {
-            navigator.clipboard.writeText(url);
-            dispatch(showAlert({ message: "Form URL copied", type: "success" }));
-          }}
-        >
-          <Copy className="h-3.5 w-3.5" />
-          Copy form URL
-        </Button>
+        <div className="grid grid-cols-3 gap-2">
+          <Button variant="outline" size="sm" className="gap-1.5 px-2 text-xs" onClick={copyUrl}>
+            <Copy className="h-3.5 w-3.5" />
+            Copy URL
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5 px-2 text-xs" onClick={shareForm}>
+            <Share2 className="h-3.5 w-3.5" />
+            Share
+          </Button>
+          <Button
+            variant={showQr ? "default" : "outline"}
+            size="sm"
+            className="gap-1.5 px-2 text-xs"
+            onClick={() => setShowQr((visible) => !visible)}
+          >
+            <QrCode className="h-3.5 w-3.5" />
+            QR Code
+          </Button>
+        </div>
+        {showQr && (
+          <div className="flex justify-center rounded-lg bg-white p-3">
+            <QRCodeCanvas value={url} size={150} includeMargin />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

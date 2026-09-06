@@ -7,6 +7,7 @@ export type FormField = {
   label: string;
   placeholder?: string;
   helperText?: string;
+  defaultValue?: string | number | boolean;
   options?: {
     label: string;
     value: string;
@@ -16,6 +17,12 @@ export type FormField = {
     min?: number;
     max?: number;
     pattern?: string;
+  };
+  logic?: {
+    enabled: boolean;
+    sourceFieldId: string;
+    operator: "equals" | "not_equals" | "contains";
+    value: string;
   };
 };
 
@@ -71,6 +78,7 @@ const formSchema = new mongoose.Schema<FormType>(
           label: { type: String, required: true },
           placeholder: { type: String },
           helperText: { type: String },
+          defaultValue: { type: mongoose.Schema.Types.Mixed },
           options: [
             {
               label: { type: String, required: true },
@@ -82,6 +90,16 @@ const formSchema = new mongoose.Schema<FormType>(
             min: { type: Number },
             max: { type: Number },
             pattern: { type: String },
+          },
+          logic: {
+            enabled: { type: Boolean, default: false },
+            sourceFieldId: { type: String, default: "" },
+            operator: {
+              type: String,
+              enum: ["equals", "not_equals", "contains"],
+              default: "equals",
+            },
+            value: { type: String, default: "" },
           },
         },
       ],
