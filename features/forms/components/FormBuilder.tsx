@@ -1,53 +1,96 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   addField,
   removeField,
   selectField,
-  updateField,
   setFormSlug,
 } from "@/redux/features/form-builder/form.slice";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { TopBar } from "./Topbar";
 import { FormCanvas } from "./FormCanvas";
 import { ElementsSidebar } from "./ElementsSidebar";
-import { RootState } from "@/redux/store";
+import { selectFormSlug, selectSelectedFieldId } from "@/redux/features/form-builder/form.selectors";
 
+/**
+ * FormBuilder Component
+ *
+ * Main orchestrator for the form building interface.
+ *
+ * Redux Subscriptions:
+ * - formSlug (via selectFormSlug) - used to sync URL slug with Redux state
+ * - selectedFieldId (via selectSelectedFieldId) - passed to FormCanvas for highlighting
+ *
+ * All other form state subscriptions are handled by child components:
+ * - TopBar: subscribes to title, description, slug, settings, fields
+ * - FormCanvas: subscribes to fields, title, description, settings
+ * - FormMeta (inside FormCanvas): subscribes to title, description
+ * - PropertiesPanel: subscribes to selectedFieldId, selectedField, fields, settings
+ *
+ * This separation means:
+ * - FormBuilder only re-renders when slug or selectedFieldId changes
+ * - Each child component only re-renders when its specific data changes
+ * - Changing form title only affects FormMeta and TopBar, not FormCanvas list
+ * - Changing a field only affects that field item, not form metadata
+ */
 export function FormBuilder() {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
-  const { fields, selectedFieldId, formSlug } = useSelector((state: RootState) => state.form);
+
+  // Only subscribe to formSlug and selectedFieldId
+  const formSlug = useSelector(selectFormSlug);
+  const selectedFieldId = useSelector(selectSelectedFieldId);
+
+  // Local UI state
   const [propertiesOpen, setPropertiesOpen] = useState(false);
 
+  // Sync URL slug with Redux state
   useEffect(() => {
     const slug = searchParams.get("slug");
 
     if (slug && slug !== formSlug) {
       dispatch(setFormSlug(slug));
     }
-  }, [formSlug, searchParams]);
+  }, [formSlug, searchParams, dispatch]);
 
-  const handleAddField = (type: string, label: string) => {
-    dispatch(
-      addField({
-        type,
-        label,
-        placeholder: `Enter ${label.toLowerCase()}...`,
-        required: false,
-      }),
-    );
-    setPropertiesOpen(true);
-  };
+  // Memoize callbacks to avoid unnecessary re-renders of child components
+  const handleAddField = useCallback(
+    (type: string, label: string) => {
+      dispatch(
+        addField({
+          type,
+          label,
+          placeholder: `Enter ${label.toLowerCase()}...`,
+          required: false,
+        }),
+      );
+      setPropertiesOpen(true);
+    },
+    [dispatch],
+  );
 
-  const handleSelectField = (id: string) => {
-    dispatch(selectField(id));
-    setPropertiesOpen(true);
-  };
+  const handleSelectField = useCallback(
+    (id: string) => {
+      dispatch(selectField(id));
+      setPropertiesOpen(true);
+    },
+    [dispatch],
+  );
 
-  const selectedField = fields.find((f: any) => f.id === selectedFieldId);
+  const handleRemoveField = useCallback(
+    (id: string) => {
+      dispatch(removeField(id));
+    },
+    [dispatch],
+  );
+
+  const handleCloseProperties = useCallback(() => {
+    setPropertiesOpen(false);
+    dispatch(selectField(null));
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -63,10 +106,9 @@ export function FormBuilder() {
         {/* Center Canvas */}
         <div className="flex-1 min-w-0 overflow-y-auto bg-muted/20">
           <FormCanvas
-            fields={fields}
             selectedFieldId={selectedFieldId}
             onSelectField={handleSelectField}
-            onRemoveField={(id) => dispatch(removeField(id))}
+            onRemoveField={handleRemoveField}
           />
         </div>
 
@@ -76,14 +118,7 @@ export function FormBuilder() {
             propertiesOpen ? "w-80" : "w-0 opacity-0 overflow-hidden"
           }`}
         >
-          <PropertiesPanel
-            selectedField={selectedField!}
-            onUpdateField={(id, updates) => dispatch(updateField({ id, ...updates }))}
-            onClose={() => {
-              setPropertiesOpen(false);
-              dispatch(selectField(null));
-            }}
-          />
+          {propertiesOpen && <PropertiesPanel onClose={handleCloseProperties} />}
         </div>
       </div>
     </div>

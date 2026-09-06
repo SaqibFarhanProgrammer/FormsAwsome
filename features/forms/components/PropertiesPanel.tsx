@@ -7,7 +7,6 @@ import { Switch } from "@/components/ui/Switch";
 import { Button } from "@/components/ui/Button";
 import { Separator } from "@/components/ui/Separator";
 import {
-  FormFieldType,
   FormSettings,
   updateField,
   updateFormMeta,
@@ -15,20 +14,50 @@ import {
 } from "@/redux/features/form-builder/form.slice";
 import { Settings, Trash2, Copy, Eye, QrCode, Plus, X, ChevronRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import {
+  selectSelectedField,
+  selectFormTitle,
+  selectFormDescription,
+  selectFormSettings,
+} from "@/redux/features/form-builder/form.selectors";
+import { useCallback } from "react";
 
 interface PropertiesPanelProps {
-  selectedField: FormFieldType | null;
-  onUpdateField: (id: string, updates: Partial<FormFieldType>) => void;
   onClose: () => void;
 }
 
-export function PropertiesPanel({ selectedField, onUpdateField, onClose }: PropertiesPanelProps) {
+/**
+ * PropertiesPanel Component
+ *
+ * Displays properties for the currently selected field or form settings.
+ *
+ * Redux Subscriptions:
+ * - selectedFieldId → selectedField (via selectSelectedField) - determines what to display
+ * - formTitle, formDescription (via selectors) - used only in form settings view
+ * - formSettings (via selectFormSettings) - used only in form settings view
+ *
+ * This component subscribes narrowly to prevent unnecessary re-renders:
+ * - Only subscribes to selectedField, not the entire form state
+ * - When a field's label changes, other unrelated components won't re-render
+ */
+export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
   const dispatch = useDispatch();
-  const formTitle = useSelector((state: RootState) => state.form.formTitle);
-  const formDescription = useSelector((state: RootState) => state.form.formDescription);
-  const settings = useSelector((state: RootState) => state.form.settings);
-  const fields = useSelector((state: RootState) => state.form.fields);
+
+  // Subscribe narrowly to just the selected field
+  const selectedField = useSelector(selectSelectedField);
+
+  // Only subscribe when needed for form settings
+  const formTitle = useSelector(selectFormTitle);
+  const formDescription = useSelector(selectFormDescription);
+  const settings = useSelector(selectFormSettings);
+
+  // Memoize the update callback to avoid unnecessary re-renders of dependents
+  const handleUpdateField = useCallback(
+    (id: string, updates: Partial<typeof selectedField>) => {
+      dispatch(updateField({ id, ...updates }));
+    },
+    [dispatch],
+  );
 
   if (!selectedField) {
     return (
@@ -73,16 +102,6 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
 
       <Separator />
 
-      <FormSettingsPanel
-        title={formTitle}
-        description={formDescription}
-        settings={settings}
-        onUpdateMeta={(updates) => dispatch(updateFormMeta(updates))}
-        onUpdateSettings={(updates) => dispatch(updateFormSettings(updates))}
-      />
-
-      <Separator />
-
       {/* Basic Properties */}
       <div className="space-y-4">
         <div className="space-y-2">
@@ -92,7 +111,7 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
           <Input
             id="label"
             value={selectedField.label}
-            onChange={(e) => onUpdateField(selectedField.id, { label: e.target.value })}
+            onChange={(e) => handleUpdateField(selectedField.id, { label: e.target.value })}
             className="rounded-xl h-9 text-sm"
           />
         </div>
@@ -105,7 +124,7 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
             <Input
               id="placeholder"
               value={selectedField.placeholder || ""}
-              onChange={(e) => onUpdateField(selectedField.id, { placeholder: e.target.value })}
+              onChange={(e) => handleUpdateField(selectedField.id, { placeholder: e.target.value })}
               className="rounded-xl h-9 text-sm"
               placeholder="Enter placeholder..."
             />
@@ -120,7 +139,9 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
           </div>
           <Switch
             checked={selectedField.required}
-            onCheckedChange={(checked) => onUpdateField(selectedField.id, { required: checked })}
+            onCheckedChange={(checked) =>
+              handleUpdateField(selectedField.id, { required: checked })
+            }
           />
         </div>
       </div>
@@ -139,7 +160,7 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
                   onChange={(e) => {
                     const newOptions = [...selectedField.options!];
                     newOptions[index] = e.target.value;
-                    onUpdateField(selectedField.id, { options: newOptions });
+                    handleUpdateField(selectedField.id, { options: newOptions });
                   }}
                   className="rounded-xl h-9 text-sm flex-1"
                 />
@@ -182,75 +203,6 @@ export function PropertiesPanel({ selectedField, onUpdateField, onClose }: Prope
       )}
 
       <Separator />
-
-      <div className="space-y-3">
-        <Label className="text-xs font-medium uppercase tracking-wider">Field Logic</Label>
-        <div className="flex items-center justify-between">
-          <div>
-            <Label className="text-sm font-medium">Conditional visibility</Label>
-            <p className="text-xs text-muted-foreground">Show this field based on another answer</p>
-          </div>
-          <Switch
-            checked={selectedField.logic?.enabled ?? false}
-            onCheckedChange={(enabled) =>
-              onUpdateField(selectedField.id, {
-                logic: {
-                  enabled,
-                  sourceFieldId: selectedField.logic?.sourceFieldId || "",
-                  operator: selectedField.logic?.operator || "equals",
-                  value: selectedField.logic?.value || "",
-                },
-              })
-            }
-          />
-        </div>
-        <>
-          <select
-            value={selectedField.logic?.sourceFieldId || ""}
-            onChange={(event) =>
-              onUpdateField(selectedField.id, {
-                logic: { ...selectedField.logic!, sourceFieldId: event.target.value },
-              })
-            }
-            className="h-9 w-full rounded-xl border border-input bg-background px-3 text-sm"
-          >
-            <option value="">Select a source field</option>
-            {fields
-              .filter((field) => field.id !== selectedField.id)
-              .map((field) => (
-                <option key={field.id} value={field.id}>
-                  {field.label}
-                </option>
-              ))}
-          </select>
-          <select
-            value={selectedField.logic?.operator || "equals"}
-            onChange={(event) =>
-              onUpdateField(selectedField.id, {
-                logic: {
-                  ...selectedField.logic!,
-                  operator: event.target.value as "equals" | "not_equals" | "contains",
-                },
-              })
-            }
-            className="h-9 w-full rounded-xl border border-input bg-background px-3 text-sm"
-          >
-            <option value="equals">Equals</option>
-            <option value="not_equals">Does not equal</option>
-            <option value="contains">Contains</option>
-          </select>
-          <Input
-            value={selectedField.logic?.value}
-            onChange={(event) =>
-              onUpdateField(selectedField.id, {
-                logic: { ...selectedField.logic!, value: event.target.value },
-              })
-            }
-            className="rounded-xl h-9 text-sm"
-            placeholder="Expected answer"
-          />
-        </>
-      </div>
 
       <Card className="rounded-xl border-border bg-muted/30">
         <CardHeader className="pb-2">

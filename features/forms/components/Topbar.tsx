@@ -6,21 +6,42 @@ import { ArrowLeft, Eye, Save, Share2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { createForm } from "@/redux/features/create-form/form-create.slice";
 import { setFormSlug } from "@/redux/features/form-builder/form.slice";
-import { AppDispatch, RootState } from "@/redux/store";
+import { AppDispatch } from "@/redux/store";
 import { Spinner } from "@/components/ui/Spinner";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { AppError } from "@/lib/auth/appError";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  selectFormTitle,
+  selectFormDescription,
+  selectFormSlug,
+  selectFormSettings,
+  selectFormFields,
+} from "@/redux/features/form-builder/form.selectors";
+import { useSelector as useFormCreateSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
+/**
+ * TopBar Component
+ *
+ * Redux Subscriptions:
+ * - formTitle (via selectFormTitle) - displays in header, used in createForm
+ * - formDescription (via selectFormDescription) - used in createForm
+ * - formSlug (via selectFormSlug) - used for form creation
+ * - formSettings (via selectFormSettings) - used in createForm
+ * - formFields (via selectFormFields) - used in createForm
+ * - formCreate.isLoading (via custom selector) - shows loading state
+ */
 export function TopBar() {
-  const title = useSelector((state: RootState) => state.form.formTitle);
-  const description = useSelector((state: RootState) => state.form.formDescription);
-  const slug = useSelector((state: RootState) => state.form.formSlug);
-  const settings = useSelector((state: RootState) => state.form.settings);
-  const { fields } = useSelector((state: RootState) => state.form);
+  const title = useSelector(selectFormTitle);
+  const description = useSelector(selectFormDescription);
+  const slug = useSelector(selectFormSlug);
+  const settings = useSelector(selectFormSettings);
+  const fields = useSelector(selectFormFields);
 
-  const loading = useSelector((state: RootState) => state.formCreate.isLoading);
+  // Separate selector for create form loading state
+  const loading = useFormCreateSelector((state: RootState) => state.formCreate.isLoading);
 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
