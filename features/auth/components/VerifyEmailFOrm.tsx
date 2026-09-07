@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -31,24 +31,9 @@ export function VerifyEmailForm() {
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [resendTimer, setResendTimer] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const emailParam = searchParams.get("email");
-    const tokenParam = searchParams.get("token");
-
-    setEmail(emailParam);
-    setToken(tokenParam);
-
-    if (!emailParam || !tokenParam) {
-      setError("Missing email or token. Please try registering again.");
-    }
-  }, [searchParams]);
+  const email = searchParams.get("email");
+  const token = searchParams.get("token");
 
   const {
     register,
@@ -193,7 +178,7 @@ export function VerifyEmailForm() {
         <h1 className="text-2xl font-semibold tracking-tight text-[#1a1a1a]">Verify your email</h1>
         <p className="mt-2 text-sm leading-relaxed text-[#666]">
           We sent a verification code to <span className="font-medium text-[#1a1a1a]">{email}</span>
-          . Enter the 6-digit code below to confirm your account. If you don't see the email, check
+          . Enter the 6-digit code below to confirm your account. If you do not see the email, check
           the spam folder. Sometimes emails will send to the spam folder.
         </p>
       </div>

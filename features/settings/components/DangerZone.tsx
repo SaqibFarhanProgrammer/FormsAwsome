@@ -17,13 +17,23 @@ import {
 import { LogOut, Trash2, AlertTriangle } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 export function DangerZone() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const router = useRouter();
+  const dispatch = useDispatch();
   const handleLogout = async () => {
-    await axios.get("/api/auth/logout");
-    router.push("/auth/login");
+    try {
+      await axios.get("/api/auth/logout");
+      router.push("/auth/login");
+    } catch (error: unknown) {
+      dispatch(
+        showAlert({ message: getErrorMessage(error, "Unable to sign out"), type: "danger" }),
+      );
+    }
   };
 
   return (

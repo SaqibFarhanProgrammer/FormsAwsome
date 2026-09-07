@@ -29,7 +29,7 @@ export function StatsCards({ className }: StatsCardsProps) {
       )}
       style={{
         backgroundImage:
-          "url('https://i.pinimg.com/736x/1a/94/a7/1a94a7d985a92ef368a251b90fabcc96.jpg')",
+          "url('https://i.pinimg.com/736x/39/09/8b/39098bb69bdfd0d18a184252b2353079.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}

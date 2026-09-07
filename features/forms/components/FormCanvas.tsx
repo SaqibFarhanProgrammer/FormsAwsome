@@ -7,7 +7,7 @@ import { Plus, AlertCircle, Type } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useState, useCallback } from "react";
-import { AppError } from "@/lib/auth/appError";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -94,17 +94,7 @@ export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: Fo
 
       router.replace(`/create?slug=${res.data.form.slug}`);
     } catch (error: unknown) {
-      const errorMessage = axios.isAxiosError(error)
-        ? error.response?.data?.message || error.message
-        : error instanceof AppError
-          ? error.message
-          : "An error occurred";
-
-      if (error instanceof AppError) {
-        console.error("AppError:", error.message);
-      } else {
-        console.error("Update form failed:", error);
-      }
+      const errorMessage = getErrorMessage(error, "An error occurred");
       setUiError(errorMessage);
       dispatch(
         showAlert({

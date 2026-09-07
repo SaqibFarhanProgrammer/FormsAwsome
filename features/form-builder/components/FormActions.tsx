@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/Button";
 import { Copy, Share2, QrCode, Globe, Trash2 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 interface FormActionsProps {
   slug: string;
@@ -14,6 +17,7 @@ interface FormActionsProps {
 export function FormActions({ slug, onDeleted }: FormActionsProps) {
   const [showQr, setShowQr] = useState(false);
   const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
   const formUrl =
     typeof window === "undefined" ? `/f/${slug}` : `${window.location.origin}/f/${slug}`;
 
@@ -25,18 +29,25 @@ export function FormActions({ slug, onDeleted }: FormActionsProps) {
   const deleteForm = async () => {
     if (!window.confirm("Delete this form and all of its submissions?")) return;
 
-    const response = await fetch("/api/forms/delete", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug }),
-    });
+    try {
+      const response = await fetch("/api/forms/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
 
-    if (!response.ok) {
-      setMessage("Unable to delete form");
-      return;
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(result?.message || "Unable to delete form");
+      }
+
+      dispatch(showAlert({ message: "Form deleted successfully", type: "success" }));
+      onDeleted();
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, "Unable to delete form");
+      setMessage(errorMessage);
+      dispatch(showAlert({ message: errorMessage, type: "danger" }));
     }
-
-    onDeleted();
   };
 
   return (

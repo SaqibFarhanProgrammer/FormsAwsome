@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import {
   Table,
@@ -286,6 +288,7 @@ export function SubmissionsTable() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const loadSubmissions = async () => {
@@ -326,6 +329,40 @@ export function SubmissionsTable() {
     }
   };
 
+  const filteredSubmissions = useMemo(() => {
+    const search = (searchParams.get("search") ?? "").toLowerCase();
+    const form = searchParams.get("form") ?? "";
+    const status = searchParams.get("status") ?? "";
+    const dateRange = searchParams.get("date") ?? "";
+    const now = new Date();
+
+    return submissions.filter((submission) => {
+      const searchableText = [
+        submission.form,
+        submission.name,
+        submission.email,
+        submission.date,
+        ...submission.details.map((detail) => `${detail.label} ${detail.value}`),
+      ]
+        .join(" ")
+        .toLowerCase();
+      const submissionDate = new Date(submission.date);
+      const matchesSearch = !search || searchableText.includes(search);
+      const matchesForm = !form || submission.form === form;
+      const matchesStatus = !status || submission.status === status;
+      const matchesDate =
+        !dateRange ||
+        (dateRange === "today" && submissionDate.toDateString() === now.toDateString()) ||
+        (dateRange === "week" && now.getTime() - submissionDate.getTime() <= 7 * 86400000) ||
+        (dateRange === "month" &&
+          submissionDate.getMonth() === now.getMonth() &&
+          submissionDate.getFullYear() === now.getFullYear()) ||
+        (dateRange === "year" && submissionDate.getFullYear() === now.getFullYear());
+
+      return matchesSearch && matchesForm && matchesStatus && matchesDate;
+    });
+  }, [searchParams, submissions]);
+
   return (
     <Card className="rounded-2xl border-border overflow-hidden">
       {/* Scrollable Table Container */}
@@ -352,7 +389,7 @@ export function SubmissionsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {submissions.map((submission) => (
+            {filteredSubmissions.map((submission) => (
               <React.Fragment key={submission.id}>
                 <TableRow
                   className="cursor-pointer hover:bg-muted/30 transition-colors border-border"
@@ -432,7 +469,7 @@ export function SubmissionsTable() {
       {/* Bottom Info Bar */}
       <div className="border-t border-border px-6 py-3 bg-card flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing all {submissions.length} submissions
+          Showing {filteredSubmissions.length} of {submissions.length} submissions
         </p>
       </div>
     </Card>

@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
+import { AppError } from "@/lib/auth/appError";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -755,7 +757,7 @@ export default function FormUI({
 
       const result = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(result?.message || "Unable to submit the form");
+        throw new AppError(result?.message || "Unable to submit the form", response.status);
       }
 
       setSubmitMessage(
@@ -764,8 +766,8 @@ export default function FormUI({
           "Thank you for your submission!",
       );
       form.reset();
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Unable to submit the form");
+    } catch (error: unknown) {
+      setSubmitError(getErrorMessage(error, "Unable to submit the form"));
     }
   };
 

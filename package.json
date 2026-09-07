@@ -32,6 +32,7 @@
     "framer-motion": "^13.1.0",
     "geoip-lite": "^2.0.3",
     "jsonwebtoken": "^9.0.3",
+    "jspdf": "^4.2.1",
     "lucide-react": "^1.32.0",
     "mongoose": "^9.9.3",
     "nanoid": "^5.0.7",

@@ -9,7 +9,6 @@ import { setFormSlug } from "@/redux/features/form-builder/form.slice";
 import { AppDispatch } from "@/redux/store";
 import { Spinner } from "@/components/ui/Spinner";
 import { showAlert } from "@/redux/features/global/alertSlice";
-import { AppError } from "@/lib/auth/appError";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -24,6 +23,7 @@ import { RootState } from "@/redux/store";
 import axios from "axios";
 import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 /**
  * TopBar Component
@@ -143,13 +143,6 @@ export function TopBar() {
     }
     window.open(getPublicUrl(slug), "_blank", "noopener,noreferrer");
   };
-
-  const getErrorMessage = (error: unknown) =>
-    axios.isAxiosError(error)
-      ? error.response?.data?.message || error.message
-      : error instanceof AppError || error instanceof Error
-        ? error.message
-        : "Something went wrong. Please try again.";
 
   return (
     <div className="h-10 border-b border-border bg-card flex items-center justify-between px-6 flex-shrink-0">
