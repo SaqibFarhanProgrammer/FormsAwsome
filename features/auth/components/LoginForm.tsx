@@ -8,11 +8,14 @@ import axios from "axios";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
 import { Eye, EyeOff } from "lucide-react";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
@@ -52,6 +55,7 @@ export function LoginForm() {
   const [appError, setAppError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -82,10 +86,9 @@ export function LoginForm() {
         router.replace(loginData?.redirectUrl || "/dashboard");
       }
     } catch (error: unknown) {
-      const errorMessage = axios.isAxiosError(error)
-        ? error.response?.data?.message || "Invalid email or password. Please try again."
-        : "Invalid email or password. Please try again.";
+      const errorMessage = getErrorMessage(error, "Invalid email or password. Please try again.");
       setAppError(errorMessage);
+      dispatch(showAlert({ message: errorMessage, type: "danger" }));
     } finally {
       setIsLoading(false);
     }

@@ -608,6 +608,19 @@ export async function getSubmissionService(submissionId: string) {
   };
 }
 
+export async function deleteSubmissionService(submissionId: string) {
+  const userId = await getUserIdFromToken();
+  await connectDB();
+
+  const submission = await Submission.findById(submissionId).select("formId");
+  if (!submission) {
+    throw new AppError("Submission not found", 404);
+  }
+
+  await findOwnedForm(submission.formId.toString(), userId.toString());
+  await Submission.deleteOne({ _id: submission._id });
+}
+
 async function findOwnedForm(formIdOrSlug: string, userId: string) {
   const form = await Form.findOne({
     userId,

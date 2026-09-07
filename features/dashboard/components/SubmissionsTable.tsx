@@ -12,7 +12,7 @@ import {
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { ChevronDown, ChevronUp, Eye, Archive, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 
 interface Submission {
   id: string;
@@ -297,6 +297,16 @@ export function SubmissionsTable() {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  const deleteSubmission = async (id: string) => {
+    const response = await fetch(`/api/submissions/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      throw new Error("Unable to delete submission");
+    }
+
+    setSubmissions((current) => current.filter((submission) => submission.id !== id));
+    setExpandedId(null);
+  };
+
   return (
     <Card className="rounded-2xl border-border overflow-hidden">
       {/* Scrollable Table Container */}
@@ -319,9 +329,6 @@ export function SubmissionsTable() {
               </TableHead>
               <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Status
-              </TableHead>
-              <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider text-right">
-                Actions
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -356,19 +363,12 @@ export function SubmissionsTable() {
                     {submission.date}
                   </TableCell>
                   <TableCell className="py-3">{getStatusBadge(submission.status)}</TableCell>
-                  <TableCell className="py-3 text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
-                        <Eye className="w-4 h-4 text-muted-foreground" />
-                      </Button>
-                    </div>
-                  </TableCell>
                 </TableRow>
 
                 {/* Expanded Detail Row */}
                 {expandedId === submission.id && (
                   <TableRow className="hover:bg-transparent border-0">
-                    <TableCell colSpan={7} className="p-0">
+                    <TableCell colSpan={6} className="p-0">
                       <div className="px-4 pb-4">
                         <Card className="rounded-xl border-border bg-muted/30 p-5">
                           <div className="flex items-center justify-between mb-4">
@@ -377,23 +377,8 @@ export function SubmissionsTable() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="rounded-xl gap-2 text-xs h-8"
-                              >
-                                <Eye className="w-3.5 h-3.5" />
-                                Mark as Viewed
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="rounded-xl gap-2 text-xs h-8"
-                              >
-                                <Archive className="w-3.5 h-3.5" />
-                                Archive
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
                                 className="rounded-xl gap-2 text-xs h-8 text-destructive border-destructive/20 hover:bg-destructive/5"
+                                onClick={() => deleteSubmission(submission.id)}
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                                 Delete

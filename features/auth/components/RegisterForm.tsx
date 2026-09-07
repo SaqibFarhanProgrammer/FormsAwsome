@@ -14,6 +14,9 @@ import { Label } from "@/components/ui/Label";
 import { Eye, EyeOff } from "lucide-react";
 import LeftPanel from "./LeftPanel";
 import { CatchErrorFunctionForService } from "@/utils/catchErrorFunction";
+import { useDispatch } from "react-redux";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const registerSchema = z
   .object({
@@ -71,6 +74,7 @@ export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -97,11 +101,12 @@ export default function RegisterForm() {
       } else {
         router.push("/profile");
       }
-    } catch (err: any) {
-      const message =
-        err.response?.data?.message || err.message || "Something went wrong. Please try again.";
-      CatchErrorFunctionForService(err, "REGISTER USER ERROR", "Failed to Register user");
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, "Something went wrong. Please try again.");
       setError(message);
+      dispatch(showAlert({ message, type: "danger" }));
+    } finally {
+      setIsLoading(false);
     }
   }
 
