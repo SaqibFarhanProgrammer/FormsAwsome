@@ -11,6 +11,10 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
 import { ArrowLeft } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { AppError } from "@/lib/auth/appError";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const verifySchema = z.object({
   code: z
@@ -24,6 +28,7 @@ type VerifyFormValues = z.infer<typeof verifySchema>;
 export function VerifyEmailForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -80,8 +85,10 @@ export function VerifyEmailForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.message || "Verification failed. Please try again.");
-        return;
+        throw new AppError(
+          result.message || "Verification failed. Please try again.",
+          response.status,
+        );
       }
 
       // setSuccess("Email verified successfully! Redirecting to dashboard...");
@@ -90,9 +97,10 @@ export function VerifyEmailForm() {
       setTimeout(() => {
         router.push("/dashboard");
       }, 1000);
-    } catch (error: any) {
-      console.error("Verification error:", error);
-      setError("An error occurred. Please try again.");
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, "Verification failed. Please try again.");
+      setError(message);
+      dispatch(showAlert({ message, type: "danger" }));
     } finally {
       setIsLoading(false);
     }

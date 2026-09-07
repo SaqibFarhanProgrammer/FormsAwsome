@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   Table,
   TableBody,
@@ -13,6 +14,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 interface Submission {
   id: string;
@@ -282,29 +285,45 @@ function getStatusBadge(status: Submission["status"]) {
 export function SubmissionsTable() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetch("/api/submissions")
-      .then(async (response) => {
+    const loadSubmissions = async () => {
+      try {
+        const response = await fetch("/api/submissions");
         if (!response.ok) throw new Error("Unable to load submissions");
         const result = await response.json();
         setSubmissions(result.data ?? []);
-      })
-      .catch(() => setSubmissions(_submissionsData));
-  }, []);
+      } catch (error: unknown) {
+        const message = getErrorMessage(error, "Unable to load submissions");
+        setSubmissions(_submissionsData);
+        dispatch(showAlert({ message, type: "danger" }));
+      }
+    };
+
+    void loadSubmissions();
+  }, [dispatch]);
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
   const deleteSubmission = async (id: string) => {
-    const response = await fetch(`/api/submissions/${id}`, { method: "DELETE" });
-    if (!response.ok) {
-      throw new Error("Unable to delete submission");
-    }
+    try {
+      const response = await fetch(`/api/submissions/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Unable to delete submission");
 
-    setSubmissions((current) => current.filter((submission) => submission.id !== id));
-    setExpandedId(null);
+      setSubmissions((current) => current.filter((submission) => submission.id !== id));
+      setExpandedId(null);
+      dispatch(showAlert({ message: "Submission deleted successfully", type: "success" }));
+    } catch (error: unknown) {
+      dispatch(
+        showAlert({
+          message: getErrorMessage(error, "Unable to delete submission"),
+          type: "danger",
+        }),
+      );
+    }
   };
 
   return (

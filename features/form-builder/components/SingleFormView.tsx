@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import { FormTopBar } from "./FormTopBar";
 import { FormSubmissions } from "./FormSubmissions";
 import { FormStats } from "./FormStats";
@@ -15,29 +18,40 @@ export function SingleFormView({ formData }: { formData: FormType }) {
   const [submissions, setSubmissions] = useState<SubmissionViewModel[]>([]);
   const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(true);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`/api/forms/${formData.slug}/submissions`)
-      .then(async (response) => {
+    const loadSubmissions = async () => {
+      try {
+        const response = await fetch(`/api/forms/${formData.slug}/submissions`);
         if (!response.ok) throw new Error("Unable to load submissions");
         const result = await response.json();
         if (!cancelled) {
           setSubmissions((result.data ?? []).map(toSubmissionViewModel));
         }
-      })
-      .catch(() => {
+      } catch (error: unknown) {
         if (!cancelled) setSubmissions([]);
-      })
-      .finally(() => {
+        if (!cancelled) {
+          dispatch(
+            showAlert({
+              message: getErrorMessage(error, "Unable to load submissions"),
+              type: "danger",
+            }),
+          );
+        }
+      } finally {
         if (!cancelled) setIsLoadingSubmissions(false);
-      });
+      }
+    };
+
+    void loadSubmissions();
 
     return () => {
       cancelled = true;
     };
-  }, [formData.slug]);
+  }, [dispatch, formData.slug]);
 
   const stats = {
     totalSubmissions: submissions.length,
