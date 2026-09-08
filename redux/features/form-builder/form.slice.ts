@@ -1,5 +1,22 @@
 import { createSlice, PayloadAction, nanoid } from "@reduxjs/toolkit";
 
+export enum FormTemplateType {
+  DEFAULT_CONTACT_FORM = "default_contact_form",
+  COMPANY_AUDIT = "company_audit",
+  CUSTOMER_FEEDBACK = "customer_feedback",
+  LEAD_CAPTURE = "lead_capture",
+  EVENT_REGISTRATION = "event_registration",
+  EMPLOYEE_CHECKIN = "employee_checkin",
+  WORKFLOW_REQUEST = "workflow_request",
+}
+
+export enum FormUiType {
+  DEFAULT = "default",
+  COMPACT = "compact",
+  CARD = "card",
+  STRUCTURED = "structured",
+}
+
 export interface FormFieldType {
   id: string;
   type: string;
@@ -8,6 +25,8 @@ export interface FormFieldType {
   defaultValue?: string | number | boolean;
   required: boolean;
   options?: string[];
+  formType?: FormTemplateType;
+  uiType?: FormUiType;
   order: number;
   logic?: FieldLogic;
 }
@@ -72,6 +91,8 @@ const formSlice = createSlice({
         placeholder: action.payload.placeholder || `Enter ${action.payload.label.toLowerCase()}...`,
         required: action.payload.required || false,
         options: action.payload.options || [],
+        formType: FormTemplateType.DEFAULT_CONTACT_FORM,
+        uiType: FormUiType.DEFAULT,
         order: state.fields.length,
       };
       state.fields.push(newField);

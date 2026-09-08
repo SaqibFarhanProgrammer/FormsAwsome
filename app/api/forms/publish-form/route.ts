@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       {
         message: "Form published successfully",
         url: publishedUrl,
+        state: form.state,
       },
       { status: 200 },
     );

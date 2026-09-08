@@ -59,6 +59,7 @@ export function TopBar() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isPublished, setIsPublished] = useState(false);
 
   const loading = useFormCreateSelector((state: RootState) => state.formCreate.isLoading);
 
@@ -135,7 +136,9 @@ export function TopBar() {
       const savedSlug = await saveCurrentForm();
       const response = await axios.post("/api/forms/publish-form", { slug: savedSlug });
       const publishedUrl = response.data.url || getPublicUrl(savedSlug);
+      const publishedState = response.data.state || "PUBLISHED";
       setShareUrl(publishedUrl);
+      setIsPublished(publishedState === "PUBLISHED");
       dispatch(showAlert({ message: "Form published successfully", type: "success" }));
     } catch (error) {
       dispatch(showAlert({ message: getErrorMessage(error), type: "danger" }));
@@ -290,9 +293,13 @@ export function TopBar() {
         </div>
         <Badge
           variant="secondary"
-          className="rounded-lg text-xs bg-amber-50 text-amber-700 border-amber-200/50"
+          className={`rounded-lg text-xs border ${
+            isPublished || shareUrl
+              ? "bg-emerald-50 text-emerald-700 border-emerald-200/60"
+              : "bg-amber-50 text-amber-700 border-amber-200/50"
+          }`}
         >
-          {shareUrl ? "Published" : "Draft"}
+          {isPublished || shareUrl ? "Published" : "Draft"}
         </Badge>
       </div>
 

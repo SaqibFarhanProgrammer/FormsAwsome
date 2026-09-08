@@ -56,6 +56,8 @@ export type FormFieldItem = {
   label: string;
   placeholder?: string;
   helperText?: string;
+  formType?: string;
+  uiType?: string;
   options?: { label: string; value: string }[];
   defaultValue?: string | number | boolean;
   validation: {
@@ -199,6 +201,52 @@ function buildDefaults(fields: FormFieldItem[]) {
 
   return defaults;
 }
+
+function getFieldTemplateType(fields: FormFieldItem[]) {
+  return fields.find((field) => field.formType)?.formType || "default_contact_form";
+}
+
+function getFieldUiType(fields: FormFieldItem[]) {
+  return fields.find((field) => field.uiType)?.uiType || "default";
+}
+
+const formTypeMeta: Record<string, { label: string; badge: string; shell: string }> = {
+  default_contact_form: {
+    label: "Default Contact Form",
+    badge: "Contact",
+    shell: "border-transparent bg-transparent",
+  },
+  company_audit: {
+    label: "Company Audit",
+    badge: "Audit",
+    shell: "border-violet-200/70 bg-violet-50/40",
+  },
+  customer_feedback: {
+    label: "Customer Feedback",
+    badge: "Feedback",
+    shell: "border-emerald-200/70 bg-emerald-50/40",
+  },
+  lead_capture: {
+    label: "Lead Capture",
+    badge: "Lead",
+    shell: "border-sky-200/70 bg-sky-50/40",
+  },
+  event_registration: {
+    label: "Event Registration",
+    badge: "Event",
+    shell: "border-amber-200/70 bg-amber-50/40",
+  },
+  employee_checkin: {
+    label: "Employee Check-in",
+    badge: "Check-in",
+    shell: "border-cyan-200/70 bg-cyan-50/40",
+  },
+  workflow_request: {
+    label: "Workflow Request",
+    badge: "Workflow",
+    shell: "border-rose-200/70 bg-rose-50/40",
+  },
+};
 
 /* ─────────── Helpers ─────────── */
 function FieldLabel({ label, required }: { label: string; required: boolean }) {
@@ -734,6 +782,27 @@ export default function FormUI({
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const formType = useMemo(() => getFieldTemplateType(formData.fields), [formData.fields]);
+  const uiType = useMemo(() => getFieldUiType(formData.fields), [formData.fields]);
+  const fieldWrapClass =
+    uiType === "card"
+      ? "rounded-xl border border-border bg-muted/20 p-3"
+      : uiType === "structured"
+        ? "rounded-xl border border-border bg-muted/10 p-3"
+        : uiType === "compact"
+          ? "space-y-1.5"
+          : "space-y-2";
+  const shellClass =
+    uiType === "card"
+      ? "rounded-2xl border border-border bg-card p-5 shadow-sm"
+      : uiType === "structured"
+        ? "rounded-2xl border border-border bg-card p-5"
+        : uiType === "compact"
+          ? "rounded-xl bg-card p-4"
+          : "rounded-lg bg-card p-6";
+  const widthClass =
+    uiType === "structured" ? "max-w-2xl" : uiType === "card" ? "max-w-xl" : "max-w-md";
+
   const schema = useMemo(() => buildSchema(formData.fields), [formData.fields]);
 
   const form = useForm<z.infer<typeof schema>>({
@@ -772,8 +841,8 @@ export default function FormUI({
   };
 
   return (
-    <div className={cn("mx-auto w-full max-w-md", className)}>
-      <div className="rounded-lg  bg-card p-6">
+    <div className={cn("mx-auto w-full", widthClass, className)}>
+      <div className={shellClass}>
         {submitMessage ? (
           <div className="flex min-h-64 flex-col items-center justify-center text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -796,10 +865,20 @@ export default function FormUI({
           </div>
         ) : (
           <>
-            <div className="mb-6 text-start">
-              <h1 className="text-2xl font-semibold text-foreground">{formData.title}</h1>
+            <div
+              className={cn(
+                "mb-6 text-start rounded-xl border p-4",
+                formTypeMeta[formType]?.shell || "border-transparent bg-transparent",
+              )}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <h1 className="text-2xl font-semibold text-foreground">{formData.title}</h1>
+                <span className="rounded-full border border-border bg-background px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {formTypeMeta[formType]?.badge || "Form"}
+                </span>
+              </div>
               {formData.description && (
-                <p className="mt-1 text-[15px] font-medium text-foreground/70">
+                <p className="mt-2 text-[15px] font-medium text-foreground/70">
                   {formData.description}
                 </p>
               )}
@@ -807,7 +886,7 @@ export default function FormUI({
 
             <form onSubmit={handleSubmit(submit)} className="space-y-4">
               {formData.fields.map((field) => (
-                <div key={field.id}>
+                <div key={field.id} className={fieldWrapClass}>
                   <RenderField
                     field={field}
                     register={register}

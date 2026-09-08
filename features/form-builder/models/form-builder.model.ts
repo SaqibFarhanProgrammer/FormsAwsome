@@ -7,6 +7,8 @@ export type FormField = {
   label: string;
   placeholder?: string;
   helperText?: string;
+  formType?: string;
+  uiType?: string;
   defaultValue?: string | number | boolean;
   options?: {
     label: string;
@@ -78,6 +80,8 @@ const formSchema = new mongoose.Schema<FormType>(
           label: { type: String, required: true },
           placeholder: { type: String },
           helperText: { type: String },
+          formType: { type: String, default: "default_contact_form" },
+          uiType: { type: String, default: "default" },
           defaultValue: { type: mongoose.Schema.Types.Mixed },
           options: [
             {

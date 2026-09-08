@@ -18,6 +18,8 @@ type IncomingField = {
   label: string;
   placeholder?: string;
   helperText?: string;
+  formType?: string;
+  uiType?: string;
   required?: boolean;
   validation?: FormField["validation"];
   options?: string[] | { label?: string; value?: string }[];
@@ -32,6 +34,8 @@ function normalizeFields(fields: IncomingField[]) {
     label: field.label,
     placeholder: field.placeholder,
     helperText: field.helperText,
+    formType: field.formType,
+    uiType: field.uiType,
     defaultValue: field.defaultValue,
     logic: field.logic,
     options: Array.isArray(field.options)
@@ -222,6 +226,8 @@ export async function getSingleFormService(formIdOrSlug: string) {
       label: field.label,
       placeholder: field.placeholder,
       helperText: field.helperText,
+      formType: field.formType,
+      uiType: field.uiType,
       options: field.options?.map((option: NonNullable<FormField["options"]>[number]) => ({
         label: option.label,
         value: option.value,
@@ -446,6 +452,8 @@ export async function getPublicFormService(slug: string) {
       label: field.label,
       placeholder: field.placeholder,
       helperText: field.helperText,
+      formType: field.formType,
+      uiType: field.uiType,
       options: field.options?.map((option: NonNullable<FormField["options"]>[number]) => ({
         label: option.label,
         value: option.value,
