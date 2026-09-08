@@ -43,7 +43,6 @@ export function FormMeta() {
                 className="w-full text-2xl font-semibold bg-transparent border-none outline-none placeholder:text-muted-foreground/60 text-foreground"
                 placeholder="Form Title"
               />
-              <div className="absolute -bottom-1 left-0 w-12 h-0.5 bg-primary/30 rounded-full" />
             </div>
 
             <input

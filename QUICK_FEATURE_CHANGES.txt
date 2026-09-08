@@ -1,0 +1,12 @@
+  1: first create a priview form insite create route like in the top bar priview bttononlcik open  a full screen popup on the top igith cros buttonand nthencetner redner the form with not editignable inotus jo feisl heinwhodisable rahgi ok or subt nhi ho sakt formjsut llok ok 
+
+  2: make the form ui .tsx usamin jo bhi text wagerda hai usko thro sa barakranhai 10% or inputs wwaehra bhi throsy se alek seook bas ok or chechkbox ka uis hwo nho hrao foxmper sko fixakro check box shwo nh hroa aha ok
+
+  3: inthe form canvas field box add 3 dots to the fiedl adn when clickon the shwo hte option liek move to up move to down ok or who ifedl uper hpae ueprwelai fiedl neache ajaye si tarhanok 
+
+  4: in teh propertiesPanel tsx fiele there are veir confsiotnhapnign samajh nhi ar ahokosni hceez ksi liey hai meintumeh srue ture bata kaahaaho sukehsiabebaanook 
+
+  in the top properties panel if feilsie selcted gieve the lael feisl settings ok and ui mein optiowala bhi dalo agar feidl fropdwonahto ht optionbhi sui meinaye ok feidlsettignek usaminok uskebaad or label ki jahal g fiesl lael thro sa achsy euse rko smakahaye ke kai kcheez ksi liey ahi ok bro 
+  properteis panel ko aye rakho sabek tope rfeilds settignhogi joek dropwown abel hogi jase feidl settignahi uskoaik hi usmainrkahok aikhiaprentmeinrkaho jsye fiedl selcted hgoi feil ka label usak requeos stae togle lo ok uski jok bhi ahi  or aga drodpwaototpinsok usekbaad formsettigneprfec haokabs ye chagnekardook
+
+  

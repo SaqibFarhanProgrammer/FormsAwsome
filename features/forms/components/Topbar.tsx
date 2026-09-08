@@ -63,6 +63,8 @@ export function TopBar() {
     ).unwrap();
     const createdSlug = result.data?.slug || slug;
     dispatch(setFormSlug(createdSlug));
+    console.log(result);
+    
     router.replace(`/create?slug=${createdSlug}`);
     return createdSlug;
   };
@@ -169,7 +171,6 @@ export function TopBar() {
         </Badge>
       </div>
 
-      {/* Right */}
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" className="rounded-xl gap-2" onClick={handlePreview}>
           <Eye className="w-4 h-4" />

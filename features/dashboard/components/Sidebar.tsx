@@ -39,7 +39,7 @@ export function Sidebar() {
     <motion.aside
       initial={false}
       animate={{
-        width: collapsed ? 72 : 256,
+        width: collapsed ? 72 : 216,
       }}
       transition={{
         type: "spring",
@@ -47,14 +47,13 @@ export function Sidebar() {
         damping: 30,
       }}
       className={cn(
-        "peer fixed inset-y-0 left-0 z-40 border-r border-border bg-sidebar flex h-screen flex-col overflow-hidden",
+        "peer fixed inset-y-0 left-0 z-40 border-r border-border bg-[#FFFFFF] flex h-screen flex-col overflow-hidden",
       )}
       data-collapsed={collapsed}
     >
-      {/* Header */}
       <div
         className={cn(
-          "flex h-16 items-center border-b border-sidebar-border shrink-0",
+          "flex h-10 pt-4 items-center  shrink-0",
           collapsed ? "justify-center px-2" : "justify-between px-4",
         )}
       >
@@ -97,7 +96,6 @@ export function Sidebar() {
         </Tooltip>
       </div>
 
-      {/* Nav Items */}
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto overflow-x-hidden">
         {navItems.map((item, index) => {
           const Icon = item.icon;
@@ -144,7 +142,6 @@ export function Sidebar() {
                   )}
                 </AnimatePresence>
 
-                {/* Active indicator dot */}
                 {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
@@ -159,7 +156,6 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer Profile */}
       <div className="p-4 border-t border-sidebar-border shrink-0">
         <div className="flex items-center gap-3 px-2">
           <motion.div

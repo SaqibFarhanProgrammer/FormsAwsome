@@ -796,10 +796,12 @@ export default function FormUI({
           </div>
         ) : (
           <>
-            <div className="mb-6 text-center">
-              <h1 className="text-xl font-semibold text-foreground">{formData.title}</h1>
+            <div className="mb-6 text-start">
+              <h1 className="text-2xl font-semibold text-foreground">{formData.title}</h1>
               {formData.description && (
-                <p className="mt-1 text-xs text-muted-foreground">{formData.description}</p>
+                <p className="mt-1 text-[15px] font-medium text-foreground/70">
+                  {formData.description}
+                </p>
               )}
             </div>
 
