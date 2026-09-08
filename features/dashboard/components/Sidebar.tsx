@@ -110,7 +110,7 @@ export function Sidebar() {
                       "relative flex items-center gap-2 rounded-lg px-3 py-2 transition-colors",
                       collapsed && "justify-center px-0",
                       isActive
-                        ? "bg-sidebar-primary/10 font-medium text-black"
+                        ? "bg-sidebar-primary/0 font-medium text-black"
                         : "text-sidebar-foreground/70 hover:bg-sidebar-accent text-sidebar-foreground",
                     )}
                   />
