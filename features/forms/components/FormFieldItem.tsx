@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   Type,
@@ -24,6 +24,7 @@ import {
   Upload,
   ToggleLeft,
   ChevronDown,
+  MoreVertical,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -104,19 +105,28 @@ interface FormFieldItemProps {
   field: FormFieldType;
   index: number;
   isSelected: boolean;
+  isFirst: boolean;
+  isLast: boolean;
   onSelect: () => void;
   onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
 }
 
 export const FormFieldItem = memo(function FormFieldItem({
   field,
   index,
   isSelected,
+  isFirst,
+  isLast,
   onSelect,
   onRemove,
+  onMoveUp,
+  onMoveDown,
 }: FormFieldItemProps) {
   const _Icon = iconMap[field.type as FieldType] || Type;
   const typeLabel = labelMap[field.type as FieldType] || field.type;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <TooltipProvider>
@@ -161,18 +171,62 @@ export const FormFieldItem = memo(function FormFieldItem({
               <p className="text-xs text-muted-foreground mt-0.5">{typeLabel}</p>
             </div>
 
-            {/* Delete Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/5 flex-shrink-0"
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove();
-              }}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:bg-muted flex-shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuOpen((open) => !open);
+                  }}
+                  aria-label="Field actions"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+                {menuOpen && (
+                  <div className="absolute right-0 top-10 z-20 w-40 rounded-xl border border-border bg-popover p-1 shadow-lg">
+                    <button
+                      type="button"
+                      className="flex w-full items-center rounded-lg px-3 py-2 text-left text-xs text-foreground hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+                      disabled={isFirst}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMoveUp();
+                        setMenuOpen(false);
+                      }}
+                    >
+                      Move up
+                    </button>
+                    <button
+                      type="button"
+                      className="flex w-full items-center rounded-lg px-3 py-2 text-left text-xs text-foreground hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+                      disabled={isLast}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMoveDown();
+                        setMenuOpen(false);
+                      }}
+                    >
+                      Move down
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/5 flex-shrink-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove();
+                }}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Field Preview */}
@@ -199,7 +253,7 @@ function FieldPreview({ field }: { field: FormFieldType }) {
     case "heading":
       return (
         <div className="py-2">
-          <h3 className="text-base font-semibold text-foreground">{field.label}</h3>
+          <h3 className="text-[15px] font-semibold text-foreground">{field.label}</h3>
         </div>
       );
 
@@ -210,7 +264,7 @@ function FieldPreview({ field }: { field: FormFieldType }) {
     case "URL":
       return (
         <div className="space-y-1">
-          <div className="w-full h-10 rounded-lg border border-border bg-muted/40 px-3 flex items-center text-sm text-muted-foreground">
+          <div className="w-full h-10 rounded-lg border border-border bg-muted/40 px-3 flex items-center text-[13px] text-muted-foreground">
             {placeholder}
           </div>
         </div>
@@ -219,7 +273,7 @@ function FieldPreview({ field }: { field: FormFieldType }) {
     case "email":
       return (
         <div className="space-y-1">
-          <div className="w-full h-10 rounded-lg border border-border bg-muted/40 px-3 flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="w-full h-10 rounded-lg border border-border bg-muted/40 px-3 flex items-center gap-2 text-[13px] text-muted-foreground">
             <Mail className="w-4 h-4" />
             <span>{placeholder}</span>
           </div>
@@ -229,7 +283,7 @@ function FieldPreview({ field }: { field: FormFieldType }) {
     case "number":
       return (
         <div className="space-y-1">
-          <div className="w-full h-10 rounded-lg border border-border bg-muted/40 px-3 flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="w-full h-10 rounded-lg border border-border bg-muted/40 px-3 flex items-center gap-2 text-[13px] text-muted-foreground">
             <Hash className="w-4 h-4" />
             <span>{placeholder}</span>
           </div>
@@ -239,7 +293,7 @@ function FieldPreview({ field }: { field: FormFieldType }) {
     case "long_text":
       return (
         <div className="space-y-1">
-          <div className="w-full min-h-[80px] rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          <div className="w-full min-h-[80px] rounded-lg border border-border bg-muted/40 px-3 py-2 text-[13px] text-muted-foreground">
             {placeholder}
           </div>
         </div>
@@ -248,7 +302,7 @@ function FieldPreview({ field }: { field: FormFieldType }) {
     case "dropdown":
       return (
         <div className="space-y-1">
-          <div className="w-full h-10 rounded-lg border border-border bg-muted/40 px-3 flex items-center justify-between text-sm text-muted-foreground">
+          <div className="w-full h-10 rounded-lg border border-border bg-muted/40 px-3 flex items-center justify-between text-[13px] text-muted-foreground">
             <span>{placeholder}</span>
             <ChevronDown className="w-4 h-4" />
           </div>
@@ -332,7 +386,7 @@ function FieldPreview({ field }: { field: FormFieldType }) {
           <div className="w-10 h-6 rounded-full bg-muted relative">
             <div className="w-4 h-4 rounded-full bg-background shadow-sm absolute left-1 top-1" />
           </div>
-          <span className="text-sm text-muted-foreground">Toggle this option</span>
+          <span className="text-[13px] text-muted-foreground">Toggle this option</span>
         </div>
       );
 

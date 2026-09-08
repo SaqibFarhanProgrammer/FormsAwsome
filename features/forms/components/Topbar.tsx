@@ -2,7 +2,21 @@
 
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { ArrowLeft, Eye, Save, Share2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  CheckSquare,
+  CircleDot,
+  Eye,
+  Hash,
+  ListFilter,
+  Mail,
+  Save,
+  Share2,
+  Star,
+  Upload,
+  X,
+} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { createForm } from "@/redux/features/create-form/form-create.slice";
 import { setFormSlug } from "@/redux/features/form-builder/form.slice";
@@ -64,7 +78,7 @@ export function TopBar() {
     const createdSlug = result.data?.slug || slug;
     dispatch(setFormSlug(createdSlug));
     console.log(result);
-    
+
     router.replace(`/create?slug=${createdSlug}`);
     return createdSlug;
   };
@@ -138,12 +152,123 @@ export function TopBar() {
     setShareUrl(getPublicUrl(slug));
   };
 
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
   const handlePreview = () => {
     if (!slug) {
       dispatch(showAlert({ message: "Save the form before previewing it.", type: "warning" }));
       return;
     }
-    window.open(getPublicUrl(slug), "_blank", "noopener,noreferrer");
+    setIsPreviewOpen(true);
+  };
+
+  const renderPreviewField = (field: (typeof fields)[number]) => {
+    const placeholder = field.placeholder || `Enter ${field.label.toLowerCase()}...`;
+    const baseClass =
+      "w-full rounded-xl border border-border bg-muted/40 px-3 py-2.5 text-[13px] text-muted-foreground";
+
+    switch (field.type) {
+      case "heading":
+        return (
+          <div className="space-y-1">
+            <h3 className="text-[15px] font-semibold text-foreground">{field.label}</h3>
+          </div>
+        );
+      case "divider":
+        return <div className="border-t border-dashed border-border" />;
+      case "long_text":
+        return <div className={baseClass + " min-h-[88px]"}>{placeholder}</div>;
+      case "email":
+        return (
+          <div className={baseClass + " flex items-center gap-2"}>
+            <Mail className="h-4 w-4" />
+            <span>{placeholder}</span>
+          </div>
+        );
+      case "number":
+        return (
+          <div className={baseClass + " flex items-center gap-2"}>
+            <Hash className="h-4 w-4" />
+            <span>{placeholder}</span>
+          </div>
+        );
+      case "dropdown":
+        return (
+          <div className={baseClass + " flex items-center justify-between gap-2"}>
+            <span>{field.placeholder || "Select an option"}</span>
+            <ListFilter className="h-4 w-4" />
+          </div>
+        );
+      case "radio":
+        return (
+          <div className="space-y-2">
+            {(field.options?.length ? field.options : ["Option 1", "Option 2"]).map(
+              (option, index) => (
+                <label
+                  key={`${field.id}-${index}`}
+                  className="flex items-center gap-2.5 text-[13px] text-muted-foreground"
+                >
+                  <CircleDot className="h-4 w-4" />
+                  <span>{option}</span>
+                </label>
+              ),
+            )}
+          </div>
+        );
+      case "checkbox":
+        return (
+          <div className="space-y-2">
+            {(field.options?.length ? field.options : ["Option 1", "Option 2"]).map(
+              (option, index) => (
+                <label
+                  key={`${field.id}-${index}`}
+                  className="flex items-center gap-2.5 text-[13px] text-muted-foreground"
+                >
+                  <CheckSquare className="h-4 w-4" />
+                  <span>{option}</span>
+                </label>
+              ),
+            )}
+          </div>
+        );
+      case "rating":
+        return (
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star key={star} className="h-4 w-4 text-muted-foreground/80" fill="currentColor" />
+            ))}
+          </div>
+        );
+      case "date":
+        return (
+          <div className={baseClass + " flex items-center gap-2"}>
+            <Calendar className="h-4 w-4" />
+            <span>MM/DD/YYYY</span>
+          </div>
+        );
+      case "toggle":
+        return (
+          <div className="flex items-center gap-3">
+            <div className="flex h-6 w-11 items-center rounded-full bg-muted p-1">
+              <div className="h-4 w-4 rounded-full bg-background shadow-sm" />
+            </div>
+            <span className="text-[13px] text-muted-foreground">{field.label}</span>
+          </div>
+        );
+      case "file_upload_image":
+      case "file_upload_pdf":
+      case "image":
+        return (
+          <div className="flex min-h-[96px] w-full items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 text-[13px] text-muted-foreground">
+            <div className="flex flex-col items-center gap-2">
+              <Upload className="h-5 w-5" />
+              <span>Upload file</span>
+            </div>
+          </div>
+        );
+      default:
+        return <div className={baseClass}>{placeholder}</div>;
+    }
   };
 
   return (
@@ -211,6 +336,70 @@ export function TopBar() {
           Publish
         </Button>
       </div>
+
+      {isPreviewOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm">
+          <div className="h-full overflow-y-auto">
+            <div className="mx-auto max-w-3xl px-4 py-8 md:px-6">
+              <div className="mb-4 flex items-center justify-between rounded-2xl border border-border bg-card/95 px-4 py-3 shadow-2xl">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                    Preview
+                  </p>
+                  <h2 className="text-lg font-semibold">{title || "Untitled Form"}</h2>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Close preview"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:text-foreground"
+                  onClick={() => setIsPreviewOpen(false)}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="rounded-[28px] border border-border bg-background p-6 shadow-2xl md:p-8">
+                <div className="mb-6 space-y-2">
+                  <h3 className="text-2xl font-semibold text-foreground">
+                    {title || "Untitled Form"}
+                  </h3>
+                  {description && <p className="text-sm text-muted-foreground">{description}</p>}
+                </div>
+
+                <div className="space-y-5">
+                  {fields.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-10 text-center text-sm text-muted-foreground">
+                      No fields added yet.
+                    </div>
+                  ) : (
+                    fields.map((field) => (
+                      <div key={field.id} className="space-y-2">
+                        {field.type !== "divider" && (
+                          <label className="flex items-center gap-1.5 text-[13px] font-medium text-foreground">
+                            {field.label || "Untitled field"}
+                            {field.required && <span className="text-destructive">*</span>}
+                          </label>
+                        )}
+                        {renderPreviewField(field)}
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="mt-8">
+                  <button
+                    type="button"
+                    disabled
+                    className="w-full rounded-xl bg-primary/80 px-4 py-3 text-sm font-medium text-white opacity-80"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {shareUrl && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">

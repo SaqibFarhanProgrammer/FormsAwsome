@@ -18,6 +18,7 @@ import {
 } from "@/redux/features/form-builder/form.selectors";
 import { FormMeta } from "./FormMeta";
 import { FormFieldItem } from "./FormFieldItem";
+import { reorderFields } from "@/redux/features/form-builder/form.slice";
 
 interface FormCanvasProps {
   selectedFieldId: string | null;
@@ -61,6 +62,23 @@ export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: Fo
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug");
   const router = useRouter();
+
+  const handleMoveField = useCallback(
+    (fieldId: string, direction: "up" | "down") => {
+      const currentIndex = fields.findIndex((field) => field.id === fieldId);
+      if (currentIndex === -1) return;
+
+      const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+      if (nextIndex < 0 || nextIndex >= fields.length) return;
+
+      const reordered = [...fields];
+      const [movedField] = reordered.splice(currentIndex, 1);
+      reordered.splice(nextIndex, 0, movedField);
+
+      dispatch(reorderFields(reordered));
+    },
+    [dispatch, fields],
+  );
 
   const handleUpdateForm = useCallback(async () => {
     if (!slug) {
@@ -144,8 +162,12 @@ export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: Fo
                 field={field}
                 index={index}
                 isSelected={field.id === selectedFieldId}
+                isFirst={index === 0}
+                isLast={index === fields.length - 1}
                 onSelect={() => onSelectField(field.id)}
                 onRemove={() => onRemoveField(field.id)}
+                onMoveUp={() => handleMoveField(field.id, "up")}
+                onMoveDown={() => handleMoveField(field.id, "down")}
               />
             ))
           )}
