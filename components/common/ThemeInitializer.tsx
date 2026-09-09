@@ -8,9 +8,10 @@ export function ThemeInitializer() {
   useEffect(() => {
     const updateTheme = () => {
       const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-      const theme = savedTheme === "light" || savedTheme === "dark" || savedTheme === "system"
-        ? savedTheme
-        : "system";
+      const theme =
+        savedTheme === "light" || savedTheme === "dark" || savedTheme === "system"
+          ? savedTheme
+          : "system";
 
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
       const shouldUseDarkMode = theme === "dark" || (theme === "system" && mediaQuery.matches);

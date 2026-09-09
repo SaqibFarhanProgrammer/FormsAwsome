@@ -111,7 +111,7 @@ export function Sidebar() {
                       collapsed && "justify-center px-0",
                       isActive
                         ? "bg-sidebar-accent font-medium text-sidebar-primary"
-                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                        : "text-sidebar-foreground/90 hover:bg-sidebar-accent hover:text-sidebar-foreground",
                     )}
                   />
                 }

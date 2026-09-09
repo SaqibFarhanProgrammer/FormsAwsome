@@ -29,7 +29,11 @@ export function SingleFormView({ formData }: { formData: FormType }) {
         if (!response.ok) throw new Error("Unable to load submissions");
         const result = await response.json();
         if (!cancelled) {
-          setSubmissions((result.data ?? []).map(toSubmissionViewModel));
+          setSubmissions(
+            (result.data ?? []).map((submission) =>
+              toSubmissionViewModel(submission, formData.fields),
+            ),
+          );
         }
       } catch (error: unknown) {
         if (!cancelled) setSubmissions([]);
@@ -124,22 +128,39 @@ type SubmissionViewModel = {
   values: Record<string, string>;
 };
 
-function toSubmissionViewModel(submission: {
-  id: string;
-  data: Record<string, unknown>;
-  createdAt: string;
-}): SubmissionViewModel {
+function toSubmissionViewModel(
+  submission: {
+    id: string;
+    data: Record<string, unknown>;
+    createdAt: string;
+  },
+  fields: FormType["fields"],
+): SubmissionViewModel {
+  const fieldMap = new Map(fields.map((field) => [field.id, field]));
+
   const values = Object.fromEntries(
-    Object.entries(submission.data).map(([key, value]) => [
-      key,
-      Array.isArray(value) ? value.join(", ") : String(value ?? ""),
-    ]),
+    Object.entries(submission.data).map(([fieldId, value]) => {
+      const field = fieldMap.get(fieldId);
+      const label = field?.label || fieldId;
+
+      return [label, Array.isArray(value) ? value.join(", ") : String(value ?? "")];
+    }),
   );
+
+  const submittedBy =
+    values.Name ||
+    values["Full Name"] ||
+    values["Full name"] ||
+    values.full_name ||
+    values.name ||
+    "Anonymous";
+
+  const email = values.Email || values.email || "No email";
 
   return {
     id: submission.id,
-    submittedBy: values.name || values.full_name || "Anonymous",
-    email: values.email || "No email",
+    submittedBy,
+    email,
     date: new Date(submission.createdAt).toLocaleString(),
     createdAt: submission.createdAt,
     status: "new",

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getThemePreference, setThemePreference, type ThemeOption } from "@/core/services/theme/theme.service";
+import {
+  getThemePreference,
+  setThemePreference,
+  type ThemeOption,
+} from "@/core/services/theme/theme.service";
 
 export async function GET() {
   const theme = await getThemePreference();
@@ -13,10 +17,7 @@ export async function PATCH(request: NextRequest) {
     const theme = body.theme;
 
     if (theme !== "system" && theme !== "light" && theme !== "dark") {
-      return NextResponse.json(
-        { success: false, message: "Invalid theme value" },
-        { status: 400 },
-      );
+      return NextResponse.json({ success: false, message: "Invalid theme value" }, { status: 400 });
     }
 
     await setThemePreference(theme as ThemeOption);

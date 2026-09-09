@@ -23,25 +23,25 @@ function getStatusBadge(status: string) {
   switch (status) {
     case "PUBLISHED":
       return (
-        <Badge className="rounded-lg bg-emerald-50 text-emerald-700 border-emerald-200/50 hover:bg-emerald-50 font-medium text-xs">
+        <Badge className="rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-300 font-medium text-xs">
           Published
         </Badge>
       );
     case "DRAFT":
       return (
-        <Badge className="rounded-lg bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-50 font-medium text-xs">
+        <Badge className="rounded-full border border-amber-500/20 bg-amber-500/10 text-amber-700 hover:bg-amber-500/10 dark:text-amber-300 font-medium text-xs">
           Draft
         </Badge>
       );
     case "ARCHIVED":
       return (
-        <Badge className="rounded-lg bg-slate-100 text-slate-600 border-slate-200/50 hover:bg-slate-100 font-medium text-xs">
+        <Badge className="rounded-full border border-slate-300 bg-slate-100 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 font-medium text-xs">
           Archived
         </Badge>
       );
     default:
       return (
-        <Badge className="rounded-lg bg-slate-100 text-slate-600 border-slate-200/50 hover:bg-slate-100 font-medium text-xs">
+        <Badge className="rounded-full border border-slate-300 bg-slate-100 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 font-medium text-xs">
           {status || "Unknown"}
         </Badge>
       );
