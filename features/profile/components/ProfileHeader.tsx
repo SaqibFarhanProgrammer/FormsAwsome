@@ -94,7 +94,9 @@ export function ProfileHeader({ data }: { data: ProfileDataType }) {
       setFeedback({
         type: "error",
         message:
-          error instanceof Error ? error.message : "Something went wrong while saving your profile.",
+          error instanceof Error
+            ? error.message
+            : "Something went wrong while saving your profile.",
       });
     } finally {
       setIsSaving(false);
@@ -142,7 +144,8 @@ export function ProfileHeader({ data }: { data: ProfileDataType }) {
               @{profile.name?.split(" ").join("").toLowerCase() || "user"}
             </p>
             <p className="text-sm text-muted-foreground mt-2 max-w-lg">
-              {profile.bio || "Building the future of form management. Passionate about clean UI and great user experiences."}
+              {profile.bio ||
+                "Building the future of form management. Passionate about clean UI and great user experiences."}
             </p>
 
             <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground flex-wrap">
@@ -192,18 +195,25 @@ export function ProfileHeader({ data }: { data: ProfileDataType }) {
               ) : (
                 <Pencil className="h-4 w-4" />
               )}
-              <AlertTitle>{feedback.type === "error" ? "Unable to save" : "Profile updated"}</AlertTitle>
+              <AlertTitle>
+                {feedback.type === "error" ? "Unable to save" : "Profile updated"}
+              </AlertTitle>
               <AlertDescription>{feedback.message}</AlertDescription>
             </Alert>
           </div>
         )}
 
         {isEditing && (
-          <form onSubmit={handleSubmit} className="mt-6 rounded-2xl border border-border bg-background/60 p-5">
+          <form
+            onSubmit={handleSubmit}
+            className="mt-6 rounded-2xl border border-border bg-background/60 p-5"
+          >
             <div className="flex items-center justify-between gap-3 mb-5">
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Edit profile</h2>
-                <p className="text-sm text-muted-foreground">Update your public profile information.</p>
+                <p className="text-sm text-muted-foreground">
+                  Update your public profile information.
+                </p>
               </div>
             </div>
 
@@ -211,7 +221,11 @@ export function ProfileHeader({ data }: { data: ProfileDataType }) {
               <div className="flex flex-col items-center gap-3">
                 <div className="relative overflow-hidden rounded-2xl border border-border bg-muted w-32 h-32">
                   {previewImage ? (
-                    <img src={previewImage} alt="Profile preview" className="h-full w-full object-cover" />
+                    <img
+                      src={previewImage}
+                      alt="Profile preview"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5 text-3xl font-bold text-primary/40">
                       U

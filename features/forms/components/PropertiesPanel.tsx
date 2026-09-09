@@ -107,7 +107,7 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
       </div>
 
       <div className="space-y-5">
-        <div className="rounded-2xl border border-violet-300/80 bg-[#f4f0ff] p-4 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
           <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
             Selected Field Settings
           </p>
@@ -239,7 +239,7 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-violet-300/80 bg-[#f4f0ff] p-4 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
           <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
             Form Settings
           </p>
@@ -511,7 +511,7 @@ function FormShareCard({ slug }: { slug: string }) {
           </Button>
         </div>
         {showQr && (
-          <div className="flex justify-center rounded-lg bg-white p-3">
+          <div className="flex justify-center rounded-lg bg-background p-3">
             <QRCodeCanvas value={url} size={150} includeMargin />
           </div>
         )}

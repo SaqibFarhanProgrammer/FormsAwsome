@@ -3,6 +3,8 @@ import { Geist, Inter } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/providers/ReduxProvider";
 import { GlobalAlert } from "@/components/common/GlobalAlert";
+import { ThemeInitializer } from "@/components/common/ThemeInitializer";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -23,10 +25,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable}  ${InterFont.variable} font-inter  h-full antialiased`}
       cz-shortcut-listen="true"
     >
       <body className="min-h-full flex flex-col" cz-shortcut-listen="true">
+        <ThemeInitializer />
         <ReduxProvider>
           <GlobalAlert />
 
