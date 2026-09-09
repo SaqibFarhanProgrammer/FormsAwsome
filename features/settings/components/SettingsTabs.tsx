@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { GeneralSettings } from "./GeneralSettings";
-import { SecuritySettings } from "./SecuritySettings";
 import { NotificationSettings } from "./NotificationSettings";
 import { BillingSettings } from "./BillingSettings";
 import { DangerZone } from "./DangerZone";
-import { User, Shield, Bell, CreditCard } from "lucide-react";
+import { User, Bell, CreditCard } from "lucide-react";
 
 export function SettingsTabs() {
   const [activeTab, setActiveTab] = useState("general");
@@ -22,13 +21,6 @@ export function SettingsTabs() {
           >
             <User className="w-4 h-4" />
             <span className="hidden sm:inline">General</span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="security"
-            className="rounded-lg px-4 py-2.5 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-all"
-          >
-            <Shield className="w-4 h-4" />
-            <span className="hidden sm:inline">Security</span>
           </TabsTrigger>
           <TabsTrigger
             value="notifications"
@@ -52,13 +44,6 @@ export function SettingsTabs() {
             className="mt-0 space-y-6 animate-in fade-in-50 duration-200"
           >
             <GeneralSettings />
-          </TabsContent>
-
-          <TabsContent
-            value="security"
-            className="mt-0 space-y-6 animate-in fade-in-50 duration-200"
-          >
-            <SecuritySettings />
           </TabsContent>
 
           <TabsContent

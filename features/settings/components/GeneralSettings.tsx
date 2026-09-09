@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { Textarea } from "@/components/ui/Textarea";
-import { Camera, Mail, User, MapPin, Briefcase, Globe, Check } from "lucide-react";
+import { Camera, Mail, User, Check } from "lucide-react";
 
 type ThemeOption = "system" | "light" | "dark";
 
@@ -32,24 +32,11 @@ export function GeneralSettings() {
             </button>
           </div>
           <CardTitle className="mt-4 text-lg">John Doe</CardTitle>
-          <CardDescription>@johndoe</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-3 text-sm">
             <Mail className="w-4 h-4 text-muted-foreground" />
             <span className="text-foreground">john@example.com</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            <MapPin className="w-4 h-4 text-muted-foreground" />
-            <span className="text-foreground">San Francisco, CA</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            <Briefcase className="w-4 h-4 text-muted-foreground" />
-            <span className="text-foreground">Product Designer</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            <Globe className="w-4 h-4 text-muted-foreground" />
-            <span className="text-foreground">johndoe.com</span>
           </div>
         </CardContent>
       </Card>
@@ -72,7 +59,7 @@ export function GeneralSettings() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
-            <div className="space-y-2">
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="fullName" className="text-sm font-medium">
                 Full Name
               </Label>
@@ -86,18 +73,8 @@ export function GeneralSettings() {
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-sm font-medium">
-                Username
-              </Label>
-              <Input
-                id="username"
-                defaultValue="@johndoe"
-                disabled={!isEditing}
-                className="rounded-xl border-border bg-background"
-              />
-            </div>
-            <div className="space-y-2">
+
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="email" className="text-sm font-medium">
                 Email Address
               </Label>
@@ -112,47 +89,8 @@ export function GeneralSettings() {
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone" className="text-sm font-medium">
-                Phone Number
-              </Label>
-              <Input
-                id="phone"
-                type="tel"
-                defaultValue="+1 (555) 123-4567"
-                disabled={!isEditing}
-                className="rounded-xl border-border bg-background"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="location" className="text-sm font-medium">
-                Location
-              </Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="location"
-                  defaultValue="San Francisco, CA"
-                  disabled={!isEditing}
-                  className="pl-10 rounded-xl border-border bg-background"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="role" className="text-sm font-medium">
-                Role
-              </Label>
-              <div className="relative">
-                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="role"
-                  defaultValue="Product Designer"
-                  disabled={!isEditing}
-                  className="pl-10 rounded-xl border-border bg-background"
-                />
-              </div>
-            </div>
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="bio" className="text-sm font-medium">
               Bio
@@ -193,7 +131,7 @@ export function GeneralSettings() {
               )}
 
               {/* Browser mockup - half light half dark */}
-              <div className="w-full aspect-[16/10] rounded-xl overflow-hidden border border-border shadow-sm">
+              <div className="w-full aspect-16/10 rounded-xl overflow-hidden border border-border shadow-sm">
                 {/* Top bar */}
                 <div className="h-4 bg-muted border-b border-border flex items-center px-2 gap-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
@@ -241,7 +179,7 @@ export function GeneralSettings() {
                 </div>
               )}
 
-              <div className="w-full aspect-[16/10] rounded-xl overflow-hidden border border-border shadow-sm bg-background">
+              <div className="w-full aspect-16/10 rounded-xl overflow-hidden border border-border shadow-sm bg-background">
                 <div className="h-4 bg-muted border-b border-border flex items-center px-2 gap-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
                   <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
@@ -280,7 +218,7 @@ export function GeneralSettings() {
                 </div>
               )}
 
-              <div className="w-full aspect-[16/10] rounded-xl overflow-hidden border border-border shadow-sm bg-[#1e293b]">
+              <div className="w-full aspect-16/10 rounded-xl overflow-hidden border border-border shadow-sm bg-[#1e293b]">
                 <div className="h-4 bg-[#0f172a] border-b border-white/10 flex items-center px-2 gap-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
                   <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />

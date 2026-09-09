@@ -3,8 +3,9 @@
 import { Bell } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { setProfile } from "@/redux/features/profile/profile.slice";
 
 interface RecentSubmission {
   id: string;
@@ -26,9 +27,48 @@ function formatRelativeTime(date: string) {
 }
 
 export function TopBar() {
+  const dispatch = useDispatch();
   const data = useSelector((state: RootState) => state.profile);
   const [notifications, setNotifications] = useState<RecentSubmission[]>([]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadProfile = async () => {
+      try {
+        const response = await fetch("/api/profile");
+        if (!response.ok) {
+          return;
+        }
+
+        const result = await response.json();
+
+        if (!cancelled && result?.data) {
+          dispatch(
+            setProfile({
+              name: result.data.name,
+              email: result.data.email,
+              createdAt: result.data.createdAt,
+              image: result.data.image ?? null,
+              bio: result.data.bio ?? null,
+              settings: result.data.settings,
+            }),
+          );
+        }
+      } catch {
+        // Ignore profile fetch failures here; the dashboard can still render fallback UI.
+      }
+    };
+
+    if (!data.isFetched) {
+      void loadProfile();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [data.isFetched, dispatch]);
 
   useEffect(() => {
     let cancelled = false;
