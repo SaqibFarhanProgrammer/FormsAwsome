@@ -17,6 +17,19 @@ const formViewSchema = new mongoose.Schema<FormViewType>(
 
     ip: {
       type: String,
+      index: true,
+    },
+
+    name: {
+      type: String,
+    },
+
+    email: {
+      type: String,
+    },
+
+    region: {
+      type: String,
     },
 
     country: {
@@ -24,6 +37,10 @@ const formViewSchema = new mongoose.Schema<FormViewType>(
     },
 
     countryCode: {
+      type: String,
+    },
+
+    city: {
       type: String,
     },
 
@@ -44,6 +61,17 @@ const formViewSchema = new mongoose.Schema<FormViewType>(
     userAgent: {
       type: String,
     },
+
+    data: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
+
+    submissionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Submission",
+      index: true,
+    },
   },
   {
     timestamps: true,
@@ -52,3 +80,6 @@ const formViewSchema = new mongoose.Schema<FormViewType>(
 
 export const FormView =
   mongoose.models.FormView || mongoose.model<FormViewType>("FormView", formViewSchema);
+
+export const FormViews =
+  mongoose.models.FormViews || mongoose.model<FormViewType>("FormViews", formViewSchema);

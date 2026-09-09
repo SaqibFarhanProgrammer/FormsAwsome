@@ -4,8 +4,9 @@ import { AppError } from "@/lib/auth/appError";
 import { connectDB } from "@/core/db/connectDb";
 import { getUserIdFromToken, verifyAccessToken } from "@/lib/auth/jwt.lib";
 import { cookies } from "next/headers";
-import { DeleteDataFromRedis, SetDataToRedisWithTTL } from "@/lib/redis/redis";
+import { DeleteDataFromRedis, GetDataFromRedis, SetDataToRedisWithTTL } from "@/lib/redis/redis";
 import { Submission } from "@/features/submissions/models/submission.model";
+import { FormView } from "@/features/submissions/models/FormViews.models";
 import { FormState } from "@/features/form-builder/types/form-builder.types";
 import { Form } from "@/features/form-builder/models/form-builder.model";
 import type { FormField } from "@/features/form-builder/models/form-builder.model";
@@ -26,6 +27,17 @@ type IncomingField = {
   defaultValue?: string | number | boolean;
   logic?: FormField["logic"];
 };
+
+const FORM_CACHE_TTL_SECONDS = 60 * 60;
+const FORM_SUBMISSION_IP_TTL_SECONDS = 60 * 60 * 24 * 30;
+
+function getPublicFormCacheKey(slug: string) {
+  return `public:form:${slug}`;
+}
+
+function getFormSubmissionKey(slug: string, ip: string) {
+  return `public:form:${slug}:submitted:${ip}`;
+}
 
 function normalizeFields(fields: IncomingField[]) {
   return fields.map((field) => ({
@@ -131,22 +143,18 @@ export async function getAllFormsService() {
   }
 
   const userId = payload.userId;
-  // const cacheKey = `forms:user:${userId}`;
+  const cacheKey = `forms:user:${userId}`;
 
-  // // Check Redis cache
-  // const cacheExists = await IsDataExitsInRedis(cacheKey);
-  // if (cacheExists) {
-  //   const cachedForms = await GetDataFromRedis(cacheKey);
-  //   if (cachedForms) {
-  //     return JSON.parse(cachedForms);
-  //   }
-  // }
+  const cachedForms = await GetDataFromRedis(cacheKey);
+  if (cachedForms) {
+    return JSON.parse(cachedForms);
+  }
 
-  // Get from DB
   await connectDB();
   const forms = await Form.find({ userId }).select("-fields -settings").sort({ createdAt: -1 });
 
   if (!forms || forms.length === 0) {
+    await SetDataToRedisWithTTL(cacheKey, JSON.stringify([]), FORM_CACHE_TTL_SECONDS);
     return [];
   }
 
@@ -161,8 +169,7 @@ export async function getAllFormsService() {
     updatedAt: form.updatedAt.toString(),
   }));
 
-  // Cache for 1 hour
-  // await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formsData), 3600);
+  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formsData), FORM_CACHE_TTL_SECONDS);
 
   return formsData;
 }
@@ -172,24 +179,18 @@ export async function getSingleFormService(formIdOrSlug: string) {
     throw new AppError("Form ID or slug is required", 400);
   }
 
-  // const cacheKeyById = `form:${formIdOrSlug}`;
-  // const cacheKeyBySlug = `form:slug:${formIdOrSlug}`;
+  const cacheKeyById = `form:${formIdOrSlug}`;
+  const cacheKeyBySlug = `form:slug:${formIdOrSlug}`;
 
-  // let cacheExists = await IsDataExitsInRedis(cacheKeyById);
-  // if (cacheExists) {
-  //   const cachedForm = await GetDataFromRedis(cacheKeyById);
-  //   if (cachedForm) {
-  //     return JSON.parse(cachedForm);
-  //   }
-  // }
+  const cachedById = await GetDataFromRedis(cacheKeyById);
+  if (cachedById) {
+    return JSON.parse(cachedById);
+  }
 
-  // cacheExists = await IsDataExitsInRedis(cacheKeyBySlug);
-  // if (cacheExists) {
-  //   const cachedForm = await GetDataFromRedis(cacheKeyBySlug);
-  //   if (cachedForm) {
-  //     return JSON.parse(cachedForm);
-  //   }
-  //      const userid = await getUserIdFromToken();
+  const cachedBySlug = await GetDataFromRedis(cacheKeyBySlug);
+  if (cachedBySlug) {
+    return JSON.parse(cachedBySlug);
+  }
 
   const userid = await getUserIdFromToken();
   await connectDB();
@@ -250,9 +251,8 @@ export async function getSingleFormService(formIdOrSlug: string) {
     updatedAt: form.updatedAt.toString(),
   };
 
-  // // Cache for 24 hours
-  // await SetDataToRedisWithTTL(cacheKeyById, JSON.stringify(formData), 86400);
-  // await SetDataToRedisWithTTL(cacheKeyBySlug, JSON.stringify(formData), 86400);
+  await SetDataToRedisWithTTL(cacheKeyById, JSON.stringify(formData), FORM_CACHE_TTL_SECONDS);
+  await SetDataToRedisWithTTL(cacheKeyBySlug, JSON.stringify(formData), FORM_CACHE_TTL_SECONDS);
 
   return formData;
 }
@@ -415,20 +415,23 @@ export async function deleteFormService(
   };
 }
 
-export async function getPublicFormService(slug: string) {
+export async function getPublicFormService(slug: string, options?: { requestIp?: string }) {
   if (!slug) {
     throw new AppError("Slug is required", 400);
   }
 
-  // const cacheKey = `public:form:${slug}`;
-  // const cacheExists = await IsDataExitsInRedis(cacheKey);
+  const cacheKey = getPublicFormCacheKey(slug);
+  const cachedForm = await GetDataFromRedis(cacheKey);
 
-  // if (cacheExists) {
-  //   const cachedForm = await GetDataFromRedis(cacheKey);
-  //   if (cachedForm) {
-  //     return JSON.parse(cachedForm);
-  //   }
-  // }
+  if (cachedForm) {
+    const parsedCachedForm = JSON.parse(cachedForm) as Record<string, unknown>;
+    return {
+      ...parsedCachedForm,
+      hasSubmitted: options?.requestIp
+        ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, options.requestIp)))
+        : false,
+    };
+  }
 
   await connectDB();
   const form = await Form.findOne({ slug });
@@ -473,19 +476,43 @@ export async function getPublicFormService(slug: string) {
     },
   };
 
-  // Cache for 1 hour
-  // await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formData), 3600 * 5);
+  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formData), FORM_CACHE_TTL_SECONDS);
 
-  return formData;
+  return {
+    ...formData,
+    hasSubmitted: options?.requestIp
+      ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, options.requestIp)))
+      : false,
+  };
 }
 
 export async function submitFormService(
   slug: string,
   data: Record<string, unknown>,
-  meta: { ip?: string; userAgent?: string } = {},
+  meta: {
+    ip?: string;
+    userAgent?: string;
+    region?: string;
+    country?: string;
+    countryCode?: string;
+    city?: string;
+    browser?: string;
+    os?: string;
+    device?: string;
+  } = {},
 ) {
   if (!slug || !data || typeof data !== "object" || Array.isArray(data)) {
     throw new AppError("A valid form submission is required", 400);
+  }
+
+  const normalizedIp = meta.ip?.trim();
+  const ipSubmissionKey = normalizedIp ? getFormSubmissionKey(slug, normalizedIp) : null;
+
+  if (ipSubmissionKey) {
+    const existingSubmission = await GetDataFromRedis(ipSubmissionKey);
+    if (existingSubmission) {
+      throw new AppError("You have already submitted the form.", 409);
+    }
   }
 
   await connectDB();
@@ -532,6 +559,35 @@ export async function submitFormService(
     data,
     meta,
   });
+
+  const formView = await FormView.create({
+    formId: form._id,
+    ip: normalizedIp,
+    name: typeof data.name === "string" ? data.name.trim() : undefined,
+    email: typeof data.email === "string" ? data.email.trim() : undefined,
+    region: meta.region || undefined,
+    country: meta.country || undefined,
+    countryCode: meta.countryCode || undefined,
+    city: meta.city || undefined,
+    device: meta.device || "unknown",
+    browser: meta.browser || undefined,
+    os: meta.os || undefined,
+    userAgent: meta.userAgent || undefined,
+    data,
+    submissionId: submission._id,
+  });
+
+  if (ipSubmissionKey) {
+    await SetDataToRedisWithTTL(
+      ipSubmissionKey,
+      JSON.stringify({
+        formId: form._id.toString(),
+        submittedAt: new Date().toISOString(),
+        viewId: formView._id.toString(),
+      }),
+      FORM_SUBMISSION_IP_TTL_SECONDS,
+    );
+  }
 
   return {
     id: submission._id.toString(),

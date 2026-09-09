@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 import { cookies } from "next/headers";
+import { AppError } from "@/lib/auth/appError";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
@@ -79,9 +80,36 @@ export const verifyVerificationToken = (token: string): VerificationTokenPayload
 export async function getUserIdFromToken() {
   const cookiesList = await cookies();
   const accessToken = cookiesList.get("accessToken")?.value;
-  if (!accessToken) {
-    throw new Error("Access token not found");
+
+  if (accessToken) {
+    try {
+      const payload = verifyAccessToken(accessToken);
+      return payload.userId;
+    } catch {
+      // fall through to refresh token logic
+    }
   }
-  const payload = verifyAccessToken(accessToken);
-  return payload.userId;
+
+  const refreshToken = cookiesList.get("refreshToken")?.value;
+
+  if (!refreshToken) {
+    throw new AppError("Access token not found", 401);
+  }
+
+  try {
+    const payload = verifyRefreshToken(refreshToken);
+    const newAccessToken = generateAccessToken(payload);
+
+    cookiesList.set("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+
+    return payload.userId;
+  } catch {
+    throw new AppError("Invalid access token", 401);
+  }
 }

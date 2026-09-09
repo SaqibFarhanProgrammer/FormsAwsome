@@ -8,16 +8,21 @@ export type FormViewType = {
   visitorId?: string;
 
   ip?: string;
-
+  name?: string;
+  email?: string;
+  region?: string;
   country?: string;
   countryCode?: string;
+  city?: string;
 
-  device: DeviceType;
+  device?: DeviceType;
 
   browser?: string;
   os?: string;
 
   userAgent?: string;
+  data?: Record<string, unknown>;
+  submissionId?: mongoose.Types.ObjectId | string;
 
   createdAt?: Date;
 };

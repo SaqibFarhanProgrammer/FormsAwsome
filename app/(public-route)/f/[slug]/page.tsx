@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { getPublicFormService } from "@/core/services/form/forms.service";
 import FormUI from "@/features/form-builder/components/form-ui";
 
@@ -7,10 +8,15 @@ interface FormPageProps {
 
 export default async function FormPage({ params }: FormPageProps) {
   const { slug } = await params;
+  const headersList = await headers();
+  const forwardedFor = headersList.get("x-forwarded-for");
+  const realIp = headersList.get("x-real-ip");
+  const requestIp = forwardedFor?.split(",")[0]?.trim() || realIp || undefined;
+
   let formData: Awaited<ReturnType<typeof getPublicFormService>> | null = null;
 
   try {
-    formData = await getPublicFormService(slug);
+    formData = await getPublicFormService(slug, { requestIp });
   } catch {}
 
   if (!formData) {
@@ -27,8 +33,12 @@ export default async function FormPage({ params }: FormPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <FormUI formData={formData} submitUrl={`/api/f/${slug}`} />
+    <main className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
+      <FormUI
+        formData={formData}
+        submitUrl={`/api/f/${slug}`}
+        hasSubmitted={Boolean(formData.hasSubmitted)}
+      />
     </main>
   );
 }

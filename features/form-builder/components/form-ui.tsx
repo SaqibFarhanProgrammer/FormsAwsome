@@ -251,19 +251,19 @@ const formTypeMeta: Record<string, { label: string; badge: string; shell: string
 /* ─────────── Helpers ─────────── */
 function FieldLabel({ label, required }: { label: string; required: boolean }) {
   return (
-    <Label className="mb-1.5 block text-sm font-medium text-foreground">
+    <Label className="mb-1.5 block text-sm font-medium text-black">
       {label}
-      {required && <span className="ml-1 text-red-400">*</span>}
+      {required && <span className="ml-1 text-red-500">*</span>}
     </Label>
   );
 }
 
 function FieldDescription({ text }: { text?: string }) {
-  return text ? <p className="mt-1 text-xs text-muted-foreground">{text}</p> : null;
+  return text ? <p className="mt-1 text-xs text-black/50">{text}</p> : null;
 }
 
 function FieldError({ error }: { error?: string }) {
-  return error ? <p className="mt-1 text-xs font-medium text-red-400">{error}</p> : null;
+  return error ? <p className="mt-1 text-xs font-medium text-red-500">{error}</p> : null;
 }
 
 /* ─────────── Field Components ─────────── */
@@ -271,16 +271,14 @@ function FieldError({ error }: { error?: string }) {
 function HeadingField({ field }: { field: FormFieldItem }) {
   return (
     <div className="py-1">
-      <h2 className="text-lg font-semibold text-foreground">{field.label}</h2>
-      {field.helperText && (
-        <p className="mt-0.5 text-xs text-muted-foreground">{field.helperText}</p>
-      )}
+      <h2 className="text-lg font-semibold text-black">{field.label}</h2>
+      {field.helperText && <p className="mt-0.5 text-xs text-black/50">{field.helperText}</p>}
     </div>
   );
 }
 
 function DividerField() {
-  return <div className="my-1 border-t border-border" aria-hidden="true" />;
+  return <div className="my-1 border-t border-black/10" aria-hidden="true" />;
 }
 
 function ToggleField({
@@ -298,16 +296,16 @@ function ToggleField({
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <div className="space-y-0">
-          <Label className="text-sm font-medium text-foreground">
+          <Label className="text-sm font-medium text-black">
             {field.label}
-            {field.validation.required && <span className="ml-1 text-red-400">*</span>}
+            {field.validation.required && <span className="ml-1 text-red-500">*</span>}
           </Label>
-          {field.helperText && <p className="text-xs text-muted-foreground">{field.helperText}</p>}
+          {field.helperText && <p className="text-xs text-black/50">{field.helperText}</p>}
         </div>
         <Switch
           checked={value}
           onCheckedChange={onChange}
-          className="data-[state=checked]:bg-primary scale-90"
+          className="data-[state=checked]:bg-black scale-90"
         />
       </div>
       <FieldError error={error} />
@@ -340,7 +338,7 @@ function TextField({
         type={type}
         placeholder={field.placeholder || "Type here..."}
         {...register(field.id)}
-        className="h-9 rounded-md border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="h-9 rounded-md border-black/15 bg-white px-3 text-sm text-black placeholder:text-black/40 focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0"
       />
       <FieldDescription text={field.helperText} />
       <FieldError error={error} />
@@ -363,7 +361,7 @@ function TextAreaField({
       <Textarea
         placeholder={field.placeholder || "Type here..."}
         {...register(field.id)}
-        className="min-h-20 rounded-md border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 resize-y"
+        className="min-h-20 rounded-md border-black/15 bg-white px-3 py-2 text-sm text-black placeholder:text-black/40 focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0 resize-y"
       />
       <FieldDescription text={field.helperText} />
       <FieldError error={error} />
@@ -386,15 +384,15 @@ function SelectField({
     <div className="space-y-1.5">
       <FieldLabel label={field.label} required={field.validation.required} />
       <Select value={value || ""} onValueChange={(nextValue) => onChange(nextValue || "")}>
-        <SelectTrigger className="h-9 rounded-md border-input bg-background px-3 text-sm text-foreground focus:ring-0 focus:ring-offset-0 [&>span]:text-muted-foreground data-[state=open]:border-primary">
+        <SelectTrigger className="h-9 rounded-md border-black/15 bg-white px-3 text-sm text-black focus:ring-0 focus:ring-offset-0 [&>span]:text-black/40 data-[state=open]:border-black">
           <SelectValue placeholder={field.placeholder || "Select an option"} />
         </SelectTrigger>
-        <SelectContent className="rounded-md border-border bg-popover">
+        <SelectContent className="rounded-md border-black/10 bg-white">
           {field.options?.map((option) => (
             <SelectItem
               key={option.value}
               value={option.value}
-              className="text-sm text-foreground focus:bg-accent focus:text-accent-foreground"
+              className="text-sm text-black focus:bg-black/5 focus:text-black"
             >
               {option.label}
             </SelectItem>
@@ -427,11 +425,11 @@ function RadioField({
             <RadioGroupItem
               value={option.value}
               id={`${field.id}-${option.value}`}
-              className="border-input data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+              className="border-black/20 data-[state=checked]:border-black data-[state=checked]:bg-black"
             />
             <Label
               htmlFor={`${field.id}-${option.value}`}
-              className="text-sm text-foreground cursor-pointer"
+              className="text-sm text-black cursor-pointer"
             >
               {option.label}
             </Label>
@@ -482,9 +480,9 @@ function CheckboxField({
               <Checkbox
                 checked={isChecked}
                 onCheckedChange={() => toggleOption(option.value)}
-                className="border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground"
+                className="border-black/20 data-[state=checked]:bg-black data-[state=checked]:border-black data-[state=checked]:text-white"
               />
-              <Label className="text-sm text-foreground cursor-pointer">{option.label}</Label>
+              <Label className="text-sm text-black cursor-pointer">{option.label}</Label>
             </div>
           );
         })}
@@ -526,15 +524,13 @@ function RatingField({
               className={cn(
                 "h-5 w-5 transition-colors duration-200",
                 star <= (hoverValue || currentValue)
-                  ? "fill-primary text-primary"
-                  : "fill-transparent text-muted-foreground/30",
+                  ? "fill-black text-black"
+                  : "fill-transparent text-black/20",
               )}
             />
           </button>
         ))}
-        {currentValue > 0 && (
-          <span className="ml-2 text-xs text-muted-foreground">{currentValue} / 5</span>
-        )}
+        {currentValue > 0 && <span className="ml-2 text-xs text-black/50">{currentValue} / 5</span>}
       </div>
       <FieldDescription text={field.helperText} />
       <FieldError error={error} />
@@ -566,11 +562,11 @@ function SliderField({
         min={min}
         max={max}
         step={1}
-        className="w-full [&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary [&>span:first-child]:bg-muted [&>span:first-child>span]:bg-primary"
+        className="w-full [&_[role=slider]]:bg-black [&_[role=slider]]:border-black [&>span:first-child]:bg-black/10 [&>span:first-child>span]:bg-black"
       />
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
+      <div className="flex items-center justify-between text-xs text-black/50">
         <span>{min}</span>
-        <span className="text-foreground">{currentValue}</span>
+        <span className="text-black">{currentValue}</span>
         <span>{max}</span>
       </div>
       <FieldDescription text={field.helperText} />
@@ -594,7 +590,7 @@ function DateField({
       <Input
         type="date"
         {...register(field.id)}
-        className="h-9 rounded-md border-input bg-background px-3 text-sm text-foreground focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="h-9 rounded-md border-black/15 bg-white px-3 text-sm text-black focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0"
       />
       <FieldDescription text={field.helperText} />
       <FieldError error={error} />
@@ -620,13 +616,13 @@ function FileField({
   return (
     <div className="space-y-1.5">
       <FieldLabel label={field.label} required={field.validation.required} />
-      <label className="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border bg-muted/30 px-4 py-6 text-center transition-colors hover:border-primary/50">
+      <label className="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-black/15 bg-black/[0.03] px-4 py-6 text-center transition-colors hover:border-black/40">
         {isImage ? (
-          <FileImage className="h-5 w-5 text-muted-foreground" />
+          <FileImage className="h-5 w-5 text-black/50" />
         ) : (
-          <FileText className="h-5 w-5 text-muted-foreground" />
+          <FileText className="h-5 w-5 text-black/50" />
         )}
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-black/50">
           {fileName ? fileName : field.placeholder || `Upload ${isImage ? "image" : "file"}`}
         </p>
         <input type="file" className="hidden" {...register(field.id)} />
@@ -654,9 +650,9 @@ function ImageUrlField({
           type="url"
           placeholder={field.placeholder || "https://example.com/image.jpg"}
           {...register(field.id)}
-          className="h-9 rounded-md border-input bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="h-9 rounded-md border-black/15 bg-white pl-9 pr-3 text-sm text-black placeholder:text-black/40 focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0"
         />
-        <Upload className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Upload className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-black/40" />
       </div>
       <FieldDescription text={field.helperText} />
       <FieldError error={error} />
@@ -767,10 +763,11 @@ function RenderField({
 
 /* ─────────── Main Component ─────────── */
 interface FormUIProps {
-  formData: FormData;
+  formData: FormData & { hasSubmitted?: boolean };
   submitUrl: string;
   className?: string;
   isSubmitting?: boolean;
+  hasSubmitted?: boolean;
 }
 
 export default function FormUI({
@@ -778,28 +775,30 @@ export default function FormUI({
   submitUrl,
   className,
   isSubmitting = false,
+  hasSubmitted = false,
 }: FormUIProps) {
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const alreadySubmitted = hasSubmitted || Boolean(formData.hasSubmitted);
 
   const formType = useMemo(() => getFieldTemplateType(formData.fields), [formData.fields]);
   const uiType = useMemo(() => getFieldUiType(formData.fields), [formData.fields]);
   const fieldWrapClass =
     uiType === "card"
-      ? "rounded-xl border border-border bg-muted/20 p-3"
+      ? "rounded-xl border border-black/10 bg-black/[0.03] p-3"
       : uiType === "structured"
-        ? "rounded-xl border border-border bg-muted/10 p-3"
+        ? "rounded-xl border border-black/10 bg-black/[0.02] p-3"
         : uiType === "compact"
           ? "space-y-1.5"
           : "space-y-2";
   const shellClass =
     uiType === "card"
-      ? "rounded-2xl border border-border bg-card p-5 shadow-sm"
+      ? "rounded-2xl border border-black/10 bg-white p-5 shadow-sm"
       : uiType === "structured"
-        ? "rounded-2xl border border-border bg-card p-5"
+        ? "rounded-2xl border border-black/10 bg-white p-5"
         : uiType === "compact"
-          ? "rounded-xl bg-card p-4"
-          : "rounded-lg bg-card p-6";
+          ? "rounded-xl bg-white p-4"
+          : "rounded-lg bg-white p-6";
   const widthClass =
     uiType === "structured" ? "max-w-2xl" : uiType === "card" ? "max-w-xl" : "max-w-md";
 
@@ -841,88 +840,97 @@ export default function FormUI({
   };
 
   return (
-    <div className={cn("mx-auto w-full", widthClass, className)}>
-      <div className={shellClass}>
-        {submitMessage ? (
-          <div className="flex min-h-64 flex-col items-center justify-center text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Check className="h-6 w-6 text-primary" />
-            </div>
-            <h1 className="text-xl font-semibold text-foreground">Submission complete</h1>
-            <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              {submitMessage}
-            </p>
-            {formData.settings.redirectUrl && (
-              <Button
-                type="button"
-                className="mt-6 gap-2 rounded-md bg-primary text-sm text-primary-foreground hover:bg-primary/90"
-                onClick={() => window.location.assign(formData.settings.redirectUrl!)}
-              >
-                Continue
-                <ArrowUpRight className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div
-              className={cn(
-                "mb-6 text-start rounded-xl border p-4",
-                formTypeMeta[formType]?.shell || "border-transparent bg-transparent",
-              )}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <h1 className="text-2xl font-semibold text-foreground">{formData.title}</h1>
-                <span className="rounded-full border border-border bg-background px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  {formTypeMeta[formType]?.badge || "Form"}
-                </span>
+    <div className="min-h-screen w-full bg-white">
+      <div className={cn("mx-auto w-full", widthClass, className)}>
+        <div className={shellClass}>
+          {alreadySubmitted ? (
+            <div className="flex min-h-64 flex-col items-center justify-center text-center">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-black/5">
+                <Check className="h-6 w-6 text-black" />
               </div>
-              {formData.description && (
-                <p className="mt-2 text-[15px] font-medium text-foreground/70">
-                  {formData.description}
-                </p>
+              <h1 className="text-xl font-semibold text-black">Already submitted</h1>
+              <p className="mt-2 max-w-sm text-sm leading-relaxed text-black/50">
+                You have already submitted the form.
+              </p>
+            </div>
+          ) : submitMessage ? (
+            <div className="flex min-h-64 flex-col items-center justify-center text-center">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-black/5">
+                <Check className="h-6 w-6 text-black" />
+              </div>
+              <h1 className="text-xl font-semibold text-black">Submission complete</h1>
+              <p className="mt-2 max-w-sm text-sm leading-relaxed text-black/50">
+                {submitMessage}
+              </p>
+              {formData.settings.redirectUrl && (
+                <Button
+                  type="button"
+                  className="mt-6 gap-2 rounded-md bg-black text-sm text-white hover:bg-black/90"
+                  onClick={() => window.location.assign(formData.settings.redirectUrl!)}
+                >
+                  Continue
+                  <ArrowUpRight className="h-4 w-4" />
+                </Button>
               )}
             </div>
-
-            <form onSubmit={handleSubmit(submit)} className="space-y-4">
-              {formData.fields.map((field) => (
-                <div key={field.id} className={fieldWrapClass}>
-                  <RenderField
-                    field={field}
-                    register={register}
-                    error={formState.errors[field.id]?.message as string | undefined}
-                    setValue={setValue}
-                    watch={watch}
-                  />
-                </div>
-              ))}
-
-              <div className="pt-2">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || formState.isSubmitting}
-                  className="h-9 w-full rounded-md bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
-                  {isSubmitting || formState.isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    formData.settings.submitButtonText || "Submit"
-                  )}
-                </Button>
-
-                {submitError && (
-                  <div className="mt-3 flex items-center justify-center gap-1.5 rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-600">
-                    <X className="h-3.5 w-3.5" />
-                    {submitError}
+          ) : (
+            <>
+              <div
+                className={cn(
+                  "mb-6 text-start rounded-xl border p-4",
+                  formTypeMeta[formType]?.shell || "border-transparent bg-transparent",
+                )}
+              >
+                <div className=" gap-3">
+                  <h1 className="text-2xl text-start mr-10 font-semibold text-black">{formData.title}</h1>
                   </div>
+                {formData.description && (
+                  <p className="mt-2 text-[15px] font-medium text-black/60">
+                    {formData.description}
+                  </p>
                 )}
               </div>
-            </form>
-          </>
-        )}
+
+              <form onSubmit={handleSubmit(submit)} className="space-y-4">
+                {formData.fields.map((field) => (
+                  <div key={field.id} className={fieldWrapClass}>
+                    <RenderField
+                      field={field}
+                      register={register}
+                      error={formState.errors[field.id]?.message as string | undefined}
+                      setValue={setValue}
+                      watch={watch}
+                    />
+                  </div>
+                ))}
+
+                <div className="pt-2">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || formState.isSubmitting}
+                    className="h-9 w-full rounded-md bg-black text-sm font-medium text-white hover:bg-black/90 transition-colors"
+                  >
+                    {isSubmitting || formState.isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      formData.settings.submitButtonText || "Submit"
+                    )}
+                  </Button>
+
+                  {submitError && (
+                    <div className="mt-3 flex items-center justify-center gap-1.5 rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-600">
+                      <X className="h-3.5 w-3.5" />
+                      {submitError}
+                    </div>
+                  )}
+                </div>
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
