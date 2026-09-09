@@ -77,25 +77,26 @@ export function StateCard({
   return (
     <div
       className={cn(
-        "relative rounded-2xl -hue-rotate-320 sa overflow-hidden p-6 sm:p-8",
+        "relative rounded-2xl hue-rotate-130 saturate-150 sa overflow-hidden p-6 sm:p-8",
         className,
       )}
       style={{
         backgroundImage:
           "url('https://i.pinimg.com/736x/39/09/8b/39098bb69bdfd0d18a184252b2353079.jpg')",
         backgroundSize: "cover",
+
         backgroundPosition: "center",
       }}
     >
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black to-transparent" />
 
       <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
 
       <div className="relative z-10">
         '
         <div className="mb-5">
-          <h2 className="text-lg font-bold text-white">{title}</h2>
-          <p className="mt-0.5 text-xs text-white">{subtitle}</p>
+          <h2 className="text-2xl font-bold text-white">{title}</h2>
+          <p className=" text-x; text-white">{subtitle}</p>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {items.map((stat) => (

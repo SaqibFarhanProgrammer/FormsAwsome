@@ -1,8 +1,6 @@
 import { AppError } from "@/lib/auth/appError";
 import { createClient, RedisClientType } from "redis";
 
-
-
 const URL = process.env.REDIS_DB_URL;
 
 let redisClient: RedisClientType | null = null;

@@ -28,6 +28,36 @@ type IncomingField = {
   logic?: FormField["logic"];
 };
 
+type PublicFormPayload = {
+  id: string;
+  title: string;
+  description?: string;
+  slug: string;
+  fields: Array<{
+    id: string;
+    type: string;
+    label: string;
+    placeholder?: string;
+    helperText?: string;
+    formType?: string;
+    uiType?: string;
+    options?: Array<{ label: string; value: string }>;
+    validation: {
+      required: boolean;
+      min?: number;
+      max?: number;
+      pattern?: string;
+    };
+  }>;
+  settings: {
+    submitButtonText: string;
+    successMessage: string;
+    redirectUrl?: string | null;
+    notifyEmail?: string | null;
+  };
+  hasSubmitted: boolean;
+};
+
 const FORM_CACHE_TTL_SECONDS = 60 * 60;
 const FORM_SUBMISSION_IP_TTL_SECONDS = 60 * 60 * 24 * 30;
 
@@ -415,7 +445,10 @@ export async function deleteFormService(
   };
 }
 
-export async function getPublicFormService(slug: string, options?: { requestIp?: string }) {
+export async function getPublicFormService(
+  slug: string,
+  options?: { requestIp?: string },
+): Promise<PublicFormPayload> {
   if (!slug) {
     throw new AppError("Slug is required", 400);
   }
@@ -424,13 +457,15 @@ export async function getPublicFormService(slug: string, options?: { requestIp?:
   const cachedForm = await GetDataFromRedis(cacheKey);
 
   if (cachedForm) {
-    const parsedCachedForm = JSON.parse(cachedForm) as Record<string, unknown>;
+    const parsedCachedForm = JSON.parse(cachedForm) as Partial<PublicFormPayload>;
+    const hasSubmitted = options?.requestIp
+      ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, options.requestIp)))
+      : false;
+
     return {
       ...parsedCachedForm,
-      hasSubmitted: options?.requestIp
-        ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, options.requestIp)))
-        : false,
-    };
+      hasSubmitted,
+    } as PublicFormPayload;
   }
 
   await connectDB();
@@ -478,11 +513,13 @@ export async function getPublicFormService(slug: string, options?: { requestIp?:
 
   await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formData), FORM_CACHE_TTL_SECONDS);
 
+  const hasSubmitted = options?.requestIp
+    ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, options.requestIp)))
+    : false;
+
   return {
     ...formData,
-    hasSubmitted: options?.requestIp
-      ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, options.requestIp)))
-      : false,
+    hasSubmitted,
   };
 }
 

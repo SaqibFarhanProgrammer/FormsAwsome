@@ -24,31 +24,7 @@ import {
 } from "@/components/ui/Select";
 import { Loader2, Star, Upload, Check, FileImage, FileText, X, ArrowUpRight } from "lucide-react";
 
-export type FieldType =
-  | "heading"
-  | "divider"
-  | "toggle"
-  | "short_text"
-  | "text"
-  | "long_text"
-  | "textarea"
-  | "email"
-  | "phone"
-  | "number"
-  | "radio"
-  | "checkbox"
-  | "dropdown"
-  | "select"
-  | "rating"
-  | "date"
-  | "multiple_choice"
-  | "file_upload_image"
-  | "file_upload_pdf"
-  | "file"
-  | "slider"
-  | "URL"
-  | "url"
-  | "image";
+export type FieldType = string;
 
 export type FormFieldItem = {
   id: string;
@@ -71,8 +47,8 @@ export type FormFieldItem = {
 export type FormSettings = {
   submitButtonText: string;
   successMessage: string;
-  redirectUrl?: string;
-  notifyEmail?: string;
+  redirectUrl?: string | null;
+  notifyEmail?: string | null;
 };
 
 export type FormData = {
@@ -338,7 +314,7 @@ function TextField({
         type={type}
         placeholder={field.placeholder || "Type here..."}
         {...register(field.id)}
-        className="h-9 rounded-md border-black/15 bg-white px-3 text-sm text-black placeholder:text-black/40 focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="h-9 rounded-md border-black/15 bg-white px-3 text-[15px] text-black placeholder:text-black/40 focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0"
       />
       <FieldDescription text={field.helperText} />
       <FieldError error={error} />
@@ -361,7 +337,7 @@ function TextAreaField({
       <Textarea
         placeholder={field.placeholder || "Type here..."}
         {...register(field.id)}
-        className="min-h-20 rounded-md border-black/15 bg-white px-3 py-2 text-sm text-black placeholder:text-black/40 focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0 resize-y"
+        className="min-h-20 rounded-md border-black/15 bg-white px-3 py-2 text-[15px] text-black placeholder:text-black/40 focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0 resize-y"
       />
       <FieldDescription text={field.helperText} />
       <FieldError error={error} />
@@ -590,7 +566,7 @@ function DateField({
       <Input
         type="date"
         {...register(field.id)}
-        className="h-9 rounded-md border-black/15 bg-white px-3 text-sm text-black focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="h-9 rounded-md border-black/15 bg-white px-3 text-[15px] text-black focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0"
       />
       <FieldDescription text={field.helperText} />
       <FieldError error={error} />
@@ -650,7 +626,7 @@ function ImageUrlField({
           type="url"
           placeholder={field.placeholder || "https://example.com/image.jpg"}
           {...register(field.id)}
-          className="h-9 rounded-md border-black/15 bg-white pl-9 pr-3 text-sm text-black placeholder:text-black/40 focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="h-9 rounded-md border-black/15 bg-white pl-9 pr-3 text-[15px] text-black placeholder:text-black/40 focus-visible:border-black focus-visible:ring-0 focus-visible:ring-offset-0"
         />
         <Upload className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-black/40" />
       </div>
@@ -798,9 +774,9 @@ export default function FormUI({
         ? "rounded-2xl border border-black/10 bg-white p-5"
         : uiType === "compact"
           ? "rounded-xl bg-white p-4"
-          : "rounded-lg bg-white p-6";
+          : "rounded-xl bg-white p-5";
   const widthClass =
-    uiType === "structured" ? "max-w-2xl" : uiType === "card" ? "max-w-xl" : "max-w-md";
+    uiType === "structured" ? "max-w-2xl" : uiType === "card" ? "max-w-xl" : "max-w-xl";
 
   const schema = useMemo(() => buildSchema(formData.fields), [formData.fields]);
 
@@ -840,7 +816,7 @@ export default function FormUI({
   };
 
   return (
-    <div className="min-h-screen w-full bg-white">
+    <div className=" w-full ">
       <div className={cn("mx-auto w-full", widthClass, className)}>
         <div className={shellClass}>
           {alreadySubmitted ? (
@@ -854,14 +830,12 @@ export default function FormUI({
               </p>
             </div>
           ) : submitMessage ? (
-            <div className="flex min-h-64 flex-col items-center justify-center text-center">
+            <div className="flex min-h-64  flex-col items-center justify-center text-center">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-black/5">
                 <Check className="h-6 w-6 text-black" />
               </div>
               <h1 className="text-xl font-semibold text-black">Submission complete</h1>
-              <p className="mt-2 max-w-sm text-sm leading-relaxed text-black/50">
-                {submitMessage}
-              </p>
+              <p className="mt-2 max-w-sm text-sm leading-relaxed text-black/50">{submitMessage}</p>
               {formData.settings.redirectUrl && (
                 <Button
                   type="button"
@@ -877,20 +851,21 @@ export default function FormUI({
             <>
               <div
                 className={cn(
-                  "mb-6 text-start rounded-xl border p-4",
+                  "mb-6 rounded-xl border ",
                   formTypeMeta[formType]?.shell || "border-transparent bg-transparent",
                 )}
               >
-                <div className=" gap-3">
-                  <h1 className="text-2xl text-start mr-10 font-semibold text-black">{formData.title}</h1>
-                  </div>
-                {formData.description && (
-                  <p className="mt-2 text-[15px] font-medium text-black/60">
-                    {formData.description}
-                  </p>
-                )}
+                <div className="space-y-2 text-left">
+                  <h1 className="text-2xl font-semibold leading-tight text-black">
+                    {formData.title}
+                  </h1>
+                  {formData.description && (
+                    <p className="text-[15px] leading-relaxed text-black/60">
+                      {formData.description}
+                    </p>
+                  )}
+                </div>
               </div>
-
               <form onSubmit={handleSubmit(submit)} className="space-y-4">
                 {formData.fields.map((field) => (
                   <div key={field.id} className={fieldWrapClass}>

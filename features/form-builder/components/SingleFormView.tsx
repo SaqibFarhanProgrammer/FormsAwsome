@@ -27,7 +27,13 @@ export function SingleFormView({ formData }: { formData: FormType }) {
       try {
         const response = await fetch(`/api/forms/${formData.slug}/submissions`);
         if (!response.ok) throw new Error("Unable to load submissions");
-        const result = await response.json();
+        const result = (await response.json()) as {
+          data?: Array<{
+            id: string;
+            data: Record<string, unknown>;
+            createdAt: string;
+          }>;
+        };
         if (!cancelled) {
           setSubmissions(
             (result.data ?? []).map((submission) =>
