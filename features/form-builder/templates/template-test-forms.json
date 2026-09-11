@@ -1,0 +1,205 @@
+{
+  "default_contact_form": {
+    "id": "test-default-contact-form",
+    "type": "default_contact_form",
+    "templateType": "default_contact_form",
+    "title": "Contact Form Template",
+    "description": "A simple form for general questions and contact requests.",
+    "fields": [
+      { "id": "name", "type": "text", "label": "Full name", "placeholder": "Your name", "validation": { "required": true } },
+      { "id": "email", "type": "email", "label": "Email address", "placeholder": "you@example.com", "validation": { "required": true } },
+      { "id": "message", "type": "textarea", "label": "Your message", "placeholder": "How can we help?", "validation": { "required": true, "min": 10 } }
+    ],
+    "settings": { "submitButtonText": "Submit", "successMessage": "Thanks for contacting us!", "redirectUrl": null, "notifyEmail": null }
+  },
+  "lead_capture": {
+    "id": "test-lead-capture",
+    "type": "lead_capture",
+    "templateType": "lead_capture",
+    "title": "Lead Generation Form",
+    "description": "Tell us about your project and we will prepare a tailored response.",
+    "fields": [
+      { "id": "company", "type": "text", "label": "Company name", "validation": { "required": true } },
+      { "id": "email", "type": "email", "label": "Work email", "validation": { "required": true } },
+      { "id": "budget", "type": "slider", "label": "Project budget", "validation": { "required": true, "min": 5, "max": 100 } }
+    ],
+    "settings": { "submitButtonText": "Get a quote", "successMessage": "We will be in touch shortly.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "customer_feedback": {
+    "id": "test-customer-feedback",
+    "type": "customer_feedback",
+    "templateType": "customer_feedback",
+    "title": "Customer Feedback Form Template",
+    "description": "Share your experience, satisfaction, and suggestions with us.",
+    "fields": [
+      { "id": "email", "type": "email", "label": "Your email", "validation": { "required": true } },
+      { "id": "source", "type": "radio", "label": "Where did you hear about us?", "options": [{ "label": "Social media", "value": "social" }, { "label": "Google", "value": "google" }, { "label": "Friends", "value": "friends" }], "validation": { "required": true } },
+      { "id": "feedback", "type": "textarea", "label": "Your feedback", "validation": { "required": false } }
+    ],
+    "settings": { "submitButtonText": "Next", "successMessage": "Thank you for your feedback!", "redirectUrl": null, "notifyEmail": null }
+  },
+  "event_registration": {
+    "id": "test-event-registration",
+    "type": "event_registration",
+    "templateType": "event_registration",
+    "title": "Registration Form Template",
+    "description": "Collect registrations for events, programs, or online access.",
+    "fields": [
+      { "id": "name", "type": "text", "label": "First name", "validation": { "required": true } },
+      { "id": "email", "type": "email", "label": "Email address", "validation": { "required": true } },
+      { "id": "ticket", "type": "dropdown", "label": "Ticket type", "options": [{ "label": "General admission", "value": "general" }, { "label": "VIP", "value": "vip" }], "validation": { "required": true } }
+    ],
+    "settings": { "submitButtonText": "Register", "successMessage": "Registration confirmed!", "redirectUrl": null, "notifyEmail": null }
+  },
+  "newsletter_signup": {
+    "id": "test-newsletter-signup",
+    "type": "newsletter_signup",
+    "templateType": "newsletter_signup",
+    "title": "Newsletter Signup Template",
+    "description": "Get useful news, product updates, and ideas in your inbox.",
+    "fields": [{ "id": "email", "type": "email", "label": "Email address", "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Subscribe", "successMessage": "You are subscribed!", "redirectUrl": null, "notifyEmail": null }
+  },
+  "employee_checkin": {
+    "id": "test-employee-checkin",
+    "type": "employee_checkin",
+    "templateType": "employee_checkin",
+    "title": "Daily Employee Check-in",
+    "description": "Let us know how your day is going.",
+    "fields": [
+      { "id": "mood", "type": "radio", "label": "How are you feeling today?", "options": [{ "label": "Great", "value": "great" }, { "label": "Good", "value": "good" }, { "label": "Okay", "value": "okay" }], "validation": { "required": true } },
+      { "id": "notes", "type": "textarea", "label": "Anything to share?", "validation": { "required": false } }
+    ],
+    "settings": { "submitButtonText": "Check in", "successMessage": "Check-in saved.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "workflow_request": {
+    "id": "test-workflow-request",
+    "type": "workflow_request",
+    "templateType": "workflow_request",
+    "title": "Workflow Request",
+    "description": "Submit a request for the right team to review.",
+    "fields": [
+      { "id": "request", "type": "text", "label": "Request title", "validation": { "required": true } },
+      { "id": "priority", "type": "radio", "label": "Priority", "options": [{ "label": "Low", "value": "low" }, { "label": "Normal", "value": "normal" }, { "label": "High", "value": "high" }], "validation": { "required": true } },
+      { "id": "details", "type": "textarea", "label": "Details", "validation": { "required": true } }
+    ],
+    "settings": { "submitButtonText": "Send request", "successMessage": "Request submitted.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "company_audit": {
+    "id": "test-company-audit",
+    "type": "company_audit",
+    "templateType": "company_audit",
+    "title": "Company Audit",
+    "description": "Review the current state of your company processes.",
+    "fields": [{ "id": "controls", "type": "checkbox", "label": "Which controls are in place?", "options": [{ "label": "Access policy", "value": "access" }, { "label": "Data backup", "value": "backup" }, { "label": "Security training", "value": "training" }], "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Complete audit", "successMessage": "Audit submitted.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "job_application": {
+    "id": "test-job-application",
+    "type": "job_application",
+    "templateType": "job_application",
+    "title": "Job Application",
+    "description": "Tell us about your experience and interest in the role.",
+    "fields": [{ "id": "name", "type": "text", "label": "Full name", "validation": { "required": true } }, { "id": "email", "type": "email", "label": "Email", "validation": { "required": true } }, { "id": "resume", "type": "file_upload_pdf", "label": "Resume", "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Apply now", "successMessage": "Application received.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "leave_request": {
+    "id": "test-leave-request",
+    "type": "leave_request",
+    "templateType": "leave_request",
+    "title": "Leave Request",
+    "description": "Request time away from work.",
+    "fields": [{ "id": "leave_type", "type": "radio", "label": "Leave type", "options": [{ "label": "Annual", "value": "annual" }, { "label": "Sick", "value": "sick" }, { "label": "Casual", "value": "casual" }], "validation": { "required": true } }, { "id": "start", "type": "date", "label": "Start date", "validation": { "required": true } }, { "id": "reason", "type": "textarea", "label": "Reason", "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Submit request", "successMessage": "Leave request submitted.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "employee_onboarding": {
+    "id": "test-employee-onboarding",
+    "type": "employee_onboarding",
+    "templateType": "employee_onboarding",
+    "title": "User Onboarding Survey Template",
+    "description": "Help us understand your work and role.",
+    "fields": [{ "id": "work", "type": "dropdown", "label": "What kind of work do you do?", "options": [{ "label": "Design", "value": "design" }, { "label": "Engineering", "value": "engineering" }, { "label": "Marketing", "value": "marketing" }], "validation": { "required": true } }, { "id": "role", "type": "dropdown", "label": "What is your role?", "options": [{ "label": "Individual contributor", "value": "ic" }, { "label": "Manager", "value": "manager" }], "validation": { "required": true } }, { "id": "discover", "type": "dropdown", "label": "How did you discover us?", "options": [{ "label": "Search", "value": "search" }, { "label": "Referral", "value": "referral" }], "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Submit", "successMessage": "Welcome aboard!", "redirectUrl": null, "notifyEmail": null }
+  },
+  "product_order": {
+    "id": "test-product-order",
+    "type": "product_order",
+    "templateType": "product_order",
+    "title": "Product Order",
+    "description": "Choose a product and quantity.",
+    "fields": [{ "id": "product", "type": "dropdown", "label": "Product", "options": [{ "label": "Starter", "value": "starter" }, { "label": "Pro", "value": "pro" }], "validation": { "required": true } }, { "id": "quantity", "type": "number", "label": "Quantity", "validation": { "required": true, "min": 1, "max": 100 } }],
+    "settings": { "submitButtonText": "Place order", "successMessage": "Order received.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "quote_request": {
+    "id": "test-quote-request",
+    "type": "quote_request",
+    "templateType": "quote_request",
+    "title": "Request a Quote",
+    "description": "Share your project requirements and budget.",
+    "fields": [{ "id": "service", "type": "dropdown", "label": "Service", "options": [{ "label": "Website", "value": "website" }, { "label": "App", "value": "app" }], "validation": { "required": true } }, { "id": "budget", "type": "slider", "label": "Budget range", "validation": { "required": true, "min": 5, "max": 100 } }, { "id": "details", "type": "textarea", "label": "Project details", "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Request quote", "successMessage": "Quote request received.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "support_ticket": {
+    "id": "test-support-ticket",
+    "type": "support_ticket",
+    "templateType": "support_ticket",
+    "title": "Contact support",
+    "description": "Choose a category so we can route your request correctly.",
+    "fields": [{ "id": "category", "type": "radio", "label": "Please select a category", "options": [{ "label": "🐞 I want to report a bug", "value": "bug" }, { "label": "🗂️ I have a feature request", "value": "feature" }, { "label": "💬 I want to share feedback", "value": "feedback" }, { "label": "🙋 I need help", "value": "help" }], "validation": { "required": true } }, { "id": "details", "type": "textarea", "label": "Tell us more", "validation": { "required": false } }],
+    "settings": { "submitButtonText": "Next", "successMessage": "Support request submitted.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "appointment_booking": {
+    "id": "test-appointment-booking",
+    "type": "appointment_booking",
+    "templateType": "appointment_booking",
+    "title": "Book an Appointment",
+    "description": "Choose a date and time that works for you.",
+    "fields": [{ "id": "date", "type": "date", "label": "Preferred date", "validation": { "required": true } }, { "id": "time", "type": "dropdown", "label": "Preferred time", "options": [{ "label": "09:00 AM", "value": "09:00" }, { "label": "02:00 PM", "value": "14:00" }], "validation": { "required": true } }, { "id": "email", "type": "email", "label": "Email", "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Book now", "successMessage": "Appointment request received.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "survey_poll": {
+    "id": "test-survey-poll",
+    "type": "survey_poll",
+    "templateType": "survey_poll",
+    "title": "Quick Survey Poll",
+    "description": "Answer a few questions to help us improve.",
+    "fields": [{ "id": "rating", "type": "rating", "label": "How would you rate us?", "validation": { "required": true } }, { "id": "recommend", "type": "radio", "label": "Would you recommend us?", "options": [{ "label": "Yes", "value": "yes" }, { "label": "Maybe", "value": "maybe" }, { "label": "No", "value": "no" }], "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Submit survey", "successMessage": "Thank you for responding.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "course_evaluation": {
+    "id": "test-course-evaluation",
+    "type": "course_evaluation",
+    "templateType": "course_evaluation",
+    "title": "Course Evaluation",
+    "description": "Tell us about your learning experience.",
+    "fields": [{ "id": "course_rating", "type": "rating", "label": "Overall course rating", "validation": { "required": true } }, { "id": "recommend", "type": "radio", "label": "Would you recommend this course?", "options": [{ "label": "Definitely", "value": "yes" }, { "label": "Maybe", "value": "maybe" }], "validation": { "required": true } }, { "id": "feedback", "type": "textarea", "label": "Additional feedback", "validation": { "required": false } }],
+    "settings": { "submitButtonText": "Submit evaluation", "successMessage": "Evaluation submitted.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "quiz_test": {
+    "id": "test-quiz-test",
+    "type": "quiz_test",
+    "templateType": "quiz_test",
+    "title": "Knowledge Quiz",
+    "description": "Test your knowledge with a short assessment.",
+    "fields": [{ "id": "q1", "type": "radio", "label": "What is 2 + 2?", "options": [{ "label": "3", "value": "3" }, { "label": "4", "value": "4" }, { "label": "5", "value": "5" }], "validation": { "required": true } }, { "id": "q2", "type": "checkbox", "label": "Select all correct answers", "options": [{ "label": "Option A", "value": "a" }, { "label": "Option B", "value": "b" }], "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Finish quiz", "successMessage": "Quiz completed.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "nda_agreement": {
+    "id": "test-nda-agreement",
+    "type": "nda_agreement",
+    "templateType": "nda_agreement",
+    "title": "Non-Disclosure Agreement",
+    "description": "Review and acknowledge this agreement.",
+    "fields": [{ "id": "name", "type": "text", "label": "Full legal name", "validation": { "required": true } }, { "id": "agree", "type": "toggle", "label": "I agree to the terms", "validation": { "required": true } }],
+    "settings": { "submitButtonText": "Sign agreement", "successMessage": "Agreement acknowledged.", "redirectUrl": null, "notifyEmail": null }
+  },
+  "expense_reimbursement": {
+    "id": "test-expense-reimbursement",
+    "type": "expense_reimbursement",
+    "templateType": "expense_reimbursement",
+    "title": "Expense Reimbursement",
+    "description": "Submit a business expense for review.",
+    "fields": [{ "id": "amount", "type": "number", "label": "Claim amount", "validation": { "required": true, "min": 0 } }, { "id": "date", "type": "date", "label": "Expense date", "validation": { "required": true } }, { "id": "details", "type": "textarea", "label": "Expense details", "validation": { "required": true } }, { "id": "receipt", "type": "file", "label": "Receipt", "validation": { "required": false } }],
+    "settings": { "submitButtonText": "Submit claim", "successMessage": "Claim submitted for review.", "redirectUrl": null, "notifyEmail": null }
+  }
+}

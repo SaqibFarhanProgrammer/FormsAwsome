@@ -173,20 +173,20 @@ export async function getAllFormsService() {
   }
 
   const userId = payload.userId;
-  const cacheKey = `forms:user:${userId}`;
+  // const cacheKey = `forms:user:${userId}`;
 
-  const cachedForms = await GetDataFromRedis(cacheKey);
-  if (cachedForms) {
-    return JSON.parse(cachedForms);
-  }
+  // const cachedForms = await GetDataFromRedis(cacheKey);
+  // if (cachedForms) {
+  //   return JSON.parse(cachedForms);
+  // }
 
   await connectDB();
   const forms = await Form.find({ userId }).select("-fields -settings").sort({ createdAt: -1 });
 
-  if (!forms || forms.length === 0) {
-    await SetDataToRedisWithTTL(cacheKey, JSON.stringify([]), FORM_CACHE_TTL_SECONDS);
-    return [];
-  }
+  // if (!forms || forms.length === 0) {
+  //   await SetDataToRedisWithTTL(cacheKey, JSON.stringify([]), FORM_CACHE_TTL_SECONDS);
+  //   return [];
+  // }
 
   const formsData = forms.map((form) => ({
     id: form._id.toString(),
@@ -199,7 +199,7 @@ export async function getAllFormsService() {
     updatedAt: form.updatedAt.toString(),
   }));
 
-  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formsData), FORM_CACHE_TTL_SECONDS);
+  // await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formsData), FORM_CACHE_TTL_SECONDS);
 
   return formsData;
 }

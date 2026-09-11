@@ -1,0 +1,1277 @@
+"use client";
+
+/**
+ * form-templates-ui.tsx — 20 alag themed form UI components
+ * Har component tumhari FormData fields render karta hai apne style mein.
+ *
+ * Usage:
+ *   import { TemplateFormUI } from "@/components/forms/form-templates-ui";
+ *   <TemplateFormUI template="event_registration" formData={formData} submitUrl="/api/submit" />
+ */
+
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { z } from "zod";
+import {
+  Check, Loader2, Star, Upload, FileText, FileImage, X, ArrowUpRight,
+} from "lucide-react";
+import type { FormData, FormFieldItem } from "./FormUI"; // ⚠️ apna correct path adjust karo
+
+/* ═══════════════════════ Props ═══════════════════════ */
+export interface TemplateUIProps {
+  formData: FormData;
+  submitUrl: string;
+  className?: string;
+  hasSubmitted?: boolean;
+}
+
+/* ═══════════════════ Validation (FormUI jaisi hi) ═══════════════════ */
+function buildSchema(fields: FormFieldItem[]) {
+  const shape: Record<string, z.ZodTypeAny> = {};
+  for (const field of fields) {
+    let schema: z.ZodTypeAny = z.string();
+    switch (field.type) {
+      case "heading":
+      case "divider":
+        schema = z.any().optional();
+        break;
+      case "toggle":
+        schema = z.boolean();
+        break;
+      case "email":
+        schema = z.string().email("Invalid email address");
+        break;
+      case "number":
+        schema = z.preprocess(
+          (value) =>
+            value === "" || value === null || value === undefined ? undefined : Number(value),
+          z
+            .number({ error: "Please enter a number" })
+            .refine((value) => !Number.isNaN(value), "Please enter a valid number")
+            .min(field.validation.min ?? -Infinity, `Minimum value is ${field.validation.min}`)
+            .max(field.validation.max ?? Infinity, `Maximum value is ${field.validation.max}`),
+        );
+        break;
+      case "URL":
+      case "url":
+        schema = z.string().url("Invalid URL");
+        break;
+      case "checkbox":
+      case "multiple_choice":
+        schema = z.array(z.string());
+        break;
+      case "rating":
+      case "slider":
+        schema = z.number();
+        break;
+      default:
+        schema = z.string();
+        if (field.validation.min !== undefined)
+          schema = (schema as z.ZodString).min(field.validation.min, `Minimum ${field.validation.min} characters required`);
+        if (field.validation.max !== undefined)
+          schema = (schema as z.ZodString).max(field.validation.max, `Maximum ${field.validation.max} characters allowed`);
+        break;
+    }
+    if (field.validation.pattern)
+      schema = (schema as z.ZodString).regex(new RegExp(field.validation.pattern), "Invalid format");
+
+    if (!field.validation.required) {
+      if (["checkbox", "multiple_choice", "rating", "slider", "number"].includes(field.type))
+        schema = schema.optional();
+      else if (!["heading", "divider"].includes(field.type)) schema = schema.optional();
+    } else if (field.type === "checkbox" || field.type === "multiple_choice") {
+      schema = (schema as z.ZodArray<z.ZodString>).min(1, "Select at least one option");
+    } else if (field.type === "toggle") {
+      schema = (schema as z.ZodBoolean).refine((v) => v === true, "This field is required");
+    } else if (["rating", "slider", "number"].includes(field.type)) {
+      schema = schema.refine((v) => v !== undefined && v !== null && !Number.isNaN(v as number), "This field is required");
+    } else if (!["heading", "divider"].includes(field.type)) {
+      schema = (schema as z.ZodString).min(1, "This field is required");
+    }
+    shape[field.id] = schema;
+  }
+  return z.object(shape);
+}
+
+function buildDefaults(fields: FormFieldItem[]) {
+  const defaults: Record<string, unknown> = {};
+  for (const field of fields) {
+    if (field.type === "checkbox" || field.type === "multiple_choice") defaults[field.id] = [];
+    else if (field.type === "toggle") defaults[field.id] = field.defaultValue ?? false;
+    else if (["rating", "slider", "number"].includes(field.type)) defaults[field.id] = field.defaultValue ?? undefined;
+    else defaults[field.id] = field.defaultValue ?? "";
+  }
+  return defaults;
+}
+
+/* ═══════════════════════ Form Hook ═══════════════════════ */
+interface TemplateForm {
+  values: Record<string, any>;
+  errors: Record<string, string>;
+  setValue: (id: string, value: any) => void;
+  submit: () => Promise<void>;
+  submitting: boolean;
+  successMsg: string | null;
+  submitError: string | null;
+}
+
+function useTemplateForm(formData: FormData, submitUrl: string): TemplateForm {
+  const schema = useMemo(() => buildSchema(formData.fields), [formData.fields]);
+  const [values, setValues] = useState<Record<string, any>>(() => buildDefaults(formData.fields));
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const setValue = (id: string, value: any) => setValues((p) => ({ ...p, [id]: value }));
+
+  const submit = async () => {
+    setSubmitError(null);
+    const result = schema.safeParse(values);
+    if (!result.success) {
+      const map: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const k = String(issue.path[0]);
+        if (!map[k]) map[k] = issue.message;
+      }
+      setErrors(map);
+      return;
+    }
+    setErrors({});
+    setSubmitting(true);
+    try {
+      const res = await fetch(submitUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(result.data),
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(json?.message || "Unable to submit the form");
+      setSuccessMsg(formData.settings.successMessage || "Thank you for your submission!");
+      setValues(buildDefaults(formData.fields));
+    } catch (e: any) {
+      setSubmitError(e?.message || "Unable to submit the form");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return { values, errors, setValue, submit, submitting, successMsg, submitError };
+}
+
+/* ═══════════════════════ Theme Tokens ═══════════════════════ */
+export interface UITheme {
+  accent: string;   // hex — CSS var --acc ban jata hai
+  soft: string;     // hex soft bg — CSS var --soft
+  page: string;
+  card: string;
+  title: string;
+  desc: string;
+  inputMode?: "boxed" | "underline";
+  radioVariant?: "list" | "pills" | "letters" | "emojis" | "tags";
+  checkVariant?: "list" | "chips";
+  selectVariant?: "default" | "slots";
+}
+
+const cls = (t: UITheme) => ({
+  label: "mb-1.5 block text-sm font-medium text-slate-700",
+  req: "ml-1 text-red-500",
+  helper: "mt-1 text-xs text-slate-400",
+  err: "mt-1 text-xs font-medium text-red-500",
+  input:
+    t.inputMode === "underline"
+      ? "w-full border-b-2 border-slate-200 bg-transparent px-1 py-2 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-[var(--acc)]"
+      : "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-[var(--acc)] focus:ring-4 focus:ring-[var(--acc)]/10",
+  btn: "inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--acc)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.99] disabled:opacity-60",
+});
+
+const TAG_COLORS = ["#10b981", "#f59e0b", "#f97316", "#ef4444", "#8b5cf6"];
+
+function emojiFor(label: string, i: number) {
+  const l = label.toLowerCase();
+  if (l.includes("great") || l.includes("excellent") || l.includes("definitely") || l.includes("yes")) return "😄";
+  if (l.includes("good") || l.includes("maybe") || l.includes("likely")) return "🙂";
+  if (l.includes("okay") || l.includes("fine") || l.includes("average")) return "😐";
+  if (l.includes("struggl") || l.includes("bad") || l.includes("unlikely")) return "😕";
+  if (l.includes("no")) return "😞";
+  return ["😄", "🙂", "😐", "😕", "😞"][i % 5];
+}
+
+/* ═══════════════════ Controls (sab field types) ═══════════════════ */
+function Controls({
+  field, value, onChange, theme,
+}: {
+  field: FormFieldItem;
+  value: any;
+  onChange: (v: any) => void;
+  theme: UITheme;
+}) {
+  const c = cls(theme);
+  const inputType =
+    field.type === "number" ? "number"
+    : field.type === "email" ? "email"
+    : ["URL", "url", "image"].includes(field.type) ? "url"
+    : field.type === "phone" ? "tel"
+    : field.type === "date" ? "date" : "text";
+
+  switch (field.type) {
+    case "short_text": case "text": case "email": case "phone": case "number":
+    case "URL": case "url": case "date":
+      return <input type={inputType} placeholder={field.placeholder} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className={c.input} />;
+
+    case "long_text": case "textarea":
+      return <textarea placeholder={field.placeholder} value={value ?? ""} onChange={(e) => onChange(e.target.value)} rows={4} className={c.input + " resize-y"} />;
+
+    case "dropdown": case "select":
+      if (theme.selectVariant === "slots") {
+        return (
+          <div className="grid grid-cols-3 gap-2">
+            {field.options?.map((o) => (
+              <button key={o.value} type="button" onClick={() => onChange(o.value)}
+                className={`rounded-lg border py-2 text-sm font-medium transition ${
+                  value === o.value
+                    ? "border-[var(--acc)] bg-[var(--acc)] text-white"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-[var(--acc)]/50"}`}>
+                {o.label}
+              </button>
+            ))}
+          </div>
+        );
+      }
+      return (
+        <select value={value ?? ""} onChange={(e) => onChange(e.target.value)} className={c.input + " appearance-none"}>
+          <option value="">{field.placeholder || "Select an option"}</option>
+          {field.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+      );
+
+    case "radio": {
+      const variant = theme.radioVariant ?? "list";
+      if (variant === "pills" || variant === "tags") {
+        return (
+          <div className="flex flex-wrap gap-2">
+            {field.options?.map((o, i) => {
+              const on = value === o.value;
+              return (
+                <button key={o.value} type="button" onClick={() => onChange(o.value)}
+                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
+                    on ? "border-[var(--acc)] bg-[var(--acc)] text-white" : "border-slate-200 bg-white text-slate-600 hover:border-[var(--acc)]/50"}`}>
+                  {variant === "tags" && (
+                    <span className="h-2 w-2 rounded-full" style={{ background: on ? "#fff" : TAG_COLORS[i % TAG_COLORS.length] }} />
+                  )}
+                  {o.label}
+                </button>
+              );
+            })}
+          </div>
+        );
+      }
+      if (variant === "emojis") {
+        return (
+          <div className="flex flex-wrap gap-3">
+            {field.options?.map((o, i) => {
+              const on = value === o.value;
+              return (
+                <button key={o.value} type="button" onClick={() => onChange(o.value)}
+                  className={`flex flex-col items-center gap-1 rounded-xl border px-4 py-3 transition ${
+                    on ? "border-[var(--acc)] bg-[var(--soft)]" : "border-slate-200 bg-white hover:border-[var(--acc)]/40"}`}>
+                  <span className="text-2xl">{emojiFor(o.label, i)}</span>
+                  <span className={`text-xs font-medium ${on ? "text-slate-800" : "text-slate-500"}`}>{o.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        );
+      }
+      if (variant === "letters") {
+        return (
+          <div className="space-y-2">
+            {field.options?.map((o, i) => {
+              const on = value === o.value;
+              return (
+                <button key={o.value} type="button" onClick={() => onChange(o.value)}
+                  className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition ${
+                    on ? "border-[var(--acc)] bg-[var(--soft)] font-medium text-slate-900" : "border-slate-200 bg-white text-slate-600 hover:border-[var(--acc)]/40"}`}>
+                  <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${on ? "bg-[var(--acc)] text-white" : "bg-slate-100 text-slate-500"}`}>
+                    {String.fromCharCode(65 + i)}
+                  </span>
+                  {o.label}
+                  {on && <Check className="ml-auto h-4 w-4 text-[var(--acc)]" />}
+                </button>
+              );
+            })}
+          </div>
+        );
+      }
+      return (
+        <div className="space-y-2">
+          {field.options?.map((o) => (
+            <label key={o.value} className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3.5 py-2.5 text-sm transition ${
+              value === o.value ? "border-[var(--acc)] bg-[var(--soft)]" : "border-slate-200 bg-white hover:border-[var(--acc)]/40"}`}>
+              <input type="radio" name={field.id} checked={value === o.value} onChange={() => onChange(o.value)} className="h-4 w-4 accent-[var(--acc)]" />
+              <span className="text-slate-700">{o.label}</span>
+            </label>
+          ))}
+        </div>
+      );
+    }
+
+    case "checkbox": case "multiple_choice": {
+      const arr: string[] = value ?? [];
+      const toggle = (v: string) => onChange(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
+      if (theme.checkVariant === "chips") {
+        return (
+          <div className="flex flex-wrap gap-2">
+            {field.options?.map((o) => {
+              const on = arr.includes(o.value);
+              return (
+                <button key={o.value} type="button" onClick={() => toggle(o.value)}
+                  className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                    on ? "border-[var(--acc)] bg-[var(--acc)] text-white" : "border-slate-200 bg-white text-slate-600 hover:border-[var(--acc)]/50"}`}>
+                  {on && <Check className="mr-1 inline h-3.5 w-3.5" />}{o.label}
+                </button>
+              );
+            })}
+          </div>
+        );
+      }
+      return (
+        <div className="space-y-2">
+          {field.options?.map((o) => (
+            <label key={o.value} className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3.5 py-2.5 text-sm transition ${
+              arr.includes(o.value) ? "border-[var(--acc)] bg-[var(--soft)]" : "border-slate-200 bg-white hover:border-[var(--acc)]/40"}`}>
+              <input type="checkbox" checked={arr.includes(o.value)} onChange={() => toggle(o.value)} className="h-4 w-4 rounded accent-[var(--acc)]" />
+              <span className="text-slate-700">{o.label}</span>
+            </label>
+          ))}
+        </div>
+      );
+    }
+
+    case "toggle":
+      return (
+        <button type="button" onClick={() => onChange(!value)}
+          className={`relative h-6 w-11 shrink-0 rounded-full transition ${value ? "bg-[var(--acc)]" : "bg-slate-300"}`}>
+          <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${value ? "left-[22px]" : "left-0.5"}`} />
+        </button>
+      );
+
+    case "rating": {
+      const v = value || 0;
+      return (
+        <div className="flex items-center gap-1 py-1">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <button key={s} type="button" onClick={() => onChange(s)} className="p-1 transition-transform hover:scale-125">
+              <Star className="h-7 w-7" fill={s <= v ? "var(--acc)" : "none"} stroke={s <= v ? "var(--acc)" : "#cbd5e1"} strokeWidth={1.5} />
+            </button>
+          ))}
+          {v > 0 && <span className="ml-2 text-sm font-semibold" style={{ color: "var(--acc)" }}>{v}/5</span>}
+        </div>
+      );
+    }
+
+    case "slider": {
+      const min = field.validation.min ?? 0;
+      const max = field.validation.max ?? 100;
+      const v = value ?? min;
+      return (
+        <div>
+          <div className="mb-1 flex items-center justify-between text-xs text-slate-400">
+            <span>{min}</span>
+            <span className="rounded-full px-2.5 py-0.5 text-sm font-bold text-white" style={{ background: "var(--acc)" }}>{v}</span>
+            <span>{max}</span>
+          </div>
+          <input type="range" min={min} max={max} value={v} onChange={(e) => onChange(Number(e.target.value))}
+            className="w-full cursor-pointer" style={{ accentColor: "var(--acc)" }} />
+        </div>
+      );
+    }
+
+    case "file_upload_image": case "file_upload_pdf": case "file": {
+      const isImg = field.type === "file_upload_image";
+      const fileName = typeof value === "string" ? value : "";
+      return (
+        <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-[var(--acc)] hover:bg-[var(--soft)]">
+          {isImg ? <FileImage className="h-6 w-6 text-slate-400" /> : <FileText className="h-6 w-6 text-slate-400" />}
+          <span className="text-sm font-medium text-slate-600">{fileName || field.placeholder || `Upload ${isImg ? "image" : "file"}`}</span>
+          <span className="text-xs text-slate-400">Click to browse</span>
+          {/* file ka naam string ki tarah store hota hai taake validation chale */}
+          <input type="file" className="hidden" onChange={(e) => onChange(e.target.files?.[0]?.name ?? "")} />
+        </label>
+      );
+    }
+
+    case "image":
+      return (
+        <div className="relative">
+          <Upload className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input type="url" placeholder={field.placeholder || "https://example.com/image.jpg"} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className={c.input + " pl-9"} />
+        </div>
+      );
+
+    default:
+      return <input placeholder={field.placeholder} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className={c.input} />;
+  }
+}
+
+/* ═══════════════════ Field wrapper ═══════════════════ */
+function Field({
+  field, form, theme, hideLabel,
+}: {
+  field: FormFieldItem;
+  form: TemplateForm;
+  theme: UITheme;
+  hideLabel?: boolean;
+}) {
+  const c = cls(theme);
+  const err = form.errors[field.id];
+
+  if (field.type === "heading")
+    return (
+      <div className="pt-1">
+        <h3 className="text-base font-semibold text-slate-900">{field.label}</h3>
+        {field.helperText && <p className="mt-0.5 text-xs text-slate-400">{field.helperText}</p>}
+      </div>
+    );
+  if (field.type === "divider") return <hr className="border-slate-100" />;
+
+  if (field.type === "toggle")
+    return (
+      <div>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <span className="text-sm font-medium text-slate-700">
+              {field.label}
+              {field.validation.required && <span className={c.req}>*</span>}
+            </span>
+            {field.helperText && <p className="text-xs text-slate-400">{field.helperText}</p>}
+          </div>
+          <Controls field={field} value={form.values[field.id]} onChange={(v) => form.setValue(field.id, v)} theme={theme} />
+        </div>
+        {err && <p className={c.err}>{err}</p>}
+      </div>
+    );
+
+  return (
+    <div>
+      {!hideLabel && (
+        <label className={c.label}>
+          {field.label}
+          {field.validation.required && <span className={c.req}>*</span>}
+        </label>
+      )}
+      <Controls field={field} value={form.values[field.id]} onChange={(v) => form.setValue(field.id, v)} theme={theme} />
+      {field.helperText && !err && <p className={c.helper}>{field.helperText}</p>}
+      {err && <p className={c.err}>{err}</p>}
+    </div>
+  );
+}
+
+/* ═══════════════════ Submit bar ═══════════════════ */
+function SubmitBar({ form, theme, text }: { form: TemplateForm; theme: UITheme; text?: string }) {
+  const c = cls(theme);
+  return (
+    <div className="pt-2">
+      <button type="button" onClick={form.submit} disabled={form.submitting} className={c.btn}>
+        {form.submitting ? (<><Loader2 className="h-4 w-4 animate-spin" /> Submitting...</>) : (text || "Submit")}
+      </button>
+      {form.submitError && (
+        <div className="mt-3 flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-600">
+          <X className="h-3.5 w-3.5" /> {form.submitError}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════ Status / Success card ═══════════════════ */
+function StatusCard({ form, formData, hasSubmitted }: { form: TemplateForm; formData: FormData; hasSubmitted?: boolean }) {
+  const done = hasSubmitted;
+  return (
+    <div className="flex min-h-64 flex-col items-center justify-center text-center">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ background: "var(--soft)" }}>
+        <Check className="h-6 w-6" style={{ color: "var(--acc)" }} />
+      </div>
+      <h2 className="text-xl font-semibold text-slate-900">{done ? "Already submitted" : "Submission complete"}</h2>
+      <p className="mt-2 max-w-sm text-sm leading-relaxed text-slate-500">
+        {done ? "You have already submitted the form." : form.successMsg}
+      </p>
+      {!done && formData.settings.redirectUrl && (
+        <button onClick={() => window.location.assign(formData.settings.redirectUrl!)}
+          className="mt-6 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white"
+          style={{ background: "var(--acc)" }}>
+          Continue <ArrowUpRight className="h-4 w-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════ Frame (page + card + wiring) ═══════════════════ */
+function Frame({
+  theme, formData, form, hasSubmitted, className, header, grid, bare, children, maxW,
+}: {
+  theme: UITheme;
+  formData: FormData;
+  form: TemplateForm;
+  hasSubmitted?: boolean;
+  className?: string;
+  header?: ReactNode;
+  grid?: boolean;
+  bare?: boolean;
+  children?: ReactNode;
+  maxW?: string;
+}) {
+  const vars = { "--acc": theme.accent, "--soft": theme.soft } as CSSProperties;
+  const done = Boolean(hasSubmitted || form.successMsg);
+
+  const body = done ? (
+    <StatusCard form={form} formData={formData} hasSubmitted={hasSubmitted} />
+  ) : (
+    <>
+      {header}
+      <div className={grid ? "grid gap-4 sm:grid-cols-2" : "space-y-4"}>
+        {children ?? formData.fields.map((f) => <Field key={f.id} field={f} form={form} theme={theme} />)}
+      </div>
+      <SubmitBar form={form} theme={theme} text={formData.settings.submitButtonText} />
+    </>
+  );
+
+  if (bare)
+    return (
+      <div style={vars} className={`${theme.page} ${className ?? ""}`}>
+        {body}
+      </div>
+    );
+
+  return (
+    <div style={vars} className={`${theme.page} px-4 py-10 ${className ?? ""}`}>
+      <div className={`mx-auto w-full ${maxW ?? "max-w-xl"}`}>
+        <div className={theme.card}>{body}</div>
+      </div>
+    </div>
+  );
+}
+
+/* Default header helper */
+function DefaultHeader({ formData, theme }: { formData: FormData; theme: UITheme }) {
+  return (
+    <div className="mb-6">
+      <h1 className={`font-semibold tracking-tight text-slate-900 ${theme.title}`}>{formData.title}</h1>
+      {formData.description && <p className={`mt-1.5 leading-relaxed text-slate-500 ${theme.desc}`}>{formData.description}</p>}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣  DEFAULT CONTACT FORM — minimal, underline inputs
+   ═══════════════════════════════════════════════════════════ */
+export function ContactFormUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#111827", soft: "#f8fafc",
+    page: "min-h-full bg-white",
+    card: "rounded-2xl border border-slate-100 bg-white p-8 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)]",
+    title: "text-2xl", desc: "text-sm",
+    inputMode: "underline",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form}
+      header={
+        <div className="mb-8">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Contact us</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{props.formData.title}</h1>
+          {props.formData.description && <p className="mt-2 text-sm leading-relaxed text-slate-500">{props.formData.description}</p>}
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2️⃣  LEAD CAPTURE — split screen: dark pitch + form
+   ═══════════════════════════════════════════════════════════ */
+export function LeadCaptureUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#0ea5e9", soft: "#f0f9ff",
+    page: "min-h-full bg-slate-950 px-4 py-10",
+    card: "", title: "text-2xl", desc: "text-sm",
+    radioVariant: "pills", checkVariant: "chips",
+  };
+  const vars = { "--acc": theme.accent, "--soft": theme.soft } as CSSProperties;
+  const done = Boolean(props.hasSubmitted || form.successMsg);
+  return (
+    <div style={vars} className={`${theme.page} ${props.className ?? ""}`}>
+      <div className="mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl shadow-2xl lg:grid-cols-2">
+        {/* Left pitch panel */}
+        <div className="relative flex flex-col justify-center gap-6 bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950 p-10 text-white lg:p-12">
+          <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-sky-500/20 blur-3xl" />
+          <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-blue-600/20 blur-3xl" />
+          <div className="relative">
+            <span className="mb-4 inline-block rounded-full bg-sky-400/15 px-3 py-1 text-xs font-semibold text-sky-300 ring-1 ring-sky-400/30">Free quote · No commitment</span>
+            <h1 className="text-3xl font-bold leading-tight tracking-tight">{props.formData.title}</h1>
+            {props.formData.description && <p className="mt-3 text-sm leading-relaxed text-slate-300">{props.formData.description}</p>}
+            <ul className="mt-8 space-y-3 text-sm text-slate-200">
+              {["Response within 1 business day", "Tailored pricing for your project", "Free 30-min consultation call"].map((t) => (
+                <li key={t} className="flex items-center gap-3">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sky-400/20"><Check className="h-3 w-3 text-sky-300" /></span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="relative flex items-center gap-3 border-t border-white/10 pt-6 text-xs text-slate-400">
+            <div className="flex -space-x-2">
+              {["from-sky-400 to-blue-500", "from-amber-400 to-orange-500", "from-emerald-400 to-teal-500"].map((g, i) => (
+                <span key={i} className={`h-8 w-8 rounded-full bg-gradient-to-br ${g} ring-2 ring-slate-900`} />
+              ))}
+            </div>
+            Trusted by 2,000+ businesses
+          </div>
+        </div>
+        {/* Right form panel */}
+        <div className="bg-white p-8 lg:p-10">
+          {done ? <StatusCard form={form} formData={props.formData} hasSubmitted={props.hasSubmitted} /> : (
+            <>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-slate-900">Tell us about your project</h2>
+                <p className="mt-1 text-sm text-slate-400">Takes less than 60 seconds.</p>
+              </div>
+              <div className="space-y-4">
+                {props.formData.fields.map((f) => <Field key={f.id} field={f} form={form} theme={theme} />)}
+              </div>
+              <div className="mt-6"><SubmitBar form={form} theme={theme} text={props.formData.settings.submitButtonText} /></div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3️⃣  CUSTOMER FEEDBACK — warm, emoji band, big stars
+   ═══════════════════════════════════════════════════════════ */
+export function CustomerFeedbackUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#f59e0b", soft: "#fffbeb",
+    page: "min-h-full bg-gradient-to-b from-amber-50 to-orange-50/50",
+    card: "overflow-hidden rounded-3xl border border-amber-100 bg-white shadow-xl shadow-amber-100/60",
+    title: "text-2xl", desc: "text-sm",
+    checkVariant: "chips",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-lg"
+      header={
+        <div className="mb-6 border-b border-amber-100 bg-gradient-to-r from-amber-400 to-orange-400 px-8 py-6 text-white">
+          <div className="mb-2 flex gap-1 text-lg">{"😍 🙂 😐 🙁 😤".split(" ").map((e, i) => <span key={i} className="transition hover:scale-125">{e}</span>)}</div>
+          <h1 className="text-2xl font-bold tracking-tight">{props.formData.title}</h1>
+          {props.formData.description && <p className="mt-1 text-sm text-amber-50">{props.formData.description}</p>}
+        </div>
+      }>
+      <div className="px-8 pb-8">
+        <div className="space-y-5">
+          {props.formData.fields.map((f) => <Field key={f.id} field={f} form={form} theme={theme} />)}
+        </div>
+        <div className="mt-6"><SubmitBar form={form} theme={theme} text={props.formData.settings.submitButtonText} /></div>
+      </div>
+    </Frame>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   4️⃣  EVENT REGISTRATION — ticket card with perforation
+   ═══════════════════════════════════════════════════════════ */
+export function EventRegistrationUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#f97316", soft: "#fff7ed",
+    page: "min-h-full bg-orange-50/60",
+    card: "relative rounded-3xl border border-orange-100 bg-white shadow-xl shadow-orange-100/70",
+    title: "text-2xl", desc: "text-sm",
+    radioVariant: "pills",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-lg" bare>
+      <div className="mx-auto w-full max-w-lg">
+        <div className={theme.card}>
+          {/* Ticket header */}
+          <div className="flex items-center gap-4 bg-gradient-to-r from-orange-500 to-amber-500 p-6 text-white">
+            <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-white/20 backdrop-blur">
+              <span className="text-[10px] font-bold uppercase tracking-wider">Date</span>
+              <span className="text-xl font-black leading-none">🎟️</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight">{props.formData.title}</h1>
+              {props.formData.description && <p className="mt-0.5 text-xs text-orange-100">{props.formData.description}</p>}
+            </div>
+          </div>
+          {/* Perforation */}
+          <div className="relative border-t-2 border-dashed border-orange-200">
+            <span className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-orange-50/60" />
+            <span className="absolute -right-3 -top-3 h-6 w-6 rounded-full bg-orange-50/60" />
+          </div>
+          <div className="p-6">
+            {props.hasSubmitted || form.successMsg ? (
+              <StatusCard form={form} formData={props.formData} hasSubmitted={props.hasSubmitted} />
+            ) : (
+              <>
+                <div className="space-y-4">
+                  {props.formData.fields.map((f) => <Field key={f.id} field={f} form={form} theme={theme} />)}
+                </div>
+                <div className="mt-6"><SubmitBar form={form} theme={theme} text={props.formData.settings.submitButtonText || "Get my ticket"} /></div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </Frame>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   5️⃣  NEWSLETTER SIGNUP — compact, playful
+   ═══════════════════════════════════════════════════════════ */
+export function NewsletterSignupUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#65a30d", soft: "#f7fee7",
+    page: "min-h-full bg-lime-50/50",
+    card: "rounded-3xl border border-lime-200 bg-white p-8 text-center shadow-lg shadow-lime-100",
+    title: "text-2xl", desc: "text-sm",
+    checkVariant: "chips", radioVariant: "pills",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-sm"
+      header={
+        <div className="mb-5 text-center">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-lime-100 text-2xl">✉️</div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          {props.formData.description && <p className="mt-1.5 text-sm text-slate-500">{props.formData.description}</p>}
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   6️⃣  EMPLOYEE CHECK-IN — emoji mood selector
+   ═══════════════════════════════════════════════════════════ */
+export function EmployeeCheckinUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#06b6d4", soft: "#ecfeff",
+    page: "min-h-full bg-cyan-50/40",
+    card: "rounded-3xl border border-cyan-100 bg-white p-8 shadow-xl shadow-cyan-100/60",
+    title: "text-2xl", desc: "text-sm",
+    radioVariant: "emojis",
+  };
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-lg"
+      header={
+        <div className="mb-6 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 p-5 text-white">
+          <p className="text-xs font-medium text-cyan-100">{today}</p>
+          <h1 className="mt-0.5 text-xl font-bold tracking-tight">Good morning 👋 {props.formData.title}</h1>
+          {props.formData.description && <p className="mt-1 text-xs text-cyan-50/90">{props.formData.description}</p>}
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   7️⃣  WORKFLOW REQUEST — priority tags, request-card style
+   ═══════════════════════════════════════════════════════════ */
+export function WorkflowRequestUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#f43f5e", soft: "#fff1f2",
+    page: "min-h-full bg-rose-50/40",
+    card: "rounded-2xl border border-rose-100 bg-white shadow-lg shadow-rose-100/50",
+    title: "text-2xl", desc: "text-sm",
+    radioVariant: "tags",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form}
+      header={
+        <div className="mb-6 flex items-start justify-between gap-4 border-b border-slate-100 pb-5">
+          <div>
+            <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-600">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-500" /> NEW REQUEST
+            </span>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+            {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
+          </div>
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   8️⃣  COMPANY AUDIT — checklist rows, violet
+   ═══════════════════════════════════════════════════════════ */
+export function CompanyAuditUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#7c3aed", soft: "#f5f3ff",
+    page: "min-h-full bg-violet-50/40",
+    card: "rounded-2xl border border-violet-100 bg-white p-8 shadow-lg shadow-violet-100/50",
+    title: "text-2xl", desc: "text-sm",
+    checkVariant: "chips",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-2xl"
+      header={
+        <div className="mb-6 flex items-center gap-4 border-b border-slate-100 pb-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-100 text-2xl">🛡️</div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+            {props.formData.description && <p className="mt-0.5 text-sm text-slate-500">{props.formData.description}</p>}
+          </div>
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   9️⃣  JOB APPLICATION — professional two-column
+   ═══════════════════════════════════════════════════════════ */
+export function JobApplicationUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#4f46e5", soft: "#eef2ff",
+    page: "min-h-full bg-indigo-50/40",
+    card: "rounded-2xl border border-indigo-100 bg-white p-8 shadow-lg shadow-indigo-100/50",
+    title: "text-2xl", desc: "text-sm",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-2xl" grid
+      header={
+        <div className="mb-6 sm:col-span-2">
+          <div className="flex items-center gap-2 text-xs font-semibold text-indigo-500">
+            <span className="rounded-full bg-indigo-100 px-2.5 py-1">We're hiring</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-400">Applications reviewed weekly</span>
+          </div>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          {props.formData.description && <p className="mt-2 text-sm text-slate-500">{props.formData.description}</p>}
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   🔟  LEAVE REQUEST — balance chips + date range
+   ═══════════════════════════════════════════════════════════ */
+export function LeaveRequestUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#ea580c", soft: "#fff7ed",
+    page: "min-h-full bg-orange-50/40",
+    card: "rounded-2xl border border-orange-100 bg-white p-8 shadow-lg shadow-orange-100/50",
+    title: "text-2xl", desc: "text-sm",
+    radioVariant: "pills",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} grid
+      header={
+        <div className="mb-6 sm:col-span-2">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {[["Annual", "12 days left"], ["Sick", "7 days left"], ["Casual", "5 days left"]].map(([k, v]) => (
+              <span key={k} className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs">
+                <b className="text-orange-700">{k}</b> <span className="text-orange-400">· {v}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣1️⃣  EMPLOYEE ONBOARDING — warm welcome gradient
+   ═══════════════════════════════════════════════════════════ */
+export function EmployeeOnboardingUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#0d9488", soft: "#f0fdfa",
+    page: "min-h-full bg-teal-50/40",
+    card: "rounded-3xl border border-teal-100 bg-white p-8 shadow-xl shadow-teal-100/60",
+    title: "text-2xl", desc: "text-sm",
+    checkVariant: "chips",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-2xl"
+      header={
+        <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 p-6 text-white">
+          <p className="text-3xl">🎉</p>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight">Welcome to the team!</h1>
+          <p className="mt-1 text-sm text-teal-50">{props.formData.description}</p>
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣2️⃣  PRODUCT ORDER — form + order summary sidebar
+   ═══════════════════════════════════════════════════════════ */
+export function ProductOrderUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#d946ef", soft: "#fdf4ff",
+    page: "min-h-full bg-slate-100",
+    card: "", title: "text-2xl", desc: "text-sm",
+    radioVariant: "pills",
+  };
+  const vars = { "--acc": theme.accent, "--soft": theme.soft } as CSSProperties;
+  const done = Boolean(props.hasSubmitted || form.successMsg);
+  const productField = props.formData.fields.find((f) => f.type === "dropdown");
+  const qtyField = props.formData.fields.find((f) => f.type === "number");
+  const productLabel = productField?.options?.find((o) => o.value === form.values[productField?.id ?? ""])?.label;
+  const qty = form.values[qtyField?.id ?? ""];
+  return (
+    <div style={vars} className={`${theme.page} px-4 py-10 ${props.className ?? ""}`}>
+      <div className="mx-auto grid w-full max-w-4xl gap-6 lg:grid-cols-[1fr_340px]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8">
+          {done ? <StatusCard form={form} formData={props.formData} hasSubmitted={props.hasSubmitted} /> : (
+            <>
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+                {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
+              </div>
+              <div className="space-y-4">
+                {props.formData.fields.map((f) => <Field key={f.id} field={f} form={form} theme={theme} />)}
+              </div>
+              <div className="mt-6"><SubmitBar form={form} theme={theme} text={props.formData.settings.submitButtonText} /></div>
+            </>
+          )}
+        </div>
+        {/* Summary sidebar */}
+        <div className="h-fit rounded-2xl bg-slate-900 p-6 text-white lg:sticky lg:top-6">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Order summary</h3>
+          <div className="mt-4 space-y-3 text-sm">
+            <div className="flex justify-between"><span className="text-slate-400">Product</span><span className="font-medium">{productLabel || "—"}</span></div>
+            <div className="flex justify-between"><span className="text-slate-400">Quantity</span><span className="font-medium">{qty || "—"}</span></div>
+            <div className="flex justify-between"><span className="text-slate-400">Shipping</span><span className="font-medium text-emerald-400">Free</span></div>
+          </div>
+          <div className="mt-4 border-t border-white/10 pt-4 text-xs text-slate-400">
+            Final pricing confirmed by our team after review.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣3️⃣  QUOTE REQUEST — blue, budget slider output
+   ═══════════════════════════════════════════════════════════ */
+export function QuoteRequestUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#2563eb", soft: "#eff6ff",
+    page: "min-h-full bg-blue-50/40",
+    card: "rounded-2xl border border-blue-100 bg-white p-8 shadow-lg shadow-blue-100/50",
+    title: "text-2xl", desc: "text-sm",
+    checkVariant: "chips",
+  };
+  const budgetField = props.formData.fields.find((f) => f.type === "slider");
+  const budget = budgetField ? form.values[budgetField.id] : null;
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-2xl"
+      header={
+        <div className="mb-6 border-b border-slate-100 pb-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+              {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
+            </div>
+            {budget !== null && budget !== undefined && (
+              <div className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-center text-white">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-blue-200">Budget</p>
+                <p className="text-lg font-bold leading-none">${budget}k</p>
+              </div>
+            )}
+          </div>
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣4️⃣  SUPPORT TICKET — support panel, red accent
+   ═══════════════════════════════════════════════════════════ */
+export function SupportTicketUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#ef4444", soft: "#fef2f2",
+    page: "min-h-full bg-red-50/30",
+    card: "overflow-hidden rounded-2xl border border-red-100 bg-white shadow-lg shadow-red-100/50",
+    title: "text-2xl", desc: "text-sm",
+    radioVariant: "tags",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} bare>
+      <div className="mx-auto w-full max-w-xl">
+        <div className={theme.card}>
+          <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-8 py-4">
+            <div className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Support online · avg reply 2h
+            </span>
+          </div>
+          <div className="p-8">
+            {props.hasSubmitted || form.successMsg ? (
+              <StatusCard form={form} formData={props.formData} hasSubmitted={props.hasSubmitted} />
+            ) : (
+              <>
+                <div className="mb-6">
+                  <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+                  {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
+                </div>
+                <div className="space-y-4">
+                  {props.formData.fields.map((f) => <Field key={f.id} field={f} form={form} theme={theme} />)}
+                </div>
+                <div className="mt-6"><SubmitBar form={form} theme={theme} text={props.formData.settings.submitButtonText || "Submit ticket"} /></div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </Frame>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣5️⃣  APPOINTMENT BOOKING — slots grid, pink
+   ═══════════════════════════════════════════════════════════ */
+export function AppointmentBookingUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#ec4899", soft: "#fdf2f8",
+    page: "min-h-full bg-pink-50/40",
+    card: "rounded-2xl border border-pink-100 bg-white p-8 shadow-lg shadow-pink-100/50",
+    title: "text-2xl", desc: "text-sm",
+    selectVariant: "slots", radioVariant: "pills",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} grid
+      header={
+        <div className="mb-6 sm:col-span-2">
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-pink-500">
+            <span>📅</span> Pick a date & time — we'll confirm instantly
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣6️⃣  SURVEY POLL — progress bar, green
+   ═══════════════════════════════════════════════════════════ */
+export function SurveyPollUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#16a34a", soft: "#f0fdf4",
+    page: "min-h-full bg-green-50/40",
+    card: "rounded-2xl border border-green-100 bg-white p-8 shadow-lg shadow-green-100/50",
+    title: "text-2xl", desc: "text-sm",
+  };
+  const required = props.formData.fields.filter((f) => f.validation.required && !["heading", "divider"].includes(f.type));
+  const filled = required.filter((f) => {
+    const v = form.values[f.id];
+    if (Array.isArray(v)) return v.length > 0;
+    return v !== undefined && v !== null && v !== "" && v !== false;
+  }).length;
+  const pct = required.length ? Math.round((filled / required.length) * 100) : 0;
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-lg"
+      header={
+        <div className="mb-6">
+          <div className="mb-3 flex items-center justify-between text-xs font-medium text-slate-400">
+            <span>{filled} of {required.length} required</span>
+            <span className="font-bold text-green-600">{pct}%</span>
+          </div>
+          <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+            <div className="h-full rounded-full bg-green-500 transition-all duration-500" style={{ width: `${pct}%` }} />
+          </div>
+          <h1 className="mt-5 text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣7️⃣  COURSE EVALUATION — yellow, education vibe
+   ═══════════════════════════════════════════════════════════ */
+export function CourseEvaluationUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#ca8a04", soft: "#fefce8",
+    page: "min-h-full bg-yellow-50/50",
+    card: "rounded-2xl border border-yellow-100 bg-white p-8 shadow-lg shadow-yellow-100/60",
+    title: "text-2xl", desc: "text-sm",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-lg"
+      header={
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-100 text-2xl">🎓</div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣8️⃣  QUIZ TEST — lettered options, question cards
+   ═══════════════════════════════════════════════════════════ */
+export function QuizTestUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#9333ea", soft: "#faf5ff",
+    page: "min-h-full bg-purple-50/40",
+    card: "", title: "text-2xl", desc: "text-sm",
+    radioVariant: "letters", checkVariant: "chips",
+  };
+  const vars = { "--acc": theme.accent, "--soft": theme.soft } as CSSProperties;
+  const done = Boolean(props.hasSubmitted || form.successMsg);
+  const flat = props.formData.fields.filter((f) => !["heading", "divider"].includes(f.type));
+  return (
+    <div style={vars} className={`${theme.page} px-4 py-10 ${props.className ?? ""}`}>
+      <div className="mx-auto w-full max-w-2xl">
+        <div className="mb-6 text-center">
+          <span className="mb-3 inline-block rounded-full bg-purple-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-purple-700">Quiz mode</span>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          {props.formData.description && <p className="mt-2 text-sm text-slate-500">{props.formData.description}</p>}
+        </div>
+        {done ? (
+          <div className="rounded-2xl border border-purple-100 bg-white p-8 shadow-lg shadow-purple-100/50">
+            <StatusCard form={form} formData={props.formData} hasSubmitted={props.hasSubmitted} />
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4">
+              {props.formData.fields.map((f) => {
+                if (f.type === "heading")
+                  return <h3 key={f.id} className="pt-3 text-sm font-bold uppercase tracking-wider text-purple-500">{f.label}</h3>;
+                if (f.type === "divider") return <hr key={f.id} className="border-purple-100" />;
+                const qNum = flat.indexOf(f) + 1;
+                return (
+                  <div key={f.id} className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm">
+                    <span className="mb-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-purple-600 text-xs font-bold text-white">{qNum}</span>
+                    <Field field={f} form={form} theme={theme} />
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-6 rounded-2xl border border-purple-100 bg-white p-5 shadow-sm">
+              <SubmitBar form={form} theme={theme} text={props.formData.settings.submitButtonText || "Finish quiz"} />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1️⃣9️⃣  NDA AGREEMENT — legal document style
+   ═══════════════════════════════════════════════════════════ */
+export function NdaAgreementUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#334155", soft: "#f8fafc",
+    page: "min-h-full bg-slate-200/60 px-4 py-12",
+    card: "rounded-sm border border-slate-300 bg-white p-10 font-serif shadow-2xl",
+    title: "text-3xl", desc: "text-sm",
+  };
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-2xl"
+      header={
+        <div className="mb-8 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Confidential · Legal Document</p>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <div className="mx-auto mt-5 max-w-md border-y border-slate-200 py-4 text-left text-xs leading-relaxed text-slate-500">
+            This Non-Disclosure Agreement ("Agreement") is entered into by and between the undersigned parties
+            for the purpose of protecting confidential information shared during the course of business. By
+            signing below, both parties agree to hold all disclosed information in strict confidence for a
+            period of twenty-four (24) months from the date of execution.
+          </div>
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2️⃣0️⃣  EXPENSE REIMBURSEMENT — ledger style, emerald
+   ═══════════════════════════════════════════════════════════ */
+export function ExpenseReimbursementUI(props: TemplateUIProps) {
+  const form = useTemplateForm(props.formData, props.submitUrl);
+  const theme: UITheme = {
+    accent: "#059669", soft: "#ecfdf5",
+    page: "min-h-full bg-emerald-50/40",
+    card: "rounded-2xl border border-emerald-100 bg-white p-8 shadow-lg shadow-emerald-100/50",
+    title: "text-2xl", desc: "text-sm",
+  };
+  const amountField = props.formData.fields.find((f) => f.type === "number");
+  const amount = amountField ? form.values[amountField.id] : null;
+  return (
+    <Frame {...props} theme={theme} form={form} maxW="max-w-2xl"
+      header={
+        <div className="mb-6 border-b-2 border-slate-900 pb-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-600">Finance · Claims</p>
+              <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+              {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
+            </div>
+            {amount !== null && amount !== undefined && amount !== "" && (
+              <div className="shrink-0 rounded-xl border-2 border-slate-900 px-4 py-2 text-right">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Claim total</p>
+                <p className="text-xl font-black text-slate-900">${Number(amount).toLocaleString()}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      } />
+  );
+}
+
+/* ═══════════════════ Registry + Dispatcher ═══════════════════ */
+export const templateUIComponents: Record<string, (p: TemplateUIProps) => ReactNode> = {
+  default_contact_form: ContactFormUI,
+  lead_capture: LeadCaptureUI,
+  customer_feedback: CustomerFeedbackUI,
+  event_registration: EventRegistrationUI,
+  newsletter_signup: NewsletterSignupUI,
+  employee_checkin: EmployeeCheckinUI,
+  workflow_request: WorkflowRequestUI,
+  company_audit: CompanyAuditUI,
+  job_application: JobApplicationUI,
+  leave_request: LeaveRequestUI,
+  employee_onboarding: EmployeeOnboardingUI,
+  product_order: ProductOrderUI,
+  quote_request: QuoteRequestUI,
+  support_ticket: SupportTicketUI,
+  appointment_booking: AppointmentBookingUI,
+  survey_poll: SurveyPollUI,
+  course_evaluation: CourseEvaluationUI,
+  quiz_test: QuizTestUI,
+  nda_agreement: NdaAgreementUI,
+  expense_reimbursement: ExpenseReimbursementUI,
+};
+
+export function TemplateFormUI({ template, ...props }: TemplateUIProps & { template: string }) {
+  const C = templateUIComponents[template] ?? ContactFormUI;
+  return <>{C(props)}</>;
+}

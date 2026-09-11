@@ -4,22 +4,43 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import {
   ArrowLeft,
+  BriefcaseBusiness,
   Calendar,
+  CalendarDays,
   CheckSquare,
+  Check,
   CircleDot,
   Eye,
+  FileCheck2,
+  GraduationCap,
+  Headphones,
   Hash,
+  HeartHandshake,
   ListFilter,
   Mail,
+  Megaphone,
+  MessageSquareText,
+  Newspaper,
+  PackageCheck,
+  PenLine,
+  Receipt,
   Save,
   Share2,
+  ShieldCheck,
   Star,
+  Ticket,
   Upload,
+  UserRoundPlus,
+  UsersRound,
   X,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { createForm } from "@/redux/features/create-form/form-create.slice";
-import { setFormSlug } from "@/redux/features/form-builder/form.slice";
+import {
+  FormTemplateType,
+  setFormSlug,
+  setFormTemplateType,
+} from "@/redux/features/form-builder/form.slice";
 import { AppDispatch } from "@/redux/store";
 import { Spinner } from "@/components/ui/Spinner";
 import { showAlert } from "@/redux/features/global/alertSlice";
@@ -36,8 +57,158 @@ import { useSelector as useFormCreateSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import axios from "axios";
 import { useState } from "react";
+import type { LucideIcon } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { getErrorMessage } from "@/utils/getErrorMessage";
+
+const TEMPLATE_OPTIONS: Array<{
+  value: FormTemplateType;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  color: string;
+}> = [
+  {
+    value: FormTemplateType.DEFAULT_CONTACT_FORM,
+    title: "Contact Form",
+    description: "Simple and focused contact form",
+    icon: MessageSquareText,
+    color: "bg-slate-100 text-slate-700",
+  },
+  {
+    value: FormTemplateType.LEAD_CAPTURE,
+    title: "Lead Capture",
+    description: "Convert visitors into qualified leads",
+    icon: Megaphone,
+    color: "bg-sky-100 text-sky-700",
+  },
+  {
+    value: FormTemplateType.CUSTOMER_FEEDBACK,
+    title: "Customer Feedback",
+    description: "Collect opinions and satisfaction ratings",
+    icon: HeartHandshake,
+    color: "bg-amber-100 text-amber-700",
+  },
+  {
+    value: FormTemplateType.EVENT_REGISTRATION,
+    title: "Event Registration",
+    description: "Register attendees for an event",
+    icon: Ticket,
+    color: "bg-orange-100 text-orange-700",
+  },
+  {
+    value: FormTemplateType.NEWSLETTER_SIGNUP,
+    title: "Newsletter Signup",
+    description: "Grow your email subscriber list",
+    icon: Newspaper,
+    color: "bg-lime-100 text-lime-700",
+  },
+  {
+    value: FormTemplateType.EMPLOYEE_CHECKIN,
+    title: "Employee Check-in",
+    description: "Capture daily team mood and status",
+    icon: UsersRound,
+    color: "bg-cyan-100 text-cyan-700",
+  },
+  {
+    value: FormTemplateType.WORKFLOW_REQUEST,
+    title: "Workflow Request",
+    description: "Collect and route internal requests",
+    icon: BriefcaseBusiness,
+    color: "bg-rose-100 text-rose-700",
+  },
+  {
+    value: FormTemplateType.COMPANY_AUDIT,
+    title: "Company Audit",
+    description: "Review processes with a checklist",
+    icon: ShieldCheck,
+    color: "bg-violet-100 text-violet-700",
+  },
+  {
+    value: FormTemplateType.JOB_APPLICATION,
+    title: "Job Application",
+    description: "Create a polished hiring application",
+    icon: UserRoundPlus,
+    color: "bg-indigo-100 text-indigo-700",
+  },
+  {
+    value: FormTemplateType.LEAVE_REQUEST,
+    title: "Leave Request",
+    description: "Manage employee time-off requests",
+    icon: CalendarDays,
+    color: "bg-orange-100 text-orange-700",
+  },
+  {
+    value: FormTemplateType.EMPLOYEE_ONBOARDING,
+    title: "Employee Onboarding",
+    description: "Welcome and collect new-hire details",
+    icon: Star,
+    color: "bg-teal-100 text-teal-700",
+  },
+  {
+    value: FormTemplateType.PRODUCT_ORDER,
+    title: "Product Order",
+    description: "Take orders with a clear summary",
+    icon: PackageCheck,
+    color: "bg-fuchsia-100 text-fuchsia-700",
+  },
+  {
+    value: FormTemplateType.QUOTE_REQUEST,
+    title: "Quote Request",
+    description: "Understand scope and budget needs",
+    icon: PenLine,
+    color: "bg-blue-100 text-blue-700",
+  },
+  {
+    value: FormTemplateType.SUPPORT_TICKET,
+    title: "Support Ticket",
+    description: "Give customers a direct support channel",
+    icon: Headphones,
+    color: "bg-red-100 text-red-700",
+  },
+  {
+    value: FormTemplateType.APPOINTMENT_BOOKING,
+    title: "Appointment Booking",
+    description: "Let people request a time slot",
+    icon: CalendarDays,
+    color: "bg-pink-100 text-pink-700",
+  },
+  {
+    value: FormTemplateType.SURVEY_POLL,
+    title: "Survey Poll",
+    description: "Run a quick structured survey",
+    icon: Check,
+    color: "bg-green-100 text-green-700",
+  },
+  {
+    value: FormTemplateType.COURSE_EVALUATION,
+    title: "Course Evaluation",
+    description: "Collect useful learning feedback",
+    icon: GraduationCap,
+    color: "bg-yellow-100 text-yellow-700",
+  },
+  {
+    value: FormTemplateType.QUIZ_TEST,
+    title: "Quiz Test",
+    description: "Build a clear quiz or assessment",
+    icon: Star,
+    color: "bg-purple-100 text-purple-700",
+  },
+  {
+    value: FormTemplateType.NDA_AGREEMENT,
+    title: "NDA Agreement",
+    description: "Present a formal agreement workflow",
+    icon: FileCheck2,
+    color: "bg-slate-200 text-slate-700",
+  },
+  {
+    value: FormTemplateType.EXPENSE_REIMBURSEMENT,
+    title: "Expense Reimbursement",
+    description: "Submit and review expense claims",
+    icon: Receipt,
+    color: "bg-emerald-100 text-emerald-700",
+  },
+];
 
 /**
  * TopBar Component
@@ -60,6 +231,10 @@ export function TopBar() {
   const [isSaving, setIsSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
+  const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<FormTemplateType>(
+    fields[0]?.formType || FormTemplateType.DEFAULT_CONTACT_FORM,
+  );
 
   const loading = useFormCreateSelector((state: RootState) => state.formCreate.isLoading);
 
@@ -112,10 +287,33 @@ export function TopBar() {
       await createCurrentForm();
       dispatch(showAlert({ message: "Form created successfully", type: "success" }));
     } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 409 && slug) {
+        try {
+          await saveCurrentForm();
+          dispatch(
+            showAlert({ message: "Form already existed, so it was updated.", type: "success" }),
+          );
+          return;
+        } catch (updateError) {
+          dispatch(showAlert({ message: getErrorMessage(updateError), type: "danger" }));
+          return;
+        }
+      }
       dispatch(showAlert({ message: getErrorMessage(error), type: "danger" }));
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const openTemplatePicker = () => {
+    setSelectedTemplate(fields[0]?.formType || FormTemplateType.DEFAULT_CONTACT_FORM);
+    setIsTemplatePickerOpen(true);
+  };
+
+  const handleTemplateCreate = async () => {
+    dispatch(setFormTemplateType(selectedTemplate));
+    setIsTemplatePickerOpen(false);
+    await handleCreateForm();
   };
 
   const handleSaveForm = async () => {
@@ -314,7 +512,7 @@ export function TopBar() {
         </Button>
         <Button
           size="sm"
-          onClick={handleCreateForm}
+          onClick={openTemplatePicker}
           className="rounded-xl px-5 py-2 gap-2"
           style={{ backgroundColor: "#432DD7" }}
           disabled={loading || isSaving}
@@ -343,6 +541,104 @@ export function TopBar() {
           Publish
         </Button>
       </div>
+
+      {isTemplatePickerOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="create-template-picker-title"
+          onClick={() => setIsTemplatePickerOpen(false)}
+        >
+          <div
+            className="flex max-h-[min(760px,calc(100vh-2rem))] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-border bg-background shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-border px-6 py-5">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
+                  New form
+                </p>
+                <h2
+                  id="create-template-picker-title"
+                  className="mt-1 text-xl font-bold text-foreground"
+                >
+                  Choose a form template
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Select a visual style before creating your form.
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="Close template picker"
+                className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                onClick={() => setIsTemplatePickerOpen(false)}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto p-6">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {TEMPLATE_OPTIONS.map((template) => {
+                  const Icon = template.icon;
+                  const isSelected = template.value === selectedTemplate;
+
+                  return (
+                    <button
+                      key={template.value}
+                      type="button"
+                      onClick={() => setSelectedTemplate(template.value)}
+                      className={`group relative flex min-h-36 flex-col items-start rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg ${
+                        isSelected
+                          ? "border-primary bg-primary/[0.04] shadow-md ring-2 ring-primary/20"
+                          : "border-border bg-card"
+                      }`}
+                    >
+                      <div
+                        className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl ${template.color}`}
+                      >
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="text-sm font-bold text-foreground">{template.title}</span>
+                      <span className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        {template.description}
+                      </span>
+                      {isSelected && (
+                        <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                          <Check className="h-3.5 w-3.5" />
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 border-t border-border px-6 py-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl"
+                onClick={() => setIsTemplatePickerOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="rounded-xl px-5"
+                style={{ backgroundColor: "#432DD7" }}
+                onClick={handleTemplateCreate}
+                disabled={loading || isSaving}
+              >
+                {loading ? <Spinner className="mr-2 h-4 w-4 text-white" /> : null}
+                Create Form
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isPreviewOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm">

@@ -2,12 +2,25 @@ import { createSlice, PayloadAction, nanoid } from "@reduxjs/toolkit";
 
 export enum FormTemplateType {
   DEFAULT_CONTACT_FORM = "default_contact_form",
-  COMPANY_AUDIT = "company_audit",
-  CUSTOMER_FEEDBACK = "customer_feedback",
   LEAD_CAPTURE = "lead_capture",
+  CUSTOMER_FEEDBACK = "customer_feedback",
   EVENT_REGISTRATION = "event_registration",
+  NEWSLETTER_SIGNUP = "newsletter_signup",
   EMPLOYEE_CHECKIN = "employee_checkin",
   WORKFLOW_REQUEST = "workflow_request",
+  COMPANY_AUDIT = "company_audit",
+  JOB_APPLICATION = "job_application",
+  LEAVE_REQUEST = "leave_request",
+  EMPLOYEE_ONBOARDING = "employee_onboarding",
+  PRODUCT_ORDER = "product_order",
+  QUOTE_REQUEST = "quote_request",
+  SUPPORT_TICKET = "support_ticket",
+  APPOINTMENT_BOOKING = "appointment_booking",
+  SURVEY_POLL = "survey_poll",
+  COURSE_EVALUATION = "course_evaluation",
+  QUIZ_TEST = "quiz_test",
+  NDA_AGREEMENT = "nda_agreement",
+  EXPENSE_REIMBURSEMENT = "expense_reimbursement",
 }
 
 export enum FormUiType {
@@ -141,6 +154,12 @@ const formSlice = createSlice({
         state.isDirty = true;
       }
     },
+    setFormTemplateType: (state, action: PayloadAction<FormTemplateType>) => {
+      state.fields.forEach((field) => {
+        field.formType = action.payload;
+      });
+      state.isDirty = true;
+    },
     updateFormMeta: (state, action: PayloadAction<{ title?: string; description?: string }>) => {
       if (action.payload.title !== undefined) {
         state.formTitle = action.payload.title;
@@ -179,6 +198,7 @@ export const {
   reorderFields,
   selectField,
   updateField,
+  setFormTemplateType,
   updateFormMeta,
   setFormSlug,
   updateFormSettings,
