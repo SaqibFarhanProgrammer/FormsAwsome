@@ -1,13 +1,7 @@
 "use client";
 
 import { useTemplateForm } from "../utils/form-template.utils";
-import {
-  type UITheme,
-  type TemplateUIProps,
-  Frame,
-  SubmitBar,
-  StatusCard,
-} from "../utils/ui.utils";
+import { type UITheme, type TemplateUIProps, Frame, StatusCard } from "../utils/ui.utils";
 import { Field } from "./form-field";
 
 export function ContactFormUI(props: TemplateUIProps) {

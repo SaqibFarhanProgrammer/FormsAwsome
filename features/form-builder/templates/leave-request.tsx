@@ -40,8 +40,7 @@ export function LeaveRequestUI(props: TemplateUIProps) {
                 key={k}
                 className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs"
               >
-                <b className="text-black">{k}</b>{" "}
-                <span className="text-slate-500">· {v}</span>
+                <b className="text-black">{k}</b> <span className="text-slate-500">· {v}</span>
               </span>
             ))}
           </div>

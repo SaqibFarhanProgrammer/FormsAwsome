@@ -38,40 +38,34 @@ export default function MyForm() {
     },
   };
 
-  return (
-    <FormRenderer
-      formData={formData}
-      submitUrl="/api/forms/submit"
-      hasSubmitted={false}
-    />
-  );
+  return <FormRenderer formData={formData} submitUrl="/api/forms/submit" hasSubmitted={false} />;
 }
 ```
 
 ## Available Templates
 
-| Type | Component | Use Case |
-|------|-----------|----------|
-| `contact_form` | ContactFormUI | General contact forms |
-| `lead_capture` | LeadCaptureUI | Sales/lead generation |
-| `customer_feedback` | CustomerFeedbackUI | Surveys & feedback |
-| `event_registration` | EventRegistrationUI | Event sign-ups |
-| `newsletter_signup` | NewsletterSignupUI | Email subscriptions |
-| `employee_checkin` | EmployeeCheckinUI | Daily check-ins |
-| `workflow_request` | WorkflowRequestUI | Process requests |
-| `company_audit` | CompanyAuditUI | Compliance forms |
-| `job_application` | JobApplicationUI | Hiring forms |
-| `leave_request` | LeaveRequestUI | Time off requests |
-| `employee_onboarding` | EmployeeOnboardingUI | Onboarding flows |
-| `product_order` | ProductOrderUI | E-commerce orders |
-| `quote_request` | QuoteRequestUI | Quote requests |
-| `support_ticket` | SupportTicketUI | Support/helpdesk |
-| `appointment_booking` | AppointmentBookingUI | Scheduling |
-| `survey_poll` | SurveyPollUI | Surveys with progress |
-| `course_evaluation` | CourseEvaluationUI | Course feedback |
-| `quiz_test` | QuizTestUI | Quiz forms |
-| `nda_agreement` | NdaAgreementUI | Legal agreements |
-| `expense_reimbursement` | ExpenseReimbursementUI | Expense claims |
+| Type                    | Component              | Use Case              |
+| ----------------------- | ---------------------- | --------------------- |
+| `contact_form`          | ContactFormUI          | General contact forms |
+| `lead_capture`          | LeadCaptureUI          | Sales/lead generation |
+| `customer_feedback`     | CustomerFeedbackUI     | Surveys & feedback    |
+| `event_registration`    | EventRegistrationUI    | Event sign-ups        |
+| `newsletter_signup`     | NewsletterSignupUI     | Email subscriptions   |
+| `employee_checkin`      | EmployeeCheckinUI      | Daily check-ins       |
+| `workflow_request`      | WorkflowRequestUI      | Process requests      |
+| `company_audit`         | CompanyAuditUI         | Compliance forms      |
+| `job_application`       | JobApplicationUI       | Hiring forms          |
+| `leave_request`         | LeaveRequestUI         | Time off requests     |
+| `employee_onboarding`   | EmployeeOnboardingUI   | Onboarding flows      |
+| `product_order`         | ProductOrderUI         | E-commerce orders     |
+| `quote_request`         | QuoteRequestUI         | Quote requests        |
+| `support_ticket`        | SupportTicketUI        | Support/helpdesk      |
+| `appointment_booking`   | AppointmentBookingUI   | Scheduling            |
+| `survey_poll`           | SurveyPollUI           | Surveys with progress |
+| `course_evaluation`     | CourseEvaluationUI     | Course feedback       |
+| `quiz_test`             | QuizTestUI             | Quiz forms            |
+| `nda_agreement`         | NdaAgreementUI         | Legal agreements      |
+| `expense_reimbursement` | ExpenseReimbursementUI | Expense claims        |
 
 ## Dynamic Template Selection
 
@@ -93,10 +87,7 @@ export function FormTemplateSelector({ selectedType }) {
 }
 
 // Then use it
-<FormRenderer
-  formData={{ ...formData, type: selectedType }}
-  submitUrl="/api/submit"
-/>
+<FormRenderer formData={{ ...formData, type: selectedType }} submitUrl="/api/submit" />;
 ```
 
 ## FormData Structure
@@ -117,7 +108,29 @@ interface FormData {
 
 interface FormFieldItem {
   id: string;
-  type: "text" | "email" | "number" | "checkbox" | "radio" | "dropdown" | "toggle" | "rating" | "slider" | "file" | "textarea" | "date" | "heading" | "divider" | "phone" | "URL" | "long_text" | "short_text" | "multiple_choice" | "file_upload_image" | "file_upload_pdf" | "image";
+  type:
+    | "text"
+    | "email"
+    | "number"
+    | "checkbox"
+    | "radio"
+    | "dropdown"
+    | "toggle"
+    | "rating"
+    | "slider"
+    | "file"
+    | "textarea"
+    | "date"
+    | "heading"
+    | "divider"
+    | "phone"
+    | "URL"
+    | "long_text"
+    | "short_text"
+    | "multiple_choice"
+    | "file_upload_image"
+    | "file_upload_pdf"
+    | "image";
   label: string;
   placeholder?: string;
   helperText?: string;
@@ -157,15 +170,15 @@ Templates use CSS variables for theming:
 
 ```tsx
 const theme = {
-  accent: "#3b82f6",      // Primary color
-  soft: "#eff6ff",        // Soft background
-  page: "bg-white",       // Page background
-  card: "bg-slate-50",    // Card background
-  title: "text-2xl",      // Title size
-  desc: "text-sm",        // Description size
-  inputMode: "boxed",     // "boxed" | "underline"
-  radioVariant: "pills",  // "list" | "pills" | "letters" | "emojis" | "tags"
-  checkVariant: "chips",  // "list" | "chips"
+  accent: "#3b82f6", // Primary color
+  soft: "#eff6ff", // Soft background
+  page: "bg-white", // Page background
+  card: "bg-slate-50", // Card background
+  title: "text-2xl", // Title size
+  desc: "text-sm", // Description size
+  inputMode: "boxed", // "boxed" | "underline"
+  radioVariant: "pills", // "list" | "pills" | "letters" | "emojis" | "tags"
+  checkVariant: "chips", // "list" | "chips"
   selectVariant: "slots", // "default" | "slots"
 };
 ```
@@ -196,10 +209,10 @@ All forms submit to `submitUrl` via POST with JSON body:
 
 ```tsx
 import {
-  useTemplateForm,    // Form state management
-  buildSchema,        // Zod validation schema
-  buildDefaults,      // Default field values
-  FormRenderer,       // Main component
+  useTemplateForm, // Form state management
+  buildSchema, // Zod validation schema
+  buildDefaults, // Default field values
+  FormRenderer, // Main component
   getAvailableTemplates,
   getTemplateName,
 } from "@/features/form-builder/templates";
