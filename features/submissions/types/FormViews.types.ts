@@ -4,10 +4,9 @@ export type DeviceType = "mobile" | "tablet" | "desktop" | "tv" | "bot" | "unkno
 
 export type FormViewType = {
   formId: mongoose.Types.ObjectId | string;
+  ip: string;
 
   visitorId?: string;
-
-  ip?: string;
   name?: string;
   email?: string;
   region?: string;
@@ -21,8 +20,7 @@ export type FormViewType = {
   os?: string;
 
   userAgent?: string;
-  data?: Record<string, unknown>;
-  submissionId?: mongoose.Types.ObjectId | string;
 
   createdAt?: Date;
+  updatedAt?: Date;
 };

@@ -16,6 +16,15 @@ import type { FormType } from "../models/form-builder.model";
 export function SingleFormView({ formData }: { formData: FormType }) {
   const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields">("preview");
   const [submissions, setSubmissions] = useState<SubmissionViewModel[]>([]);
+  const [analytics, setAnalytics] = useState({
+    totalSubmissions: 0,
+    totalViews: 0,
+    conversionRate: 0,
+    avgTime: "—",
+    lastSubmission: "No submissions yet",
+    todaySubmissions: 0,
+    weekSubmissions: 0,
+  });
   const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(true);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -23,30 +32,75 @@ export function SingleFormView({ formData }: { formData: FormType }) {
   useEffect(() => {
     let cancelled = false;
 
-    const loadSubmissions = async () => {
+    const loadFormData = async () => {
       try {
-        const response = await fetch(`/api/forms/${formData.slug}/submissions`);
-        if (!response.ok) throw new Error("Unable to load submissions");
-        const result = (await response.json()) as {
+        const [submissionsResponse, analyticsResponse] = await Promise.all([
+          fetch(`/api/forms/${formData.slug}/submissions`),
+          fetch(`/api/forms/${formData.slug}/analytics`),
+        ]);
+
+        if (!submissionsResponse.ok) {
+          throw new Error("Unable to load submissions");
+        }
+
+        const submissionsResult = (await submissionsResponse.json()) as {
           data?: Array<{
             id: string;
             data: Record<string, unknown>;
             createdAt: string;
           }>;
         };
+
         if (!cancelled) {
           setSubmissions(
-            (result.data ?? []).map((submission) =>
+            (submissionsResult.data ?? []).map((submission) =>
               toSubmissionViewModel(submission, formData.fields),
             ),
           );
         }
+
+        if (analyticsResponse.ok) {
+          const analyticsResult = (await analyticsResponse.json()) as {
+            data?: {
+              totalSubmissions?: number;
+              totalViews?: number;
+              conversionRate?: number;
+              avgTime?: string;
+              lastSubmission?: string;
+              todaySubmissions?: number;
+              weekSubmissions?: number;
+            };
+          };
+
+          if (!cancelled && analyticsResult.data) {
+            setAnalytics({
+              totalSubmissions: analyticsResult.data.totalSubmissions ?? 0,
+              totalViews: analyticsResult.data.totalViews ?? 0,
+              conversionRate: analyticsResult.data.conversionRate ?? 0,
+              avgTime: analyticsResult.data.avgTime ?? "—",
+              lastSubmission: analyticsResult.data.lastSubmission ?? "No submissions yet",
+              todaySubmissions: analyticsResult.data.todaySubmissions ?? 0,
+              weekSubmissions: analyticsResult.data.weekSubmissions ?? 0,
+            });
+          }
+        }
       } catch (error: unknown) {
-        if (!cancelled) setSubmissions([]);
+        if (!cancelled) {
+          setSubmissions([]);
+          setAnalytics({
+            totalSubmissions: 0,
+            totalViews: 0,
+            conversionRate: 0,
+            avgTime: "—",
+            lastSubmission: "No submissions yet",
+            todaySubmissions: 0,
+            weekSubmissions: 0,
+          });
+        }
         if (!cancelled) {
           dispatch(
             showAlert({
-              message: getErrorMessage(error, "Unable to load submissions"),
+              message: getErrorMessage(error, "Unable to load form analytics"),
               type: "danger",
             }),
           );
@@ -56,23 +110,22 @@ export function SingleFormView({ formData }: { formData: FormType }) {
       }
     };
 
-    void loadSubmissions();
+    void loadFormData();
 
     return () => {
       cancelled = true;
     };
-  }, [dispatch, formData.slug]);
+  }, [dispatch, formData.fields, formData.slug]);
 
   const stats = {
-    totalSubmissions: submissions.length,
-    totalViews: 0,
-    conversionRate: 0,
-    avgTime: "—",
-    lastSubmission: submissions[0]?.date || "No submissions yet",
-    todaySubmissions: submissions.filter((submission) => isToday(submission.createdAt)).length,
-    weekSubmissions: submissions.filter((submission) => isThisWeek(submission.createdAt)).length,
+    totalSubmissions: analytics.totalSubmissions || submissions.length,
+    totalViews: analytics.totalViews,
+    conversionRate: analytics.conversionRate,
+    avgTime: analytics.avgTime,
+    lastSubmission: analytics.lastSubmission,
+    todaySubmissions: analytics.todaySubmissions,
+    weekSubmissions: analytics.weekSubmissions,
   };
-
   return (
     <div className="min-h-screen bg-background">
       {/* Top Bar */}

@@ -33,6 +33,8 @@ export const selectSelectedField = (state: RootState) => {
 // Form slug selector
 export const selectFormSlug = (state: RootState): string | null => state.form.formSlug;
 
+export const selectFormPublished = (state: RootState): boolean => state.form.isPublished;
+
 // Settings selectors
 export const selectFormSettings = (state: RootState) => state.form.settings;
 

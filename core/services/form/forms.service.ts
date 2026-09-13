@@ -59,7 +59,7 @@ type PublicFormPayload = {
 };
 
 const FORM_CACHE_TTL_SECONDS = 60 * 60;
-const FORM_SUBMISSION_IP_TTL_SECONDS = 60 * 60 * 24 * 30;
+const FORM_SUBMISSION_IP_TTL_SECONDS = 60 * 60 * 6;
 
 function getPublicFormCacheKey(slug: string) {
   return `public:form:${slug}`;
@@ -67,6 +67,35 @@ function getPublicFormCacheKey(slug: string) {
 
 function getFormSubmissionKey(slug: string, ip: string) {
   return `public:form:${slug}:submitted:${ip}`;
+}
+
+function getFormViewKey(formId: string, ip: string) {
+  return `form:view:${formId}:${ip}`;
+}
+
+async function recordUniqueFormView(formId: string, requestIp?: string) {
+  if (!formId || !requestIp || !requestIp.trim()) {
+    return;
+  }
+
+  const normalizedIp = requestIp.trim();
+
+  try {
+    await connectDB();
+    const existingView = await FormView.findOne({ formId, ip: normalizedIp }).lean();
+
+    if (existingView) {
+      return;
+    }
+
+    await FormView.create({ formId, ip: normalizedIp });
+  } catch (error: unknown) {
+    const mongoError = error as { code?: number; message?: string };
+    if (mongoError?.code === 11000) {
+      return;
+    }
+    console.error("Failed to track unique form view:", mongoError?.message || error);
+  }
 }
 
 function normalizeFields(fields: IncomingField[]) {
@@ -458,6 +487,11 @@ export async function getPublicFormService(
 
   if (cachedForm) {
     const parsedCachedForm = JSON.parse(cachedForm) as Partial<PublicFormPayload>;
+
+    if (options?.requestIp && parsedCachedForm.id) {
+      await recordUniqueFormView(parsedCachedForm.id, options.requestIp);
+    }
+
     const hasSubmitted = options?.requestIp
       ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, options.requestIp)))
       : false;
@@ -478,6 +512,8 @@ export async function getPublicFormService(
   if (form.state !== FormState.PUBLISHED && !(await isFormOwner(form.userId.toString()))) {
     throw new AppError("Form not found or not published", 404);
   }
+
+  await recordUniqueFormView(form._id.toString(), options?.requestIp);
 
   const formData = {
     id: form._id.toString(),
@@ -597,7 +633,7 @@ export async function submitFormService(
     meta,
   });
 
-  const formView = await FormView.create({
+  const formViewPayload = {
     formId: form._id,
     ip: normalizedIp,
     name: typeof data.name === "string" ? data.name.trim() : undefined,
@@ -610,9 +646,19 @@ export async function submitFormService(
     browser: meta.browser || undefined,
     os: meta.os || undefined,
     userAgent: meta.userAgent || undefined,
-    data,
-    submissionId: submission._id,
-  });
+  };
+
+  const existingView = normalizedIp
+    ? await FormView.findOne({ formId: form._id, ip: normalizedIp }).lean()
+    : null;
+
+  const formView = existingView
+    ? await FormView.findByIdAndUpdate(
+        existingView._id,
+        { $set: { ...formViewPayload, updatedAt: new Date() } },
+        { new: true },
+      )
+    : await FormView.create(formViewPayload);
 
   if (ipSubmissionKey) {
     await SetDataToRedisWithTTL(
@@ -620,7 +666,7 @@ export async function submitFormService(
       JSON.stringify({
         formId: form._id.toString(),
         submittedAt: new Date().toISOString(),
-        viewId: formView._id.toString(),
+        viewId: formView?._id?.toString?.() ?? existingView?._id?.toString?.() ?? "",
       }),
       FORM_SUBMISSION_IP_TTL_SECONDS,
     );
@@ -687,6 +733,40 @@ export async function getFormSubmissionsService(formIdOrSlug: string) {
     meta: submission.meta,
     createdAt: submission.createdAt,
   }));
+}
+
+export async function getFormAnalyticsService(formIdOrSlug: string) {
+  const userId = await getUserIdFromToken();
+  await connectDB();
+
+  const form = await findOwnedForm(formIdOrSlug, userId.toString());
+
+  const [totalViews, totalSubmissions, lastSubmission, todaySubmissions, weekSubmissions] =
+    await Promise.all([
+      FormView.countDocuments({ formId: form._id }),
+      Submission.countDocuments({ formId: form._id }),
+      Submission.findOne({ formId: form._id }).sort({ createdAt: -1 }).select("createdAt").lean(),
+      Submission.countDocuments({
+        formId: form._id,
+        createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) },
+      }),
+      Submission.countDocuments({
+        formId: form._id,
+        createdAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 6)).setHours(0, 0, 0, 0) },
+      }),
+    ]);
+
+  const conversionRate = totalViews > 0 ? Math.round((totalSubmissions / totalViews) * 100) : 0;
+
+  return {
+    totalViews,
+    totalSubmissions,
+    conversionRate,
+    avgTime: "—",
+    lastSubmission: lastSubmission?.createdAt ? new Date(lastSubmission.createdAt).toLocaleString() : "No submissions yet",
+    todaySubmissions,
+    weekSubmissions,
+  };
 }
 
 export async function getSubmissionService(submissionId: string) {

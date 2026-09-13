@@ -7,7 +7,13 @@ import { getPublicFormService, submitFormService } from "@/core/services/form/fo
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
-    const data = await getPublicFormService(slug);
+    const requestIp =
+      request.headers.get("x-vercel-forwarded-for") ??
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      request.headers.get("x-real-ip") ??
+      undefined;
+
+    const data = await getPublicFormService(slug, { requestIp });
     return NextResponse.json(
       {
         success: true,

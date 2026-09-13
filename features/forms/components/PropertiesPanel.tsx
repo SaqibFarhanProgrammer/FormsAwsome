@@ -53,6 +53,7 @@ import {
   selectFormDescription,
   selectFormSettings,
   selectFormFields,
+  selectFormPublished,
 } from "@/redux/features/form-builder/form.selectors";
 import { useCallback, useState } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -225,6 +226,34 @@ const TEMPLATE_OPTIONS: Array<{
  * - Only subscribes to selectedField, not the entire form state
  * - When a field's label changes, other unrelated components won't re-render
  */
+function getGeneratedPlaceholder(field: NonNullable<ReturnType<typeof selectSelectedField>>) {
+  if (!field) return "";
+
+  if (field.placeholder && field.placeholder.trim()) {
+    return field.placeholder;
+  }
+
+  const label = field.label?.trim() || "value";
+
+  switch (field.type) {
+    case "email":
+      return "you@example.com";
+    case "number":
+      return "Enter a number";
+    case "long_text":
+      return "Tell us more...";
+    case "dropdown":
+      return "Select an option";
+    case "url":
+    case "URL":
+      return "https://example.com";
+    case "date":
+      return "Select a date";
+    default:
+      return `Enter ${label.toLowerCase()}...`;
+  }
+}
+
 export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
   const dispatch = useDispatch();
 
@@ -235,6 +264,7 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
   const formDescription = useSelector(selectFormDescription);
   const settings = useSelector(selectFormSettings);
   const fields = useSelector(selectFormFields);
+  const isPublished = useSelector(selectFormPublished);
   const formSlug = useSelector((state: import("@/redux/store").RootState) => state.form.formSlug);
 
   // Memoize the update callback to avoid unnecessary re-renders of dependents
@@ -273,6 +303,7 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
           description={formDescription}
           settings={settings}
           slug={formSlug}
+          isPublished={isPublished}
           onUpdateMeta={(updates) => dispatch(updateFormMeta(updates))}
           onUpdateSettings={(updates) => dispatch(updateFormSettings(updates))}
         />
@@ -328,7 +359,7 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
                 </Label>
                 <Input
                   id="placeholder"
-                  value={selectedField.placeholder || ""}
+                  value={selectedField.placeholder ?? getGeneratedPlaceholder(selectedField)}
                   onChange={(e) =>
                     handleUpdateField(selectedField.id, { placeholder: e.target.value })
                   }
@@ -494,7 +525,7 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
           </div>
         </div>
 
-        {formSlug && <FormShareCard slug={formSlug} />}
+        {formSlug && isPublished && <FormShareCard slug={formSlug} />}
 
         <div className="space-y-2 pt-2">
           <Button
@@ -649,6 +680,7 @@ function FormSettingsPanel({
   description,
   settings,
   slug,
+  isPublished,
   onUpdateMeta,
   onUpdateSettings,
 }: {
@@ -656,6 +688,7 @@ function FormSettingsPanel({
   description: string;
   settings: FormSettings;
   slug: string | null;
+  isPublished: boolean;
   onUpdateMeta: (updates: { title?: string; description?: string }) => void;
   onUpdateSettings: (updates: Partial<FormSettings>) => void;
 }) {
@@ -714,7 +747,7 @@ function FormSettingsPanel({
         placeholder="you@example.com"
         onChange={(value) => onUpdateSettings({ notifyEmail: value })}
       />
-      {slug && <FormShareCard slug={slug} />}
+      {slug && isPublished && <FormShareCard slug={slug} />}
     </div>
   );
 }

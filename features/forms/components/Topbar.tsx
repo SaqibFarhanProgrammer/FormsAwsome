@@ -39,6 +39,7 @@ import { createForm } from "@/redux/features/create-form/form-create.slice";
 import {
   FormTemplateType,
   setFormSlug,
+  setFormPublished,
   setFormTemplateType,
 } from "@/redux/features/form-builder/form.slice";
 import { AppDispatch } from "@/redux/store";
@@ -337,6 +338,7 @@ export function TopBar() {
       const publishedState = response.data.state || "PUBLISHED";
       setShareUrl(publishedUrl);
       setIsPublished(publishedState === "PUBLISHED");
+      dispatch(setFormPublished(publishedState === "PUBLISHED"));
       dispatch(showAlert({ message: "Form published successfully", type: "success" }));
     } catch (error) {
       dispatch(showAlert({ message: getErrorMessage(error), type: "danger" }));

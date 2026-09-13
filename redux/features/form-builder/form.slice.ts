@@ -64,6 +64,7 @@ interface FormState {
   formTitle: string;
   formDescription: string;
   formSlug: string | null;
+  isPublished: boolean;
   settings: FormSettings;
   isDirty: boolean;
 }
@@ -74,6 +75,7 @@ const initialState: FormState = {
   formTitle: "Untitled Form",
   formDescription: "",
   formSlug: null,
+  isPublished: false,
   settings: {
     submitButtonText: "Submit",
     successMessage: "Thank you for your submission!",
@@ -172,6 +174,10 @@ const formSlice = createSlice({
     setFormSlug: (state, action: PayloadAction<string | null>) => {
       state.formSlug = action.payload;
     },
+    setFormPublished: (state, action: PayloadAction<boolean>) => {
+      state.isPublished = action.payload;
+      state.isDirty = true;
+    },
     updateFormSettings: (state, action: PayloadAction<Partial<FormSettings>>) => {
       Object.assign(state.settings, action.payload);
       state.isDirty = true;
@@ -201,6 +207,7 @@ export const {
   setFormTemplateType,
   updateFormMeta,
   setFormSlug,
+  setFormPublished,
   updateFormSettings,
   clearForm,
   markSaved,
