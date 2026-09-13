@@ -58,7 +58,7 @@ type PublicFormPayload = {
   hasSubmitted: boolean;
 };
 
-const FORM_CACHE_TTL_SECONDS = 60 * 60;
+const FORM_CACHE_TTL_SECONDS = 60 * 60 * 2;
 const FORM_SUBMISSION_IP_TTL_SECONDS = 60 * 60 * 6;
 
 function getPublicFormCacheKey(slug: string) {
@@ -202,20 +202,20 @@ export async function getAllFormsService() {
   }
 
   const userId = payload.userId;
-  // const cacheKey = `forms:user:${userId}`;
+  const cacheKey = `forms:user:${userId}`;
 
-  // const cachedForms = await GetDataFromRedis(cacheKey);
-  // if (cachedForms) {
-  //   return JSON.parse(cachedForms);
-  // }
+  const cachedForms = await GetDataFromRedis(cacheKey);
+  if (cachedForms) {
+    return JSON.parse(cachedForms);
+  }
 
   await connectDB();
   const forms = await Form.find({ userId }).select("-fields -settings").sort({ createdAt: -1 });
 
-  // if (!forms || forms.length === 0) {
-  //   await SetDataToRedisWithTTL(cacheKey, JSON.stringify([]), FORM_CACHE_TTL_SECONDS);
-  //   return [];
-  // }
+  if (!forms || forms.length === 0) {
+    await SetDataToRedisWithTTL(cacheKey, JSON.stringify([]), FORM_CACHE_TTL_SECONDS);
+    return [];
+  }
 
   const formsData = forms.map((form) => ({
     id: form._id.toString(),
@@ -228,7 +228,7 @@ export async function getAllFormsService() {
     updatedAt: form.updatedAt.toString(),
   }));
 
-  // await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formsData), FORM_CACHE_TTL_SECONDS);
+  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formsData), FORM_CACHE_TTL_SECONDS);
 
   return formsData;
 }
@@ -487,6 +487,11 @@ export async function getPublicFormService(
 
   if (cachedForm) {
     const parsedCachedForm = JSON.parse(cachedForm) as Partial<PublicFormPayload>;
+
+    if (parsedCachedForm.state === FormState.ARCHIVED) {
+      throw new AppError("Form not found or not published", 404);
+    }
+
 
     if (options?.requestIp && parsedCachedForm.id) {
       await recordUniqueFormView(parsedCachedForm.id, options.requestIp);
