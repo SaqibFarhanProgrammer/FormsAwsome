@@ -1,5 +1,6 @@
 import { connectDB } from "@/core/db/connectDb";
 import { Form } from "@/features/form-builder/models/form-builder.model";
+import { getApiAuthContext } from "@/lib/auth/api-auth";
 import { AppError } from "@/lib/auth/appError";
 import { FormFieldType, FormSettings } from "@/redux/features/form-builder/form.slice";
 import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
@@ -7,40 +8,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(request: NextRequest) {
   try {
-    // incomming data
-
-    // id
-    // :
-    // "FDlzZ7LQIAK4Vr7yZiH-e"
-    // label
-    // :
-    // "Radio"
-    // options
-    // :
-    // Array(1)
-    // 0
-    // :
-    // "intermediate"
-    // length
-    // :
-    // 1
-    // [[Prototype]]
-    // :
-    // Array(0)
-    // order
-    // :
-    // 3
-    // placeholder
-    // :
-    // "Enter radio..."
-    // required
-    // :
-    // false
-    // type
-    // :
-    // "radio"
-
     const body = await request.json();
+
     const {
       fields,
       title,
@@ -54,6 +23,8 @@ export async function PATCH(request: NextRequest) {
       slug?: string;
       settings?: FormSettings;
     } = body;
+
+    const data = await getApiAuthContext(request);
 
     if (!fields) {
       throw new AppError("Form ID is required", 400);
@@ -69,7 +40,8 @@ export async function PATCH(request: NextRequest) {
     await connectDB();
 
     await Form.updateOne(
-      { slug: slug },
+      { slug: slug, userId: data?.userId },
+
       {
         title: title,
         description: description,
