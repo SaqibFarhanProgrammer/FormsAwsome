@@ -21,10 +21,5 @@ const themeScript = `
 `;
 
 export function ThemeInitializer() {
-  return (
-    <script
-      dangerouslySetInnerHTML={{ __html: themeScript }}
-      suppressHydrationWarning
-    />
-  );
+  return <script dangerouslySetInnerHTML={{ __html: themeScript }} suppressHydrationWarning />;
 }

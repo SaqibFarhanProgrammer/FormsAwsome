@@ -752,7 +752,9 @@ export async function getFormAnalyticsService(formIdOrSlug: string) {
       }),
       Submission.countDocuments({
         formId: form._id,
-        createdAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 6)).setHours(0, 0, 0, 0) },
+        createdAt: {
+          $gte: new Date(new Date().setDate(new Date().getDate() - 6)).setHours(0, 0, 0, 0),
+        },
       }),
     ]);
 
@@ -763,7 +765,9 @@ export async function getFormAnalyticsService(formIdOrSlug: string) {
     totalSubmissions,
     conversionRate,
     avgTime: "—",
-    lastSubmission: lastSubmission?.createdAt ? new Date(lastSubmission.createdAt).toLocaleString() : "No submissions yet",
+    lastSubmission: lastSubmission?.createdAt
+      ? new Date(lastSubmission.createdAt).toLocaleString()
+      : "No submissions yet",
     todaySubmissions,
     weekSubmissions,
   };
