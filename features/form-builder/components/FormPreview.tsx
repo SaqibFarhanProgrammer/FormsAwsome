@@ -24,17 +24,26 @@ import {
 const iconMap: Record<string, React.ElementType> = {
   heading: Heading1,
   text: Type,
+  short_text: Type,
   textarea: AlignLeft,
+  long_text: AlignLeft,
   select: ListFilter,
+  dropdown: ListFilter,
   checkbox: CheckSquare,
+  multiple_choice: CheckSquare,
   radio: CircleDot,
   email: Mail,
   phone: Phone,
   number: Hash,
   date: Calendar,
   url: Link,
+  URL: Link,
   file: Upload,
+  file_upload_image: Upload,
+  file_upload_pdf: Upload,
+  image: Upload,
   rating: Star,
+  slider: Star,
   toggle: ToggleLeft,
   divider: SeparatorHorizontal,
 };
@@ -73,9 +82,23 @@ export function FormPreview({ fields }: FormPreviewProps) {
 
 function PreviewField({ field }: { field: any }) {
   const isRequired = field.validation?.required;
-  const Icon = iconMap[field.type] || Type;
+  const normalizedType =
+    field.type === "short_text"
+      ? "text"
+      : field.type === "long_text"
+        ? "textarea"
+        : field.type === "dropdown"
+          ? "select"
+          : field.type === "multiple_choice"
+            ? "checkbox"
+            : field.type === "URL" || field.type === "url"
+              ? "url"
+              : field.type === "file_upload_image" || field.type === "file_upload_pdf"
+                ? "file"
+                : field.type;
+  const Icon = iconMap[normalizedType] || iconMap[field.type] || Type;
 
-  switch (field.type) {
+  switch (normalizedType) {
     case "heading":
       return (
         <div className="pt-2">
