@@ -4,6 +4,19 @@ import { ConnectionToRedis } from "@/lib/redis/redis";
 export const AUTH_RATE_LIMIT = 5;
 export const AUTH_RATE_LIMIT_WINDOW_SECONDS = 30 * 60;
 
+export type RateLimitOptions = {
+  name: string;
+  identifier: string;
+  limit: number;
+  windowSeconds: number;
+};
+
+export type RateLimitResult = {
+  allowed: boolean;
+  remaining: number;
+  retryAfter: number;
+};
+
 export function getClientIp(request: Request): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
 
@@ -14,13 +27,15 @@ export function getClientIp(request: Request): string {
   return request.headers.get("x-real-ip") ?? "unknown";
 }
 
-export async function consumeRateLimit(
-  key: string,
-  limit: number,
-  windowSeconds: number,
-): Promise<{ allowed: boolean; remaining: number; retryAfter: number }> {
+export async function rateLimit({
+  name,
+  identifier,
+  limit,
+  windowSeconds,
+}: RateLimitOptions): Promise<RateLimitResult> {
   try {
     const redis = await ConnectionToRedis();
+    const key = `rate-limit:${name}:${identifier}`;
     const results = await redis.multi().incr(key).expire(key, windowSeconds, "NX").exec();
     const count = Number(results?.[0]);
     const ttl = await redis.ttl(key);

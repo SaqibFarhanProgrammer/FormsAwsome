@@ -5,26 +5,27 @@ import { RegisterUserService } from "@/core/services/auth/register.service";
 import {
   AUTH_RATE_LIMIT,
   AUTH_RATE_LIMIT_WINDOW_SECONDS,
-  consumeRateLimit,
   getClientIp,
+  rateLimit,
 } from "@/lib/auth/rateLimit";
 import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
 
 export async function POST(request: NextRequest) {
   try {
-    const rateLimit = await consumeRateLimit(
-      `auth:register:${getClientIp(request)}`,
-      AUTH_RATE_LIMIT,
-      AUTH_RATE_LIMIT_WINDOW_SECONDS,
-    );
+    const registerRateLimit = await rateLimit({
+      name: "register",
+      identifier: `ip:${getClientIp(request)}`,
+      limit: AUTH_RATE_LIMIT,
+      windowSeconds: AUTH_RATE_LIMIT_WINDOW_SECONDS,
+    });
 
-    if (!rateLimit.allowed) {
+    if (!registerRateLimit.allowed) {
       return NextResponse.json(
         { message: "Too many signup attempts. Please try again later." },
         {
           status: 429,
           headers: {
-            "Retry-After": String(rateLimit.retryAfter),
+            "Retry-After": String(registerRateLimit.retryAfter),
           },
         },
       );
