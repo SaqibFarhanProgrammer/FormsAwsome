@@ -8,9 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { Textarea } from "@/components/ui/Textarea";
 import { Camera, Mail, User, Check } from "lucide-react";
-
-type ThemeOption = "system" | "light" | "dark";
-const THEME_STORAGE_KEY = "formsawesome-theme";
+import { THEME_STORAGE_KEY, type ThemeOption } from "@/components/common/ThemeInitializer";
 
 function getStoredTheme(): ThemeOption {
   if (typeof window === "undefined") {
@@ -28,11 +26,7 @@ function getStoredTheme(): ThemeOption {
 
 export function GeneralSettings() {
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState<ThemeOption>("system");
-
-  useEffect(() => {
-    setSelectedTheme(getStoredTheme());
-  }, []);
+  const [selectedTheme, setSelectedTheme] = useState<ThemeOption>(getStoredTheme);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -47,6 +41,11 @@ export function GeneralSettings() {
     };
 
     applyTheme();
+    void fetch("/api/theme", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ theme: selectedTheme }),
+    });
 
     const handleSystemThemeChange = () => applyTheme();
 
