@@ -33,6 +33,7 @@ type PublicFormPayload = {
   title: string;
   description?: string;
   slug: string;
+  state: string | FormState;
   fields: Array<{
     id: string;
     type: string;
@@ -488,10 +489,12 @@ export async function getPublicFormService(
   if (cachedForm) {
     const parsedCachedForm = JSON.parse(cachedForm) as Partial<PublicFormPayload>;
 
-    if (parsedCachedForm.state === FormState.ARCHIVED) {
+    if (
+      parsedCachedForm.state === FormState.ARCHIVED ||
+      parsedCachedForm.state === FormState.DRAFT
+    ) {
       throw new AppError("Form not found or not published", 404);
     }
-
 
     if (options?.requestIp && parsedCachedForm.id) {
       await recordUniqueFormView(parsedCachedForm.id, options.requestIp);
@@ -525,6 +528,7 @@ export async function getPublicFormService(
     title: form.title,
     description: form.description,
     slug: form.slug,
+    state: form.state,
     fields: form.fields.map((field: FormField) => ({
       id: field.id,
       type: field.type,
@@ -657,13 +661,7 @@ export async function submitFormService(
     ? await FormView.findOne({ formId: form._id, ip: normalizedIp }).lean()
     : null;
 
-  const formView = existingView
-    ? await FormView.findByIdAndUpdate(
-        existingView._id,
-        { $set: { ...formViewPayload, updatedAt: new Date() } },
-        { new: true },
-      )
-    : await FormView.create(formViewPayload);
+  await FormView.create(formViewPayload);
 
   if (ipSubmissionKey) {
     await SetDataToRedisWithTTL(
@@ -671,7 +669,7 @@ export async function submitFormService(
       JSON.stringify({
         formId: form._id.toString(),
         submittedAt: new Date().toISOString(),
-        viewId: formView?._id?.toString?.() ?? existingView?._id?.toString?.() ?? "",
+        viewId: form?._id?.toString?.() ?? existingView?._id?.toString?.() ?? "",
       }),
       FORM_SUBMISSION_IP_TTL_SECONDS,
     );
@@ -702,7 +700,7 @@ export async function getUserSubmissionsService() {
     .sort({ createdAt: -1 })
     .lean();
 
-  return submissions.map((submission) => {
+  const dataa = submissions.map((submission) => {
     const form = formMap.get(submission.formId.toString());
     const details = Object.entries(submission.data).map(([fieldId, value]) => ({
       label: form?.fields.find((field: FormField) => field.id === fieldId)?.label || fieldId,
@@ -710,7 +708,6 @@ export async function getUserSubmissionsService() {
     }));
     const name = details.find((detail) => detail.label.toLowerCase() === "name")?.value || "-";
     const email = details.find((detail) => detail.label.toLowerCase() === "email")?.value || "-";
-
     return {
       id: submission._id.toString(),
       form: form?.title || "Deleted form",
@@ -721,6 +718,8 @@ export async function getUserSubmissionsService() {
       details,
     };
   });
+
+  return dataa;
 }
 
 export async function getFormSubmissionsService(formIdOrSlug: string) {

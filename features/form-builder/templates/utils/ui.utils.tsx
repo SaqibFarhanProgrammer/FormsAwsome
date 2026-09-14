@@ -167,18 +167,61 @@ export function Frame({
 
 export const TAG_COLORS = ["#10b981", "#f59e0b", "#f97316", "#ef4444", "#8b5cf6"];
 
-export function emojiFor(label: string, i: number) {
-  const l = label.toLowerCase();
+export function normalizeSentimentText(label: string) {
+  return label.trim().toLowerCase();
+}
+
+export function getSentimentEmoji(label: string, index: number) {
+  const l = normalizeSentimentText(label);
+
   if (
     l.includes("great") ||
     l.includes("excellent") ||
+    l.includes("absolutely") ||
     l.includes("definitely") ||
-    l.includes("yes")
+    l.includes("yes") ||
+    l.includes("very positive") ||
+    l.includes("super")
   )
     return "😄";
-  if (l.includes("good") || l.includes("maybe") || l.includes("likely")) return "🙂";
-  if (l.includes("okay") || l.includes("fine") || l.includes("average")) return "😐";
-  if (l.includes("struggl") || l.includes("bad") || l.includes("unlikely")) return "😕";
-  if (l.includes("no")) return "😞";
-  return ["😄", "🙂", "😐", "😕", "😞"][i % 5];
+
+  if (
+    l.includes("good") ||
+    l.includes("positive") ||
+    l.includes("likely") ||
+    l.includes("okay") ||
+    l.includes("fine") ||
+    l.includes("average") ||
+    l.includes("moderate") ||
+    l.includes("neutral")
+  )
+    return "🙂";
+
+  if (
+    l.includes("okay") ||
+    l.includes("fair") ||
+    l.includes("so-so") ||
+    l.includes("steady") ||
+    l.includes("mixed") ||
+    l.includes("normal")
+  )
+    return "😐";
+
+  if (
+    l.includes("struggl") ||
+    l.includes("challenging") ||
+    l.includes("bad") ||
+    l.includes("unlikely") ||
+    l.includes("tough") ||
+    l.includes("busy")
+  )
+    return "😕";
+
+  if (l.includes("no") || l.includes("not")) return "😞";
+
+  return ["😄", "🙂", "😐", "😕", "😞"][index % 5];
+}
+
+export function emojiFor(label: string, i: number) {
+  return getSentimentEmoji(label, i);
 }

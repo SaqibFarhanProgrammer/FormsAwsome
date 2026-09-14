@@ -161,9 +161,11 @@
         "type": "radio",
         "label": "How are you feeling today?",
         "options": [
-          { "label": "Great", "value": "great" },
-          { "label": "Good", "value": "good" },
-          { "label": "Okay", "value": "okay" }
+          { "label": "Very positive", "value": "very-positive" },
+          { "label": "Positive", "value": "positive" },
+          { "label": "Okay", "value": "okay" },
+          { "label": "Tough", "value": "tough" },
+          { "label": "Very challenging", "value": "very-challenging" }
         ],
         "validation": { "required": true }
       },
