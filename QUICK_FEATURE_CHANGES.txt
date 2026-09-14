@@ -1,148 +1,39 @@
-# Task Brief: Profile Feature (Image Upload + Edit + Settings)
+1. getFormSubmissionsService
+   - Ye function service layer mein hai aur form ke submissions fetch karne ke liye use hota hai.
+   - Isme check add karna hai: authenticated user ka access, form ownership, and valid formIdOrSlug.
+   - Agar user kisi dusre user ke form ki submissions dekhna chahe, to 403 ya 404 return karna chahiye.
+   - Time: 5 minutes
 
-## Project
-**Name:** forms-awesome (FormBuilder) — a drag-and-drop form builder app.
+2. getFormAnalyticsService
+   - Ye function analytics ke liye use hota hai and isme bhi authorization + ownership check required hai.
+   - Validate karna hai ki current user sirf apne form ka analytics dekh sakta hai.
+   - Invalid date filters / malformed params ko handle karna chahiye.
+   - Time: 5 minutes
 
-**Stack:**
-- Next.js 16.3.3 (App Router)
-- React 19.2.8 / React DOM 19.2.8
-- MongoDB via Mongoose 9.9.3
-- Auth: custom, via `jsonwebtoken` + `bcryptjs` (no NextAuth)
-- Forms: `react-hook-form` + `@hookform/resolvers` + `zod`
-- UI: `@base-ui/react`, `shadcn`, Tailwind CSS v4, `tw-animate-css`, `lucide-react` (icons)
-- Drag/drop builder: `@dnd-kit/core`, `@dnd-kit/react`, `@dnd-kit/sortable`
-- Charts: `recharts`
-- State: `@reduxjs/toolkit` + `react-redux`
-- Other installed but not yet used for this task: `bullmq`, `redis`, `geoip-lite`, `ua-parser-js`, `qrcode`/`qrcode.react`, `jspdf`, `nodemailer`, `date-fns`/`dayjs`
+3. getSubmissionService
+   - Ye function single submission detail ke liye use hota hai.
+   - Isme bhi ownership verification add karni hai.
+   - Response ko label-based detail mapping ke sath return karna chahiye, raw internal field data na dikhana chahiye.
+   - Time: 10 minutes
 
-Full `package.json` is at the end of this file for reference.
+4. Zod validation for auth + form flows
+   - Registration, form creation, form update, and public submissions me schema validation missing hai.
+   - Zod use karke shared schema files create karni chahiye, ideally under features/*/schemas or core/schemas.
+   - Form fields validation: required checks, type checks, option validation, max length, proper slug rules.
+   - Ye structure clean and reusable hona chahiye.
 
-## Current App State (already working)
-- Dashboard (`/dashboard`) — stats cards, recent activity, quick actions.
-- Form builder (`/create?slug=...`) — drag-and-drop elements (Short Text, Long Text, Email, Number, Date, URL, Dropdown, Checkbox, Radio, File Upload, Rating, Toggle, Divider), field properties panel, form settings (UI type, submit button text, success message, redirect URL, notification email), Publish/Save/Duplicate/Delete.
-- Public form render page (`/f/[slug]`) — renders published form for respondents to fill and submit.
-- Submissions page (`/submissions`) — table of all submissions with filters (form, status, time) and export.
-- Profile page (`/profile`) — currently mostly static/placeholder: shows name, handle, bio, email, join date, Edit Profile button, Settings button. **No working image upload, no working edit flow yet.**
+5. Replace raw Error.message usage with AppError
+   - Jahan bhi Error.message direct use ho raha hai, wahan AppError class se proper custom messages and status codes use karne chahiye.
+   - This keeps API responses consistent and avoids leaking internal details.
+   - Critical files to review: utils/catchErrorFunction.ts, core/services/*, app/api/*, and any frontend helper that surfaces raw error messages.
 
-## Known bugs to be aware of (not the primary task, but fix opportunistically if touched)
-1. **Submissions not saving/showing**: after submitting a public form, `/submissions` shows "Showing 0 of 0 submissions" — likely the submit handler isn't persisting to the submissions collection, or the submissions query isn't matching correctly.
-2. **Number field validation bug**: on the public form, entering a negative number (e.g. `-135`) in a Number-type field and submitting causes the field to clear itself and show "Please enter a number" — likely the validation/parsing logic resets the field value instead of just flagging it invalid.
+6. Extra security and consistency checks
+   - Public form access should reject unpublished or archived forms.
+   - Cache and Redis access should not leak private form data into public keys.
+   - Legacy routes like /api/forms/update and duplicate routes should be migrated or removed after auth checks.
 
-## PRIMARY TASK: Build the Profile feature
-
-### 1. Image storage
-No image upload library is currently installed. Pick one and wire it up (Cloudinary or UploadThing are the simplest with Next.js App Router; Vercel Blob if deploying on Vercel). Add the chosen SDK + env vars for API keys.
-
-### 2. User schema (Mongoose)
-Extend the `User` model with:
-- `avatarUrl: string`
-- `bio: string`
-- `settings: { notifications: boolean, privacy: ..., ... }` (define fields as needed by the Settings UI)
-
-### 3. API route — profile update
-Create/extend `app/api/profile/route.ts` (or wherever the API layer lives) with a `PATCH` handler that:
-- Verifies the requester via JWT (reuse existing auth/session logic — check for existing middleware/lib first).
-- Accepts `multipart/form-data` (image file + text fields: name, bio, etc.).
-- Uploads the image via the chosen provider, gets back a URL.
-- Updates the Mongoose `User` document.
-- Returns the updated profile.
-
-### 4. Frontend — Edit Profile form
-Build using `react-hook-form` + `zod` resolver (already installed):
-- Image upload input with live preview before submit.
-- Fields: name, bio, email (and any other profile fields already shown on `/profile`).
-- Loading state on submit, success/error feedback.
-- Wire the existing "Edit Profile" button on `/profile` to open this form (modal or dedicated route — match whatever pattern the rest of the app uses).
-
-### 5. Settings section
-Keep separate from the Edit Profile form. Either its own API endpoint or a `settings` sub-object handled by the same profile route. Wire the existing "Settings" button on `/profile`.
-
-### 6. Auth guard
-Ensure only the logged-in user can edit their own profile — verify JWT/session on the API route, not just in the UI.
-
-## FUTURE (explicitly out of scope for this task — do not build yet)
-- Per-form view analytics.
-- Redis-based resubmission limiting: after a submission, the same user/IP should not be able to submit the same form again for 12 hours (use `redis`, already installed, keyed by form ID + IP).
-- Richer submission metadata: capture region/geo-location and IP per submission (`geoip-lite` and `ua-parser-js` are already installed for this).
-
----
-
-## package.json (for reference)
-
-```json
-{
-  "name": "forms-awesome",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier . --write",
-    "format:check": "prettier . --check",
-    "check": "pnpm lint && pnpm format:check"
-  },
-  "dependencies": {
-    "@base-ui/react": "^1.7.0",
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/react": "^0.5.0",
-    "@dnd-kit/sortable": "^10.0.0",
-    "@dnd-kit/utilities": "^3.2.2",
-    "@hookform/resolvers": "^5.9.1",
-    "@reduxjs/toolkit": "^2.12.0",
-    "@tabler/icons-react": "^3.46.0",
-    "axios": "^1.19.0",
-    "bcryptjs": "^3.0.3",
-    "bullmq": "^6.1.2",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "cn": "^0.2.4",
-    "date-fns": "^4.4.0",
-    "dayjs": "^1.11.23",
-    "framer-motion": "^13.1.0",
-    "geoip-lite": "^2.0.3",
-    "jsonwebtoken": "^9.0.3",
-    "jspdf": "^4.2.1",
-    "lucide-react": "^1.32.0",
-    "mongoose": "^9.9.3",
-    "nanoid": "^5.0.7",
-    "next": "16.3.3",
-    "nodemailer": "^9.0.5",
-    "qrcode": "^1.5.4",
-    "qrcode.react": "^4.2.0",
-    "react": "19.2.8",
-    "react-day-picker": "^10.0.1",
-    "react-dom": "19.2.8",
-    "react-hook-form": "^7.85.0",
-    "react-redux": "^9.3.0",
-    "recharts": "^3.8.0",
-    "redis": "^5.12.1",
-    "shadcn": "^4.18.0",
-    "tailwind-merge": "^3.6.0",
-    "tw-animate-css": "^1.4.0",
-    "ua-parser-js": "^2.0.10",
-    "zod": "^4.4.3"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/geoip-lite": "^1.4.4",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^20.19.43",
-    "@types/nodemailer": "^8.0.1",
-    "@types/qrcode": "^1.5.6",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
-    "eslint": "^9",
-    "eslint-config-next": "16.3.3",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.6",
-    "eslint-plugin-unused-imports": "^4.4.1",
-    "prettier": "^3.9.6",
-    "tailwindcss": "^4",
-    "typescript": "^5.8.3"
-  },
-  "packageManager": "pnpm@11.5.0"
-}
-```
+7. Recommended priority order
+   - Step 1: Fix authorization inside getFormSubmissionsService, getFormAnalyticsService, and getSubmissionService.
+   - Step 2: Add shared Zod schemas and enforce validation.
+   - Step 3: Replace raw Error.message with AppError everywhere.
+   - Step 4: Review cache/public form exposure and route security.

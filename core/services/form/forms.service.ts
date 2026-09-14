@@ -12,6 +12,12 @@ import { Form } from "@/features/form-builder/models/form-builder.model";
 import type { FormField } from "@/features/form-builder/models/form-builder.model";
 import { Types } from "mongoose";
 import { nanoid } from "@reduxjs/toolkit";
+import { createFormSchema, updateFormSchema } from "@/core/schemas/form.schema";
+import {
+  analyticsQuerySchema,
+  formIdentifierSchema,
+  submissionDataSchema,
+} from "@/core/schemas/submission.schema";
 
 type IncomingField = {
   id: string;
@@ -68,10 +74,6 @@ function getPublicFormCacheKey(slug: string) {
 
 function getFormSubmissionKey(slug: string, ip: string) {
   return `public:form:${slug}:submitted:${ip}`;
-}
-
-function getFormViewKey(formId: string, ip: string) {
-  return `form:view:${formId}:${ip}`;
 }
 
 async function recordUniqueFormView(formId: string, requestIp?: string) {
@@ -131,11 +133,11 @@ function normalizeFields(fields: IncomingField[]) {
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
-  const { title, description, slug, fields, settings } = body;
-
-  if (!title || !slug || !fields) {
-    throw new AppError("Title, slug and fields are required", 400);
+  const parsedBody = createFormSchema.safeParse(body);
+  if (!parsedBody.success) {
+    throw new AppError("Invalid form details", 400);
   }
+  const { title, description, slug, fields, settings } = parsedBody.data;
 
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
@@ -318,15 +320,21 @@ export async function getSingleFormService(formIdOrSlug: string) {
 }
 
 export async function updateFormService(request: NextRequest, formIdOrSlug: string) {
-  if (!formIdOrSlug) {
+  if (!formIdentifierSchema.safeParse(formIdOrSlug).success) {
     throw new AppError("Form ID or slug is required", 400);
   }
 
   const body = await request.json();
-  const { title, description, fields, settings, state } = body;
+  const parsedBody = updateFormSchema.safeParse(body);
+  if (!parsedBody.success) {
+    throw new AppError("Invalid form update details", 400);
+  }
+  const { title, description, fields, settings, state } = parsedBody.data;
 
   const userid = await getUserIdFromToken();
-  const newSlug = title.toLowerCase().replace(/ /g, "-") + "-" + userid + nanoid(); // Generate a new slug based on the title and user ID
+  const newSlug = title
+    ? title.toLowerCase().replace(/ /g, "-") + "-" + userid + nanoid()
+    : undefined;
 
   await connectDB();
 
@@ -367,7 +375,9 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
     };
   }
 
-  isFormExit.slug = newSlug; // Update slug to the new generated slug
+  if (newSlug) {
+    isFormExit.slug = newSlug;
+  }
 
   if (state !== undefined) {
     isFormExit.state = state;
@@ -382,7 +392,7 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
     id: isFormExit._id,
     title: isFormExit.title,
     description: isFormExit.description,
-    slug: newSlug, // Return the new slug
+    slug: isFormExit.slug,
     version: isFormExit.version,
     fields: isFormExit.fields,
     settings: isFormExit.settings,
@@ -489,10 +499,7 @@ export async function getPublicFormService(
   if (cachedForm) {
     const parsedCachedForm = JSON.parse(cachedForm) as Partial<PublicFormPayload>;
 
-    if (
-      parsedCachedForm.state === FormState.ARCHIVED ||
-      parsedCachedForm.state === FormState.DRAFT
-    ) {
+    if (parsedCachedForm.state !== FormState.PUBLISHED) {
       throw new AppError("Form not found or not published", 404);
     }
 
@@ -583,9 +590,11 @@ export async function submitFormService(
     device?: string;
   } = {},
 ) {
-  if (!slug || !data || typeof data !== "object" || Array.isArray(data)) {
+  const parsedData = submissionDataSchema.safeParse(data);
+  if (!slug || !parsedData.success) {
     throw new AppError("A valid form submission is required", 400);
   }
+  data = parsedData.data;
 
   const normalizedIp = meta.ip?.trim();
   const ipSubmissionKey = normalizedIp ? getFormSubmissionKey(slug, normalizedIp) : null;
@@ -723,6 +732,10 @@ export async function getUserSubmissionsService() {
 }
 
 export async function getFormSubmissionsService(formIdOrSlug: string) {
+  if (!formIdentifierSchema.safeParse(formIdOrSlug).success) {
+    throw new AppError("Form ID or slug is required", 400);
+  }
+
   const userId = await getUserIdFromToken();
   await connectDB();
 
@@ -739,23 +752,43 @@ export async function getFormSubmissionsService(formIdOrSlug: string) {
   }));
 }
 
-export async function getFormAnalyticsService(formIdOrSlug: string) {
+export async function getFormAnalyticsService(
+  formIdOrSlug: string,
+  filters: { startDate?: string; endDate?: string } = {},
+) {
+  if (!formIdentifierSchema.safeParse(formIdOrSlug).success) {
+    throw new AppError("Form ID or slug is required", 400);
+  }
+
+  const parsedFilters = analyticsQuerySchema.safeParse(filters);
+  if (!parsedFilters.success) {
+    throw new AppError("Invalid analytics date filters", 400);
+  }
+
   const userId = await getUserIdFromToken();
   await connectDB();
 
   const form = await findOwnedForm(formIdOrSlug, userId.toString());
+  const dateFilter =
+    parsedFilters.data.startDate || parsedFilters.data.endDate
+      ? {
+          ...(parsedFilters.data.startDate && { $gte: parsedFilters.data.startDate }),
+          ...(parsedFilters.data.endDate && { $lte: parsedFilters.data.endDate }),
+        }
+      : undefined;
+  const submissionFilter = { formId: form._id, ...(dateFilter && { createdAt: dateFilter }) };
 
   const [totalViews, totalSubmissions, lastSubmission, todaySubmissions, weekSubmissions] =
     await Promise.all([
       FormView.countDocuments({ formId: form._id }),
-      Submission.countDocuments({ formId: form._id }),
-      Submission.findOne({ formId: form._id }).sort({ createdAt: -1 }).select("createdAt").lean(),
+      Submission.countDocuments(submissionFilter),
+      Submission.findOne(submissionFilter).sort({ createdAt: -1 }).select("createdAt").lean(),
       Submission.countDocuments({
-        formId: form._id,
+        ...submissionFilter,
         createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) },
       }),
       Submission.countDocuments({
-        formId: form._id,
+        ...submissionFilter,
         createdAt: {
           $gte: new Date(new Date().setDate(new Date().getDate() - 6)).setHours(0, 0, 0, 0),
         },
@@ -778,6 +811,10 @@ export async function getFormAnalyticsService(formIdOrSlug: string) {
 }
 
 export async function getSubmissionService(submissionId: string) {
+  if (!Types.ObjectId.isValid(submissionId)) {
+    throw new AppError("Submission not found", 404);
+  }
+
   const userId = await getUserIdFromToken();
   await connectDB();
 
@@ -787,17 +824,26 @@ export async function getSubmissionService(submissionId: string) {
   }
 
   const form = await findOwnedForm(submission.formId.toString(), userId.toString());
+  const details = Object.entries(submission.data).map(([fieldId, value]) => ({
+    label: form.fields.find((field: FormField) => field.id === fieldId)?.label || fieldId,
+    value: Array.isArray(value) ? value.join(", ") : String(value ?? ""),
+  }));
+
   return {
     id: submission._id.toString(),
     formId: form._id.toString(),
     form: form.title,
-    data: submission.data,
+    details,
     meta: submission.meta,
     createdAt: submission.createdAt,
   };
 }
 
 export async function deleteSubmissionService(submissionId: string) {
+  if (!Types.ObjectId.isValid(submissionId)) {
+    throw new AppError("Submission not found", 404);
+  }
+
   const userId = await getUserIdFromToken();
   await connectDB();
 

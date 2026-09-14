@@ -25,8 +25,6 @@ export async function CatchErrorFunctionForRoute(error: Error, ErrorBane: string
   if (error instanceof AppError) {
     message = error.message;
     statusCode = error.statusCode;
-  } else if (error instanceof Error) {
-    message = error.message;
   }
 
   return NextResponse.json({ message }, { status: statusCode });

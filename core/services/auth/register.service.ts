@@ -9,18 +9,15 @@ import { generateVerificationToken } from "@/lib/auth/jwt.lib";
 import { generateVerificationCode } from "@/lib/auth/verificationCode.lib";
 import { SetDataToRedisWithTTL } from "@/lib/redis/redis";
 import SendVerificationEmail from "@/features/node-mailer/nodemailer.config";
+import { registerSchema } from "@/core/schemas/auth.schema";
 
 export async function RegisterUserService(request: NextRequest) {
   const body = await request.json();
-  const { name, email, password } = body;
-
-  if (!name || !email || !password) {
-    throw new AppError("Name, email and password are required", 400);
+  const parsedBody = registerSchema.safeParse(body);
+  if (!parsedBody.success) {
+    throw new AppError("Invalid registration details", 400);
   }
-
-  if (password.length < 6) {
-    throw new AppError("Password must be at least 6 characters", 400);
-  }
+  const { name, email, password } = parsedBody.data;
 
   await connectDB();
 
