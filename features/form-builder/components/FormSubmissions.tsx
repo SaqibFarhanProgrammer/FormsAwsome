@@ -28,7 +28,7 @@ export function FormSubmissions({ submissions }: FormSubmissionsProps) {
         <p className="text-sm text-muted-foreground">All responses to this form.</p>
       </CardHeader>
       <CardContent className="space-y-3">
-        {submissions.map((submission) => (
+        {(submissions || []).map((submission) => (
           <div
             key={submission.id}
             className={`rounded-xl border transition-all ${
@@ -37,7 +37,6 @@ export function FormSubmissions({ submissions }: FormSubmissionsProps) {
                 : "border-border bg-card hover:border-primary/30"
             }`}
           >
-            {/* Header Row */}
             <button
               onClick={() => setExpandedId(expandedId === submission.id ? null : submission.id)}
               className="w-full p-4 flex items-center justify-between text-left"
@@ -66,7 +65,6 @@ export function FormSubmissions({ submissions }: FormSubmissionsProps) {
               </div>
             </button>
 
-            {/* Expanded Values */}
             {expandedId === submission.id && (
               <div className="px-4 pb-4">
                 <div className="rounded-xl bg-muted/50 p-4 space-y-3">

@@ -22,27 +22,32 @@ export function FormStats({ stats }: FormStatsProps) {
     {
       icon: Send,
       label: "Total Submissions",
-      value: stats.totalSubmissions.toLocaleString(),
+      value: (stats.totalSubmissions || 0).toLocaleString(),
       color: THEME.primary,
     },
     {
       icon: Eye,
       label: "Total Views",
-      value: stats.totalViews.toLocaleString(),
+      value: (stats.totalViews || 0).toLocaleString(),
       color: THEME.secondary,
     },
     {
       icon: TrendingUp,
       label: "Conversion Rate",
-      value: `${stats.conversionRate}%`,
+      value: `${stats.conversionRate || 0}%`,
       color: "#10b981",
     },
-    { icon: Clock, label: "Avg. Time", value: stats.avgTime, color: "#f59e0b" },
-    { icon: CalendarDays, label: "Today", value: `+${stats.todaySubmissions}`, color: "#6366f1" },
+    { icon: Clock, label: "Avg. Time", value: stats.avgTime || "—", color: "#f59e0b" },
+    {
+      icon: CalendarDays,
+      label: "Today",
+      value: `+${stats.todaySubmissions || 0}`,
+      color: "#6366f1",
+    },
     {
       icon: CalendarDays,
       label: "This Week",
-      value: `+${stats.weekSubmissions}`,
+      value: `+${stats.weekSubmissions || 0}`,
       color: "#8b5cf6",
     },
   ];

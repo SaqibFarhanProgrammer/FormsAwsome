@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Copy, Share2, QrCode, Globe, Trash2 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { getErrorMessage } from "@/utils/getErrorMessage";
@@ -18,9 +18,14 @@ interface FormActionsProps {
 export function FormActions({ slug, onDeleted }: FormActionsProps) {
   const [showQr, setShowQr] = useState(false);
   const [message, setMessage] = useState("");
+  const [origin, setOrigin] = useState("");
   const dispatch = useDispatch();
-  const formUrl =
-    typeof window === "undefined" ? `/f/${slug}` : `${window.location.origin}/f/${slug}`;
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  const formUrl = origin ? `${origin}/f/${slug}` : `/f/${slug}`;
 
   const copyUrl = async () => {
     await navigator.clipboard.writeText(formUrl);

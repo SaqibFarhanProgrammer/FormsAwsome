@@ -14,82 +14,7 @@ import { FormPreview } from "./FormPreview";
 import { FormFieldsList } from "./FormFieldsList";
 import type { FormType } from "../models/form-builder.model";
 
-export function SingleFormView({ formData }: { formData: FormType }) {
-  const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields">("preview");
-  const [submissions, setSubmissions] = useState<SubmissionViewModel[]>([]);
-  const [analytics, setAnalytics] = useState<AnalyticsViewModel>(emptyAnalytics);
-  const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(true);
-  const router = useRouter();
-  const dispatch = useDispatch();
-
-  const stats = {
-    totalSubmissions: analytics.totalSubmissions || submissions.length,
-    totalViews: analytics.totalViews,
-    conversionRate: analytics.conversionRate,
-    avgTime: analytics.avgTime,
-    lastSubmission: analytics.lastSubmission,
-    todaySubmissions: analytics.todaySubmissions,
-    weekSubmissions: analytics.weekSubmissions,
-  };
-  return (
-    <div className="min-h-screen bg-background">
-      <FormSubmissionsData
-        slug={formData.slug}
-        fields={formData.fields}
-        onLoaded={setSubmissions}
-        onLoadingChange={setIsLoadingSubmissions}
-      />
-      <FormAnalyticsData slug={formData.slug} onLoaded={setAnalytics} />
-      {/* Top Bar */}
-      <FormTopBar title={formData.title} state={formData.state} slug={formData.slug} />
-
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left Column - 2/3 */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Tabs */}
-            <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-xl w-fit">
-              {[
-                { id: "preview" as const, label: "Preview" },
-                {
-                  id: "submissions" as const,
-                  label: `Submissions (${isLoadingSubmissions ? "..." : submissions.length})`,
-                },
-                { id: "fields" as const, label: "Fields" },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    activeTab === tab.id
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Tab Content */}
-            {activeTab === "preview" && <FormPreview fields={formData.fields} />}
-            {activeTab === "submissions" && <FormSubmissions submissions={submissions} />}
-            {activeTab === "fields" && <FormFieldsList fields={formData.fields} />}
-          </div>
-
-          {/* Right Column - 1/3 Stats & Actions */}
-          <div className="space-y-4">
-            <FormStats stats={stats} />
-            <FormActions slug={formData.slug} onDeleted={() => router.push("/all-forms")} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-type AnalyticsViewModel = {
+export type AnalyticsViewModel = {
   totalSubmissions: number;
   totalViews: number;
   conversionRate: number;
@@ -109,6 +34,133 @@ const emptyAnalytics: AnalyticsViewModel = {
   weekSubmissions: 0,
 };
 
+export type SubmissionViewModel = {
+  id: string;
+  submittedBy: string;
+  email: string;
+  date: string;
+  createdAt: string;
+  status: "new";
+  values: Record<string, string>;
+};
+
+function toSubmissionViewModel(
+  submission: {
+    id: string;
+    data: Record<string, unknown>;
+    createdAt: string;
+  },
+  fields: FormType["fields"],
+): SubmissionViewModel {
+  const fieldMap = new Map(fields.map((field) => [field.id, field]));
+  const safeData = submission.data || {};
+
+  const values = Object.fromEntries(
+    Object.entries(safeData).map(([fieldId, value]) => {
+      const field = fieldMap.get(fieldId);
+      const label = field?.label || fieldId;
+
+      return [label, Array.isArray(value) ? value.join(", ") : String(value ?? "")];
+    }),
+  );
+
+  const submittedBy =
+    values.Name ||
+    values["Full Name"] ||
+    values["Full name"] ||
+    values.full_name ||
+    values.name ||
+    "Anonymous";
+
+  const email = values.Email || values.email || "No email";
+
+  return {
+    id: submission.id,
+    submittedBy,
+    email,
+    date: new Date(submission.createdAt || Date.now()).toLocaleString(),
+    createdAt: submission.createdAt || new Date().toISOString(),
+    status: "new",
+    values,
+  };
+}
+
+export function SingleFormView({ formData }: { formData: FormType }) {
+  const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields">("preview");
+  const [submissions, setSubmissions] = useState<SubmissionViewModel[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsViewModel>(emptyAnalytics);
+  const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(true);
+  const router = useRouter();
+
+  const stats = {
+    totalSubmissions: analytics.totalSubmissions || (submissions?.length ?? 0),
+    totalViews: analytics.totalViews,
+    conversionRate: analytics.conversionRate,
+    avgTime: analytics.avgTime,
+    lastSubmission: analytics.lastSubmission,
+    todaySubmissions: analytics.todaySubmissions,
+    weekSubmissions: analytics.weekSubmissions,
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <FormSubmissionsData
+        slug={formData.slug}
+        fields={formData.fields}
+        onLoaded={(data) => setSubmissions(data || [])}
+        onLoadingChange={setIsLoadingSubmissions}
+      />
+      <FormAnalyticsData slug={formData.slug} onLoaded={setAnalytics} />
+
+      {/* Top Bar */}
+      <FormTopBar title={formData.title} state={formData.state} slug={formData.slug} />
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Left Column - 2/3 */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Tabs */}
+            <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-xl w-fit">
+              {[
+                { id: "preview" as const, label: "Preview" },
+                {
+                  id: "submissions" as const,
+                  label: `Submissions (${isLoadingSubmissions ? "..." : (submissions?.length ?? 0)})`,
+                },
+                { id: "fields" as const, label: "Fields" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeTab === tab.id
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            {activeTab === "preview" && <FormPreview fields={formData.fields} />}
+            {activeTab === "submissions" && <FormSubmissions submissions={submissions || []} />}
+            {activeTab === "fields" && <FormFieldsList fields={formData.fields} />}
+          </div>
+
+          {/* Right Column - 1/3 Stats & Actions */}
+          <div className="space-y-4">
+            <FormStats stats={stats} />
+            <FormActions slug={formData.slug} onDeleted={() => router.push("/all-forms")} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FormSubmissionsData({
   slug,
   fields,
@@ -127,12 +179,13 @@ function FormSubmissionsData({
     onLoadingChange(true);
 
     void axios
-      .get<{
-        data?: Array<{ id: string; data: Record<string, unknown>; createdAt: string }>;
-      }>(`/api/forms/${slug}/submissions`)
-      .then(({ data }) => {
-        if (!cancelled)
-          onLoaded((data.data ?? []).map((item) => toSubmissionViewModel(item, fields)));
+      .get(`/api/forms/${slug}/submissions`)
+      .then((response) => {
+        if (!cancelled) {
+          const rawData = response.data?.data || response.data || [];
+          const items = Array.isArray(rawData) ? rawData : [];
+          onLoaded(items.map((item: any) => toSubmissionViewModel(item, fields)));
+        }
       })
       .catch((error: unknown) => {
         if (!cancelled) {
@@ -168,9 +221,10 @@ function FormAnalyticsData({
 
   useEffect(() => {
     void axios
-      .get<{ data?: Partial<AnalyticsViewModel> }>(`/api/forms/${slug}/analytics`)
-      .then(({ data }) => {
-        onLoaded({ ...emptyAnalytics, ...data.data });
+      .get(`/api/forms/${slug}/analytics`)
+      .then((response) => {
+        const rawData = response.data?.data || response.data || {};
+        onLoaded({ ...emptyAnalytics, ...rawData });
       })
       .catch((error: unknown) => {
         dispatch(
@@ -183,54 +237,4 @@ function FormAnalyticsData({
   }, [dispatch, onLoaded, slug]);
 
   return null;
-}
-
-type SubmissionViewModel = {
-  id: string;
-  submittedBy: string;
-  email: string;
-  date: string;
-  createdAt: string;
-  status: "new";
-  values: Record<string, string>;
-};
-
-function toSubmissionViewModel(
-  submission: {
-    id: string;
-    data: Record<string, unknown>;
-    createdAt: string;
-  },
-  fields: FormType["fields"],
-): SubmissionViewModel {
-  const fieldMap = new Map(fields.map((field) => [field.id, field]));
-
-  const values = Object.fromEntries(
-    Object.entries(submission.data).map(([fieldId, value]) => {
-      const field = fieldMap.get(fieldId);
-      const label = field?.label || fieldId;
-
-      return [label, Array.isArray(value) ? value.join(", ") : String(value ?? "")];
-    }),
-  );
-
-  const submittedBy =
-    values.Name ||
-    values["Full Name"] ||
-    values["Full name"] ||
-    values.full_name ||
-    values.name ||
-    "Anonymous";
-
-  const email = values.Email || values.email || "No email";
-
-  return {
-    id: submission.id,
-    submittedBy,
-    email,
-    date: new Date(submission.createdAt).toLocaleString(),
-    createdAt: submission.createdAt,
-    status: "new",
-    values,
-  };
 }
