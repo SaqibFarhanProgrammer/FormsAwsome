@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { getErrorMessage } from "@/utils/getErrorMessage";
+import axios from "axios";
 
 interface FormActionsProps {
   slug: string;
@@ -30,16 +31,7 @@ export function FormActions({ slug, onDeleted }: FormActionsProps) {
     if (!window.confirm("Delete this form and all of its submissions?")) return;
 
     try {
-      const response = await fetch("/api/forms/delete", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug }),
-      });
-
-      const result = await response.json().catch(() => null);
-      if (!response.ok) {
-        throw new Error(result?.message || "Unable to delete form");
-      }
+      await axios.delete("/api/forms/delete", { data: { slug } });
 
       dispatch(showAlert({ message: "Form deleted successfully", type: "success" }));
       onDeleted();

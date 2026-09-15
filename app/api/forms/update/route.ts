@@ -52,6 +52,6 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ message: "Form metadata updated successfully" }, { status: 200 });
   } catch (error) {
-    CatchErrorFunctionForRoute(error as Error, "Update Form Meta");
+    return CatchErrorFunctionForRoute(error, "Update Form Meta");
   }
 }

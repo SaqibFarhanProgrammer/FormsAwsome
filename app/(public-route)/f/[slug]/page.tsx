@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { getPublicFormService } from "@/core/services/form/forms.service";
 import FormUI from "@/features/form-builder/components/form-ui";
+import { getUserIP } from "@/lib/auth/rateLimit";
 
 interface FormPageProps {
   params: Promise<{ slug: string }>;
@@ -9,9 +10,7 @@ interface FormPageProps {
 export default async function FormPage({ params }: FormPageProps) {
   const { slug } = await params;
   const headersList = await headers();
-  const forwardedFor = headersList.get("x-forwarded-for");
-  const realIp = headersList.get("x-real-ip");
-  const requestIp = forwardedFor?.split(",")[0]?.trim() || realIp || undefined;
+  const requestIp = getUserIP(new Request("http://localhost", { headers: headersList }));
 
   let formData: Awaited<ReturnType<typeof getPublicFormService>> | null = null;
 

@@ -11,7 +11,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
-import { AppError } from "@/lib/auth/appError";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -29,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import { Loader2, Star, Upload, Check, FileImage, FileText, X, ArrowUpRight } from "lucide-react";
+import axios from "axios";
 
 export type FieldType = string;
 
@@ -800,16 +800,7 @@ export default function DefaultForm({
     setSubmitError(null);
 
     try {
-      const response = await fetch(submitUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      const result = await response.json().catch(() => null);
-      if (!response.ok) {
-        throw new AppError(result?.message || "Unable to submit the form", response.status);
-      }
+      const { data: result } = await axios.post<{ data?: { message?: string } }>(submitUrl, values);
 
       setSubmitMessage(
         formData.settings.successMessage ||

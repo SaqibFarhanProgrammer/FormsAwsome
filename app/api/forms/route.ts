@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createFormService, getAllFormsService } from "@/core/services/form/forms.service";
 import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
+import { AppError } from "@/lib/auth/appError";
 
 export async function GET() {
   try {
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data }, { status: 201 });
   } catch (error: unknown) {
     return CatchErrorFunctionForRoute(
-      error instanceof Error ? error : new Error("Unable to create form"),
+      error instanceof AppError ? error : new Error("Unable to create form"),
       "CREATE FORM ERROR",
     );
   }

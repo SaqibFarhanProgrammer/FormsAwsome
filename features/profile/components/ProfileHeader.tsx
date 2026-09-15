@@ -12,6 +12,9 @@ import Link from "next/link";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ProfileDataType } from "../types/types";
+import axios from "axios";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 export function ProfileHeader({ data }: { data: ProfileDataType }) {
   const dispatch = useDispatch();
@@ -70,16 +73,10 @@ export function ProfileHeader({ data }: { data: ProfileDataType }) {
         formData.append("image", uploadedFile);
       }
 
-      const response = await fetch("/api/profile", {
-        method: "PATCH",
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Unable to update profile");
-      }
+      const { data: result } = await axios.patch<{ data: ProfileDataType; message?: string }>(
+        "/api/profile",
+        formData,
+      );
 
       const updatedProfile = result.data as ProfileDataType;
       setProfile(updatedProfile);
@@ -91,13 +88,8 @@ export function ProfileHeader({ data }: { data: ProfileDataType }) {
         message: result.message || "Profile updated successfully",
       });
     } catch (error) {
-      setFeedback({
-        type: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Something went wrong while saving your profile.",
-      });
+      const message = getErrorMessage(error, "Unable to update profile");
+      dispatch(showAlert({ message, type: "danger" }));
     } finally {
       setIsSaving(false);
       if (fileInputRef.current) {

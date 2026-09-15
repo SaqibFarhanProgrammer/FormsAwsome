@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { FormTopBar } from "./FormTopBar";
@@ -16,106 +17,10 @@ import type { FormType } from "../models/form-builder.model";
 export function SingleFormView({ formData }: { formData: FormType }) {
   const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields">("preview");
   const [submissions, setSubmissions] = useState<SubmissionViewModel[]>([]);
-  const [analytics, setAnalytics] = useState({
-    totalSubmissions: 0,
-    totalViews: 0,
-    conversionRate: 0,
-    avgTime: "—",
-    lastSubmission: "No submissions yet",
-    todaySubmissions: 0,
-    weekSubmissions: 0,
-  });
+  const [analytics, setAnalytics] = useState<AnalyticsViewModel>(emptyAnalytics);
   const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(true);
   const router = useRouter();
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadFormData = async () => {
-      try {
-        const [submissionsResponse, analyticsResponse] = await Promise.all([
-          fetch(`/api/forms/${formData.slug}/submissions`),
-          fetch(`/api/forms/${formData.slug}/analytics`),
-        ]);
-
-        if (!submissionsResponse.ok) {
-          throw new Error("Unable to load submissions");
-        }
-
-        const submissionsResult = (await submissionsResponse.json()) as {
-          data?: Array<{
-            id: string;
-            data: Record<string, unknown>;
-            createdAt: string;
-          }>;
-        };
-
-        if (!cancelled) {
-          setSubmissions(
-            (submissionsResult.data ?? []).map((submission) =>
-              toSubmissionViewModel(submission, formData.fields),
-            ),
-          );
-        }
-
-        if (analyticsResponse.ok) {
-          const analyticsResult = (await analyticsResponse.json()) as {
-            data?: {
-              totalSubmissions?: number;
-              totalViews?: number;
-              conversionRate?: number;
-              avgTime?: string;
-              lastSubmission?: string;
-              todaySubmissions?: number;
-              weekSubmissions?: number;
-            };
-          };
-
-          if (!cancelled && analyticsResult.data) {
-            setAnalytics({
-              totalSubmissions: analyticsResult.data.totalSubmissions ?? 0,
-              totalViews: analyticsResult.data.totalViews ?? 0,
-              conversionRate: analyticsResult.data.conversionRate ?? 0,
-              avgTime: analyticsResult.data.avgTime ?? "—",
-              lastSubmission: analyticsResult.data.lastSubmission ?? "No submissions yet",
-              todaySubmissions: analyticsResult.data.todaySubmissions ?? 0,
-              weekSubmissions: analyticsResult.data.weekSubmissions ?? 0,
-            });
-          }
-        }
-      } catch (error: unknown) {
-        if (!cancelled) {
-          setSubmissions([]);
-          setAnalytics({
-            totalSubmissions: 0,
-            totalViews: 0,
-            conversionRate: 0,
-            avgTime: "—",
-            lastSubmission: "No submissions yet",
-            todaySubmissions: 0,
-            weekSubmissions: 0,
-          });
-        }
-        if (!cancelled) {
-          dispatch(
-            showAlert({
-              message: getErrorMessage(error, "Unable to load form analytics"),
-              type: "danger",
-            }),
-          );
-        }
-      } finally {
-        if (!cancelled) setIsLoadingSubmissions(false);
-      }
-    };
-
-    void loadFormData();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [dispatch, formData.fields, formData.slug]);
 
   const stats = {
     totalSubmissions: analytics.totalSubmissions || submissions.length,
@@ -128,6 +33,13 @@ export function SingleFormView({ formData }: { formData: FormType }) {
   };
   return (
     <div className="min-h-screen bg-background">
+      <FormSubmissionsData
+        slug={formData.slug}
+        fields={formData.fields}
+        onLoaded={setSubmissions}
+        onLoadingChange={setIsLoadingSubmissions}
+      />
+      <FormAnalyticsData slug={formData.slug} onLoaded={setAnalytics} />
       {/* Top Bar */}
       <FormTopBar title={formData.title} state={formData.state} slug={formData.slug} />
 
@@ -175,6 +87,102 @@ export function SingleFormView({ formData }: { formData: FormType }) {
       </div>
     </div>
   );
+}
+
+type AnalyticsViewModel = {
+  totalSubmissions: number;
+  totalViews: number;
+  conversionRate: number;
+  avgTime: string;
+  lastSubmission: string;
+  todaySubmissions: number;
+  weekSubmissions: number;
+};
+
+const emptyAnalytics: AnalyticsViewModel = {
+  totalSubmissions: 0,
+  totalViews: 0,
+  conversionRate: 0,
+  avgTime: "—",
+  lastSubmission: "No submissions yet",
+  todaySubmissions: 0,
+  weekSubmissions: 0,
+};
+
+function FormSubmissionsData({
+  slug,
+  fields,
+  onLoaded,
+  onLoadingChange,
+}: {
+  slug: string;
+  fields: FormType["fields"];
+  onLoaded: (submissions: SubmissionViewModel[]) => void;
+  onLoadingChange: (loading: boolean) => void;
+}) {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    let cancelled = false;
+    onLoadingChange(true);
+
+    void axios
+      .get<{
+        data?: Array<{ id: string; data: Record<string, unknown>; createdAt: string }>;
+      }>(`/api/forms/${slug}/submissions`)
+      .then(({ data }) => {
+        if (!cancelled)
+          onLoaded((data.data ?? []).map((item) => toSubmissionViewModel(item, fields)));
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          onLoaded([]);
+          dispatch(
+            showAlert({
+              message: getErrorMessage(error, "Unable to load submissions"),
+              type: "danger",
+            }),
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) onLoadingChange(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dispatch, fields, onLoaded, onLoadingChange, slug]);
+
+  return null;
+}
+
+function FormAnalyticsData({
+  slug,
+  onLoaded,
+}: {
+  slug: string;
+  onLoaded: (analytics: AnalyticsViewModel) => void;
+}) {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    void axios
+      .get<{ data?: Partial<AnalyticsViewModel> }>(`/api/forms/${slug}/analytics`)
+      .then(({ data }) => {
+        onLoaded({ ...emptyAnalytics, ...data.data });
+      })
+      .catch((error: unknown) => {
+        dispatch(
+          showAlert({
+            message: getErrorMessage(error, "Unable to load form analytics"),
+            type: "danger",
+          }),
+        );
+      });
+  }, [dispatch, onLoaded, slug]);
+
+  return null;
 }
 
 type SubmissionViewModel = {
@@ -225,15 +233,4 @@ function toSubmissionViewModel(
     status: "new",
     values,
   };
-}
-
-function isToday(date: string) {
-  const value = new Date(date);
-  const today = new Date();
-  return value.toDateString() === today.toDateString();
-}
-
-function isThisWeek(date: string) {
-  const value = new Date(date).getTime();
-  return Date.now() - value <= 7 * 24 * 60 * 60 * 1000;
 }

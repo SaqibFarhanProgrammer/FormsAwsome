@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setProfile } from "@/redux/features/profile/profile.slice";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
+import axios from "axios";
 
 interface RecentSubmission {
   id: string;
@@ -37,27 +40,25 @@ export function TopBar() {
 
     const loadProfile = async () => {
       try {
-        const response = await fetch("/api/profile");
-        if (!response.ok) {
-          return;
-        }
-
-        const result = await response.json();
+        const response = await axios.get<{ data?: Record<string, unknown> }>("/api/profile");
+        const result = response.data;
 
         if (!cancelled && result?.data) {
           dispatch(
             setProfile({
-              name: result.data.name,
-              email: result.data.email,
-              createdAt: result.data.createdAt,
-              image: result.data.image ?? null,
-              bio: result.data.bio ?? null,
-              settings: result.data.settings,
+              name: result.data.name as string,
+              email: result.data.email as string,
+              createdAt: result.data.createdAt as string,
+              image: result.data.image as string | null,
+              bio: result.data.bio as string | null,
+              settings: result.data.settings as Record<string, unknown>,
             }),
           );
         }
-      } catch {
-        // Ignore profile fetch failures here; the dashboard can still render fallback UI.
+      } catch (error: unknown) {
+        dispatch(
+          showAlert({ message: getErrorMessage(error, "Unable to load profile"), type: "danger" }),
+        );
       }
     };
 
@@ -75,21 +76,26 @@ export function TopBar() {
 
     const loadNotifications = async () => {
       try {
-        const response = await fetch("/api/submissions");
-        if (!response.ok) return;
-
-        const result = await response.json();
+        const response = await axios.get<{ data?: RecentSubmission[] }>("/api/submissions");
+        const result = response.data;
         if (!cancelled) {
           setNotifications((result.data ?? []).slice(0, 5));
         }
-      } catch {}
+      } catch (error: unknown) {
+        dispatch(
+          showAlert({
+            message: getErrorMessage(error, "Unable to load notifications"),
+            type: "danger",
+          }),
+        );
+      }
     };
 
     void loadNotifications();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <header className="flex items-center mx-6 gap-3 shrink-0 py-2 pt-3">

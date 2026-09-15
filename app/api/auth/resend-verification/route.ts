@@ -53,6 +53,6 @@ export async function POST(request: NextRequest) {
       { status: 200 },
     );
   } catch (error: any) {
-    CatchErrorFunctionForRoute(error, "RESEND VERIFICATION EMAIL ERROR");
+    return CatchErrorFunctionForRoute(error, "RESEND VERIFICATION EMAIL ERROR");
   }
 }

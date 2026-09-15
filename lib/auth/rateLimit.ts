@@ -17,8 +17,9 @@ export type RateLimitResult = {
   retryAfter: number;
 };
 
-export function getClientIp(request: Request): string {
-  const forwardedFor = request.headers.get("x-forwarded-for");
+export function getUserIP(request: Request): string {
+  const forwardedFor =
+    request.headers.get("x-vercel-forwarded-for") ?? request.headers.get("x-forwarded-for");
 
   if (forwardedFor) {
     return forwardedFor.split(",")[0].trim();
@@ -26,6 +27,8 @@ export function getClientIp(request: Request): string {
 
   return request.headers.get("x-real-ip") ?? "unknown";
 }
+
+export const getClientIp = getUserIP;
 
 export async function rateLimit({
   name,

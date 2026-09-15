@@ -4,11 +4,15 @@ import {
   setThemePreference,
   type ThemeOption,
 } from "@/core/services/theme/theme.service";
+import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
 
 export async function GET() {
-  const theme = await getThemePreference();
-
-  return NextResponse.json({ success: true, data: { theme } }, { status: 200 });
+  try {
+    const theme = await getThemePreference();
+    return NextResponse.json({ success: true, data: { theme } }, { status: 200 });
+  } catch (error: unknown) {
+    return CatchErrorFunctionForRoute(error, "GET THEME ERROR");
+  }
 }
 
 export async function PATCH(request: NextRequest) {
@@ -26,10 +30,7 @@ export async function PATCH(request: NextRequest) {
       { success: true, message: "Theme updated", data: { theme } },
       { status: 200 },
     );
-  } catch {
-    return NextResponse.json(
-      { success: false, message: "Unable to update theme" },
-      { status: 500 },
-    );
+  } catch (error: unknown) {
+    return CatchErrorFunctionForRoute(error, "UPDATE THEME ERROR");
   }
 }

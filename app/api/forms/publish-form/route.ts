@@ -5,6 +5,7 @@ import { Form } from "@/features/form-builder/models/form-builder.model";
 import { FormState } from "@/features/form-builder/types/form-builder.types";
 import { getUserIdFromToken } from "@/lib/auth/jwt.lib";
 import { NextRequest, NextResponse } from "next/server";
+import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,8 +41,7 @@ export async function POST(req: NextRequest) {
       },
       { status: 200 },
     );
-  } catch (error) {
-    console.error("Publish form error:", error);
-    return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
+  } catch (error: unknown) {
+    return CatchErrorFunctionForRoute(error, "PUBLISH FORM ERROR");
   }
 }

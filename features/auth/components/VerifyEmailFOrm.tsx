@@ -12,9 +12,9 @@ import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
 import { ArrowLeft } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { AppError } from "@/lib/auth/appError";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { getErrorMessage } from "@/utils/getErrorMessage";
+import axios from "axios";
 
 const verifySchema = z.object({
   code: z
@@ -55,26 +55,11 @@ export function VerifyEmailForm() {
     // setSuccess(null);
 
     try {
-      const response = await fetch("/api/auth/verify-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          code: data.code,
-          token,
-        }),
+      await axios.post("/api/auth/verify-email", {
+        email,
+        code: data.code,
+        token,
       });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new AppError(
-          result.message || "Verification failed. Please try again.",
-          response.status,
-        );
-      }
 
       // setSuccess("Email verified successfully! Redirecting to dashboard...");
 

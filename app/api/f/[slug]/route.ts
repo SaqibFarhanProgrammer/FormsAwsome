@@ -3,15 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { UAParser } from "ua-parser-js";
 import { CatchErrorFunctionForRoute } from "@/utils/catchErrorFunction";
 import { getPublicFormService, submitFormService } from "@/core/services/form/forms.service";
+import { getUserIP } from "@/lib/auth/rateLimit";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
-    const requestIp =
-      request.headers.get("x-vercel-forwarded-for") ??
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      request.headers.get("x-real-ip") ??
-      undefined;
+    const requestIp = getUserIP(request);
 
     const data = await getPublicFormService(slug, { requestIp });
     return NextResponse.json(
@@ -41,11 +38,7 @@ export async function POST(
     const result = parser.getResult();
 
     const data = await submitFormService(slug, await request.json(), {
-      ip:
-        request.headers.get("x-vercel-forwarded-for") ??
-        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-        request.headers.get("x-real-ip") ??
-        undefined,
+      ip: getUserIP(request),
       userAgent,
       region: request.headers.get("x-vercel-ip-country-region") || undefined,
       country: request.headers.get("x-vercel-ip-country") || undefined,

@@ -9,6 +9,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { Textarea } from "@/components/ui/Textarea";
 import { Camera, Mail, User, Check } from "lucide-react";
 import { THEME_STORAGE_KEY, type ThemeOption } from "@/components/common/ThemeInitializer";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 function getStoredTheme(): ThemeOption {
   if (typeof window === "undefined") {
@@ -27,6 +31,7 @@ function getStoredTheme(): ThemeOption {
 export function GeneralSettings() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<ThemeOption>(getStoredTheme);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -41,10 +46,10 @@ export function GeneralSettings() {
     };
 
     applyTheme();
-    void fetch("/api/theme", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ theme: selectedTheme }),
+    void axios.patch("/api/theme", { theme: selectedTheme }).catch((error: unknown) => {
+      dispatch(
+        showAlert({ message: getErrorMessage(error, "Unable to update theme"), type: "danger" }),
+      );
     });
 
     const handleSystemThemeChange = () => applyTheme();
@@ -54,7 +59,7 @@ export function GeneralSettings() {
     return () => {
       mediaQuery.removeEventListener("change", handleSystemThemeChange);
     };
-  }, [selectedTheme]);
+  }, [dispatch, selectedTheme]);
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">

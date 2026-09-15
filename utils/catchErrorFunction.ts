@@ -16,8 +16,8 @@ export async function CatchErrorFunctionForService(
   throw new AppError(errorMessage, 500);
 }
 
-export async function CatchErrorFunctionForRoute(error: Error, ErrorBane: string) {
-  console.error(ErrorBane, error);
+export async function CatchErrorFunctionForRoute(error: unknown, errorName: string) {
+  console.error(`${errorName}:`, error);
 
   let message = "Server Error";
   let statusCode = 500;
@@ -25,6 +25,8 @@ export async function CatchErrorFunctionForRoute(error: Error, ErrorBane: string
   if (error instanceof AppError) {
     message = error.message;
     statusCode = error.statusCode;
+  } else if (error instanceof Error) {
+    message = error.message;
   }
 
   return NextResponse.json({ message }, { status: statusCode });

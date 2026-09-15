@@ -66,6 +66,7 @@ type PublicFormPayload = {
 };
 
 const FORM_CACHE_TTL_SECONDS = 60 * 60 * 2;
+const FORM_SMALL_DATA_CACHE_TTL_SECONDS = 60 * 5;
 const FORM_SUBMISSION_IP_TTL_SECONDS = 60 * 60 * 6;
 
 function getPublicFormCacheKey(slug: string) {
@@ -74,6 +75,18 @@ function getPublicFormCacheKey(slug: string) {
 
 function getFormSubmissionKey(slug: string, ip: string) {
   return `public:form:${slug}:submitted:${ip}`;
+}
+
+function getFormSubmissionsCacheKey(formId: string, userId: string) {
+  return `form:${formId}:submissions:${userId}`;
+}
+
+function getFormAnalyticsCacheKey(
+  formId: string,
+  userId: string,
+  filters: { startDate?: string; endDate?: string },
+) {
+  return `form:${formId}:analytics:${userId}:${filters.startDate ?? ""}:${filters.endDate ?? ""}`;
 }
 
 async function recordUniqueFormView(formId: string, requestIp?: string) {
@@ -651,6 +664,12 @@ export async function submitFormService(
     meta,
   });
 
+  const ownerId = form.userId.toString();
+  await Promise.all([
+    DeleteDataFromRedis(getFormSubmissionsCacheKey(form._id.toString(), ownerId)),
+    DeleteDataFromRedis(getFormAnalyticsCacheKey(form._id.toString(), ownerId, {})),
+  ]);
+
   const formViewPayload = {
     formId: form._id,
     ip: normalizedIp,
@@ -740,9 +759,15 @@ export async function getFormSubmissionsService(formIdOrSlug: string) {
   await connectDB();
 
   const form = await findOwnedForm(formIdOrSlug, userId.toString());
+  const cacheKey = getFormSubmissionsCacheKey(form._id.toString(), userId.toString());
+  const cachedSubmissions = await GetDataFromRedis(cacheKey);
+  if (cachedSubmissions) {
+    return JSON.parse(cachedSubmissions);
+  }
+
   const submissions = await Submission.find({ formId: form._id }).sort({ createdAt: -1 }).lean();
 
-  return submissions.map((submission) => ({
+  const result = submissions.map((submission) => ({
     id: submission._id.toString(),
     formId: form._id.toString(),
     form: form.title,
@@ -750,6 +775,8 @@ export async function getFormSubmissionsService(formIdOrSlug: string) {
     meta: submission.meta,
     createdAt: submission.createdAt,
   }));
+  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(result), FORM_SMALL_DATA_CACHE_TTL_SECONDS);
+  return result;
 }
 
 export async function getFormAnalyticsService(
@@ -769,6 +796,11 @@ export async function getFormAnalyticsService(
   await connectDB();
 
   const form = await findOwnedForm(formIdOrSlug, userId.toString());
+  const cacheKey = getFormAnalyticsCacheKey(form._id.toString(), userId.toString(), filters);
+  const cachedAnalytics = await GetDataFromRedis(cacheKey);
+  if (cachedAnalytics) {
+    return JSON.parse(cachedAnalytics);
+  }
   const dateFilter =
     parsedFilters.data.startDate || parsedFilters.data.endDate
       ? {
@@ -797,7 +829,7 @@ export async function getFormAnalyticsService(
 
   const conversionRate = totalViews > 0 ? Math.round((totalSubmissions / totalViews) * 100) : 0;
 
-  return {
+  const result = {
     totalViews,
     totalSubmissions,
     conversionRate,
@@ -808,6 +840,8 @@ export async function getFormAnalyticsService(
     todaySubmissions,
     weekSubmissions,
   };
+  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(result), FORM_SMALL_DATA_CACHE_TTL_SECONDS);
+  return result;
 }
 
 export async function getSubmissionService(submissionId: string) {

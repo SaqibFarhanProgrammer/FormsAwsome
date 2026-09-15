@@ -7,6 +7,7 @@ import { jsPDF } from "jspdf";
 import { Search, Download, ChevronDown } from "lucide-react";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { getErrorMessage } from "@/utils/getErrorMessage";
+import axios from "axios";
 
 type ExportSubmission = {
   form: string;
@@ -41,9 +42,8 @@ export function SubmissionsFilters() {
   };
 
   const loadFilteredSubmissions = async () => {
-    const response = await fetch("/api/submissions");
-    if (!response.ok) throw new Error("Unable to export submissions");
-    const result = await response.json();
+    const response = await axios.get<{ data?: ExportSubmission[] }>("/api/submissions");
+    const result = response.data;
     const query = filters.search.toLowerCase();
 
     return (result.data ?? []).filter((submission: ExportSubmission) => {

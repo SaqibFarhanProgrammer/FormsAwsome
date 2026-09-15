@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import type { FormData, FormFieldItem } from "../../models/FormData";
+import axios from "axios";
 
 /* ==========================================
    Form Validation Schema
@@ -140,13 +141,7 @@ export function useTemplateForm(formData: FormData, submitUrl: string): Template
     setErrors({});
     setSubmitting(true);
     try {
-      const res = await fetch(submitUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result.data),
-      });
-      const json = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(json?.message || "Unable to submit the form");
+      await axios.post(submitUrl, result.data);
       setSuccessMsg(formData.settings.successMessage || "Thank you for your submission!");
       setValues(buildDefaults(formData.fields));
     } catch (e: unknown) {

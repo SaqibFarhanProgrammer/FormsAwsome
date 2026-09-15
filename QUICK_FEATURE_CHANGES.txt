@@ -1,39 +1,25 @@
-1. getFormSubmissionsService
-   - Ye function service layer mein hai aur form ke submissions fetch karne ke liye use hota hai.
-   - Isme check add karna hai: authenticated user ka access, form ownership, and valid formIdOrSlug.
-   - Agar user kisi dusre user ke form ki submissions dekhna chahe, to 403 ya 404 return karna chahiye.
-   - Time: 5 minutes
+1: jahan jahan fetch sue horaha hai wahan axios use karo ok or catch emi erro handle akro with ui errror ok 
+shi se karnaok ui errror nhi dalan sirf dispatch use karna global alert erro wl aok 
 
-2. getFormAnalyticsService
-   - Ye function analytics ke liye use hota hai and isme bhi authorization + ownership check required hai.
-   - Validate karna hai ki current user sirf apne form ka analytics dekh sakta hai.
-   - Invalid date filters / malformed params ko handle karna chahiye.
-   - Time: 5 minutes
+2: ip service yani jahan jahan ip ka kaam hai rotues mei liek rat limitng methdo mein yan form submit publci page mein usek leu aik resuael mehot dba ana do getUserIP naam ka ok usko su ekaro request ke abses per ok 
 
-3. getSubmissionService
-   - Ye function single submission detail ke liye use hota hai.
-   - Isme bhi ownership verification add karni hai.
-   - Response ko label-based detail mapping ke sath return karna chahiye, raw internal field data na dikhana chahiye.
-   - Time: 10 minutes
+3: api routs emin catch erro ko is tarha handle karo     console.error('REGISTER_USER_ERROR:', error);
 
-4. Zod validation for auth + form flows
-   - Registration, form creation, form update, and public submissions me schema validation missing hai.
-   - Zod use karke shared schema files create karni chahiye, ideally under features/*/schemas or core/schemas.
-   - Form fields validation: required checks, type checks, option validation, max length, proper slug rules.
-   - Ye structure clean and reusable hona chahiye.
+    let message = 'Server Error';
+    let statusCode = 500;
 
-5. Replace raw Error.message usage with AppError
-   - Jahan bhi Error.message direct use ho raha hai, wahan AppError class se proper custom messages and status codes use karne chahiye.
-   - This keeps API responses consistent and avoids leaking internal details.
-   - Critical files to review: utils/catchErrorFunction.ts, core/services/*, app/api/*, and any frontend helper that surfaces raw error messages.
+    if (error instanceof AppError) {
+      message = error.message;
+      statusCode = error.statusCode;
+    } else if (error instanceof Error) {
+      message = error.message;
+    }
 
-6. Extra security and consistency checks
-   - Public form access should reject unpublished or archived forms.
-   - Cache and Redis access should not leak private form data into public keys.
-   - Legacy routes like /api/forms/update and duplicate routes should be migrated or removed after auth checks.
+    return NextResponse.json({ message }, { status: statusCode });
 
-7. Recommended priority order
-   - Step 1: Fix authorization inside getFormSubmissionsService, getFormAnalyticsService, and getSubmissionService.
-   - Step 2: Add shared Zod schemas and enforce validation.
-   - Step 3: Replace raw Error.message with AppError everywhere.
-   - Step 4: Review cache/public form exposure and route security.
+    isko yan tho aik method banad o joekemn banaoya hau hai CatchErrorFunctionForRoute ye ok isko use akro  isntead of manual ok 
+
+4: add caching on samll isze data ok for 10 1 5mins ok 
+
+5: all-forms/slug apge mein jo promise a.all hro ahai suko hatao or indivitial level ek comeptnemindata ge takrook axisoe submtion ka submtonse mein form anayarics ak form anylatics mein ok 
+

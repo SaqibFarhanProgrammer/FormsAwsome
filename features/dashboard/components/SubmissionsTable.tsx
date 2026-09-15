@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/Card";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { getErrorMessage } from "@/utils/getErrorMessage";
+import axios from "axios";
 
 interface Submission {
   id: string;
@@ -293,10 +294,8 @@ export function SubmissionsTable() {
   useEffect(() => {
     const loadSubmissions = async () => {
       try {
-        const response = await fetch("/api/submissions");
-        if (!response.ok) throw new Error("Unable to load submissions");
-        const result = await response.json();
-        setSubmissions(result.data ?? []);
+        const response = await axios.get<{ data?: Submission[] }>("/api/submissions");
+        setSubmissions(response.data.data ?? []);
       } catch (error: unknown) {
         const message = getErrorMessage(error, "Unable to load submissions");
         setSubmissions(_submissionsData);
@@ -313,8 +312,7 @@ export function SubmissionsTable() {
 
   const deleteSubmission = async (id: string) => {
     try {
-      const response = await fetch(`/api/submissions/${id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error("Unable to delete submission");
+      await axios.delete(`/api/submissions/${id}`);
 
       setSubmissions((current) => current.filter((submission) => submission.id !== id));
       setExpandedId(null);
