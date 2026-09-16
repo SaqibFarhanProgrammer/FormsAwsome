@@ -1,8 +1,7 @@
 import { headers } from "next/headers";
 import { getPublicFormService, TrackFormViews } from "@/core/services/form/forms.service";
 import FormUI from "@/features/form-builder/components/form-ui";
-import { getUserIP } from "@/lib/auth/rateLimit";
-import axios from "axios";
+import PublicFormCLientApiCall from "@/features/form-builder/components/PublicFormCLientApiCall";
 
 interface FormPageProps {
   params: Promise<{ slug: string }>;
@@ -12,11 +11,7 @@ export default async function FormPage({ params }: FormPageProps) {
   const { slug } = await params;
 
   const formData = await getPublicFormService(slug);
-  const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/forms/set-visitor-id-in-cookie`,
-  );
-
-  console.log(res.data);
+  await TrackFormViews(slug);
 
   if (!formData) {
     return (
@@ -38,6 +33,7 @@ export default async function FormPage({ params }: FormPageProps) {
         submitUrl={`/api/f/${slug}`}
         hasSubmitted={Boolean(formData!.hasSubmitted)}
       />
+      <PublicFormCLientApiCall />
     </main>
   );
 }

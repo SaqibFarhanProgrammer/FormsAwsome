@@ -912,21 +912,30 @@ async function findOwnedForm(formIdOrSlug: string, userId: string) {
 
   return form;
 }
-
 export async function TrackFormViews(slug: string) {
-  const CookieStore = await cookies();
+  const cookieStore = await cookies();
 
-  let visitorId = CookieStore.get("VisitorId")?.value;
+  let visitorId = cookieStore.get("VisitorId")?.value;
+
+  if (!visitorId) {
+    return;
+  }
 
   const redis = await ConnectionToRedis();
 
-  const FormViewKey = `formview:${slug}`;
-  const FormviewVisitorKey = `formview:${slug}:visitor:${visitorId}`;
+  const formViewKey = `formview:${slug}`;
+  const formViewVisitorKey = `formview:${slug}:visitor:${visitorId}`;
 
-  const result = await redis.set(FormviewVisitorKey, "1", {
+  const result = await redis.set(formViewVisitorKey, "1", {
     EX: 60 * 60 * 24,
     NX: true,
   });
 
-  console.log(result);
+  if (result === "OK") {
+    const totalViews = await redis.incr(formViewKey);
+
+    console.log("New view:", totalViews);
+  } else {
+    console.log("Already viewed within 24h");
+  }
 }
