@@ -4,7 +4,12 @@ import { AppError } from "@/lib/auth/appError";
 import { connectDB } from "@/core/db/connectDb";
 import { getUserIdFromToken, verifyAccessToken } from "@/lib/auth/jwt.lib";
 import { cookies } from "next/headers";
-import { DeleteDataFromRedis, GetDataFromRedis, SetDataToRedisWithTTL } from "@/lib/redis/redis";
+import {
+  ConnectionToRedis,
+  DeleteDataFromRedis,
+  GetDataFromRedis,
+  SetDataToRedisWithTTL,
+} from "@/lib/redis/redis";
 import { Submission } from "@/features/submissions/models/submission.model";
 import { FormView } from "@/features/submissions/models/FormViews.models";
 import { FormState } from "@/features/form-builder/types/form-builder.types";
@@ -18,6 +23,8 @@ import {
   formIdentifierSchema,
   submissionDataSchema,
 } from "@/core/schemas/submission.schema";
+import { getUserIP, getUserIPFromServer } from "@/lib/auth/rateLimit";
+import { GenerateVisitoriD } from "@/features/form-builder/utils/VisitorIdGenerator";
 
 type IncomingField = {
   id: string;
@@ -498,13 +505,12 @@ export async function deleteFormService(
   };
 }
 
-export async function getPublicFormService(
-  slug: string,
-  options?: { requestIp?: string },
-): Promise<PublicFormPayload> {
+export async function getPublicFormService(slug: string): Promise<PublicFormPayload> {
   if (!slug) {
     throw new AppError("Slug is required", 400);
   }
+
+  const userip = await getUserIPFromServer();
 
   const cacheKey = getPublicFormCacheKey(slug);
   const cachedForm = await GetDataFromRedis(cacheKey);
@@ -516,12 +522,12 @@ export async function getPublicFormService(
       throw new AppError("Form not found or not published", 404);
     }
 
-    if (options?.requestIp && parsedCachedForm.id) {
-      await recordUniqueFormView(parsedCachedForm.id, options.requestIp);
+    if (userip && parsedCachedForm.id) {
+      await recordUniqueFormView(parsedCachedForm.id, userip);
     }
 
-    const hasSubmitted = options?.requestIp
-      ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, options.requestIp)))
+    const hasSubmitted = userip
+      ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, userip)))
       : false;
 
     return {
@@ -541,7 +547,7 @@ export async function getPublicFormService(
     throw new AppError("Form not found or not published", 404);
   }
 
-  await recordUniqueFormView(form._id.toString(), options?.requestIp);
+  await recordUniqueFormView(form._id.toString(), userip);
 
   const formData = {
     id: form._id.toString(),
@@ -578,8 +584,8 @@ export async function getPublicFormService(
 
   await SetDataToRedisWithTTL(cacheKey, JSON.stringify(formData), FORM_CACHE_TTL_SECONDS);
 
-  const hasSubmitted = options?.requestIp
-    ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, options.requestIp)))
+  const hasSubmitted = userip
+    ? Boolean(await GetDataFromRedis(getFormSubmissionKey(slug, userip)))
     : false;
 
   return {
@@ -904,4 +910,38 @@ async function findOwnedForm(formIdOrSlug: string, userId: string) {
   }
 
   return form;
+}
+
+export async function TrackFormViews(slug: string) {
+  try {
+    const CookieStore = await cookies();
+    let visitorId = CookieStore.get("VisitorId")?.value;
+
+    if (!visitorId) {
+      visitorId = GenerateVisitoriD();
+
+      CookieStore.set("VisitorId", visitorId, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
+
+    const redis = await ConnectionToRedis();
+
+    const FormViewKey = `formview:${slug}`;
+    const FormviewVisitorKey = `formview:${slug}:visitor:${visitorId}`;
+
+    const existingVisitorView = await GetDataFromRedis(FormviewVisitorKey);
+
+    if (!existingVisitorView) {
+      const result = await redis.set(FormviewVisitorKey, "1", {
+        EX: 60 * 60 * 24,
+        NX: true,
+      });
+
+      console.log(result);
+      
+
+    }
+  } catch (error) {}
 }

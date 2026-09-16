@@ -1,5 +1,6 @@
 import { AppError } from "@/lib/auth/appError";
 import { ConnectionToRedis } from "@/lib/redis/redis";
+import { headers } from "next/headers";
 
 export const AUTH_RATE_LIMIT = 5;
 export const AUTH_RATE_LIMIT_WINDOW_SECONDS = 30 * 60;
@@ -27,6 +28,32 @@ export function getUserIP(request: Request): string {
 
   return request.headers.get("x-real-ip") ?? "unknown";
 }
+
+export async function getUserIPFromServer() {
+
+    const headerStore =await headers();
+
+    // 1. Check X-Forwarded-For (standard for multi-hop proxies/CDNs)
+    const forwardedFor = headerStore.get("x-forwarded-for");
+    if (forwardedFor) {
+      // The first IP in the list is the original client
+      return forwardedFor.split(",")[0].trim();
+    }
+
+    // 2. Check X-Real-IP (common fallback for Nginx/reverse proxies)
+    const realIP = headerStore.get("x-real-ip");
+    if (realIP) {
+      return realIP;
+    }
+
+    // 3. Vercel-specific fallback if deploying on Vercel
+    const vercelIP = headerStore.get("x-vercel-forwarded-for");
+    if (vercelIP) {
+      return vercelIP;
+    }
+
+    return "Unknown";
+  }
 
 export const getClientIp = getUserIP;
 

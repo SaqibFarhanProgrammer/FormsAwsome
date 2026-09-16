@@ -9,14 +9,8 @@ interface FormPageProps {
 
 export default async function FormPage({ params }: FormPageProps) {
   const { slug } = await params;
-  const headersList = await headers();
-  const requestIp = getUserIP(new Request("http://localhost", { headers: headersList }));
 
-  let formData: Awaited<ReturnType<typeof getPublicFormService>> | null = null;
-
-  try {
-    formData = await getPublicFormService(slug, { requestIp });
-  } catch {}
+   const formData = await getPublicFormService(slug);
 
   if (!formData) {
     return (

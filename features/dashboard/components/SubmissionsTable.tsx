@@ -390,7 +390,7 @@ export function SubmissionsTable() {
             {filteredSubmissions.map((submission) => (
               <React.Fragment key={submission.id}>
                 <TableRow
-                  className="cursor-pointer hover:bg-muted/30 transition-colors border-border"
+                  className="cursor-pointer hover:bg-muted/30 transition-colors bo"
                   onClick={() => toggleExpand(submission.id)}
                 >
                   <TableCell className="py-3">
@@ -421,10 +421,10 @@ export function SubmissionsTable() {
 
                 {/* Expanded Detail Row */}
                 {expandedId === submission.id && (
-                  <TableRow className="hover:bg-transparent border-0">
+                  <TableRow className="hover:bg-transparent mt-10">
                     <TableCell colSpan={6} className="p-0">
                       <div className="px-4 pb-4">
-                        <Card className="rounded-xl border-border bg-muted/30 p-5">
+                        <Card className="rounded-xl  p-5 border-none">
                           <div className="flex items-center justify-between mb-4">
                             <h4 className="text-sm font-semibold">Submission Details</h4>
                             <div className="flex items-center gap-2">
