@@ -25,6 +25,7 @@ import {
 } from "@/core/schemas/submission.schema";
 import { getUserIP, getUserIPFromServer } from "@/lib/auth/rateLimit";
 import { GenerateVisitoriD } from "@/features/form-builder/utils/VisitorIdGenerator";
+import axios from "axios";
 
 type IncomingField = {
   id: string;
@@ -913,35 +914,19 @@ async function findOwnedForm(formIdOrSlug: string, userId: string) {
 }
 
 export async function TrackFormViews(slug: string) {
-  try {
-    const CookieStore = await cookies();
-    let visitorId = CookieStore.get("VisitorId")?.value;
+  const CookieStore = await cookies();
 
-    if (!visitorId) {
-      visitorId = GenerateVisitoriD();
+  let visitorId = CookieStore.get("VisitorId")?.value;
 
-      CookieStore.set("VisitorId", visitorId, {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 365,
-      });
-    }
+  const redis = await ConnectionToRedis();
 
-    const redis = await ConnectionToRedis();
+  const FormViewKey = `formview:${slug}`;
+  const FormviewVisitorKey = `formview:${slug}:visitor:${visitorId}`;
 
-    const FormViewKey = `formview:${slug}`;
-    const FormviewVisitorKey = `formview:${slug}:visitor:${visitorId}`;
+  const result = await redis.set(FormviewVisitorKey, "1", {
+    EX: 60 * 60 * 24,
+    NX: true,
+  });
 
-    const existingVisitorView = await GetDataFromRedis(FormviewVisitorKey);
-
-    if (!existingVisitorView) {
-      const result = await redis.set(FormviewVisitorKey, "1", {
-        EX: 60 * 60 * 24,
-        NX: true,
-      });
-
-      console.log(result);
-      
-
-    }
-  } catch (error) {}
+  console.log(result);
 }
