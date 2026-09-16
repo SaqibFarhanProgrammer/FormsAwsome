@@ -112,15 +112,11 @@ export function SingleFormView({ formData }: { formData: FormType }) {
       />
       <FormAnalyticsData slug={formData.slug} onLoaded={setAnalytics} />
 
-      {/* Top Bar */}
       <FormTopBar title={formData.title} state={formData.state} slug={formData.slug} />
 
-      {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left Column - 2/3 */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Tabs */}
             <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-xl w-fit">
               {[
                 { id: "preview" as const, label: "Preview" },
@@ -144,13 +140,11 @@ export function SingleFormView({ formData }: { formData: FormType }) {
               ))}
             </div>
 
-            {/* Tab Content */}
             {activeTab === "preview" && <FormPreview fields={formData.fields} />}
             {activeTab === "submissions" && <FormSubmissions submissions={submissions || []} />}
             {activeTab === "fields" && <FormFieldsList fields={formData.fields} />}
           </div>
 
-          {/* Right Column - 1/3 Stats & Actions */}
           <div className="space-y-4">
             <FormStats stats={stats} />
             <FormActions slug={formData.slug} onDeleted={() => router.push("/all-forms")} />
