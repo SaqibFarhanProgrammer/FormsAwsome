@@ -10,7 +10,9 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "check": "pnpm lint && pnpm format:check"
+    "check": "pnpm lint && pnpm format:check",
+      "worker": "tsx core/services/bullMQ/worker.ts"
+
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -28,6 +30,7 @@
     "dayjs": "^1.11.23",
     "framer-motion": "^13.1.0",
     "geoip-lite": "^2.0.3",
+    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.32.0",
