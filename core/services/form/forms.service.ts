@@ -24,6 +24,7 @@ import {
   submissionDataSchema,
 } from "@/core/schemas/submission.schema";
 import { getUserIPFromServer } from "@/lib/auth/rateLimit";
+import { FormViewModel } from "@/features/form-builder/models/FormViews.models";
 
 type IncomingField = {
   id: string;
@@ -152,11 +153,9 @@ function normalizeFields(fields: IncomingField[]) {
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
-  const parsedBody = createFormSchema.safeParse(body);
-  if (!parsedBody.success) {
-    throw new AppError("Invalid form details", 400);
-  }
-  const { title, description, slug, fields, settings } = parsedBody.data;
+  console.log(body);
+
+  const { title, description, slug, fields, settings } = body;
 
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
@@ -344,16 +343,10 @@ export async function updateFormService(request: NextRequest, formIdOrSlug: stri
   }
 
   const body = await request.json();
-  const parsedBody = updateFormSchema.safeParse(body);
-  if (!parsedBody.success) {
-    throw new AppError("Invalid form update details", 400);
-  }
-  const { title, description, fields, settings, state } = parsedBody.data;
+  const { title, description, fields, settings, state } = body;
 
   const userid = await getUserIdFromToken();
-  const newSlug = title
-    ? title.toLowerCase().replace(/ /g, "-") + "-" + userid + nanoid()
-    : undefined;
+  const newSlug = title ? title.toLowerCase().replace(/ /g, "-") + "-" + userid : undefined;
 
   await connectDB();
 
@@ -922,17 +915,42 @@ export async function TrackFormViews(slug: string, visitorId: string) {
   const formViewKey = `formview:${slug}`;
   const formViewVisitorKey = `formview:${slug}:visitor:${visitorId}`;
 
+  console.log(slug.split("-")[1]);
+
+  const FormViewIdSlug = slug.split("-")[1];
+
   const result = await redis.set(formViewVisitorKey, "1", {
     EX: 60 * 60 * 24,
     NX: true,
   });
 
-  if (result === "OK") {
-    const totalViews = await redis.incr(formViewKey);
+  const currentCount = await redis.get(formViewKey);
+  console.log(currentCount);
 
+  if (result !== "OK") {
+    const totalViews = await redis.incr(formViewKey);
     console.log("New view:", totalViews);
 
     // Phase 2
+
+    const exitingFormView = await FormViewModel.findOne({
+      formId: FormViewIdSlug,
+    });
+
+    const newCount = exitingFormView.count + 1;
+    console.log(newCount);
+
+    if (exitingFormView) {
+      exitingFormView.count = newCount;
+      await exitingFormView.save();
+    }
+
+    if (!exitingFormView) {
+      await FormViewModel.create({
+        formId: FormViewIdSlug,
+        count: 1,
+      });
+    }
   } else {
     console.log("Already viewed within 24h");
   }

@@ -229,6 +229,9 @@ export function TopBar() {
   const settings = useSelector(selectFormSettings);
   const fields = useSelector(selectFormFields);
 
+  console.log(slug);
+  
+
   const [isSaving, setIsSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
@@ -254,7 +257,6 @@ export function TopBar() {
     ).unwrap();
     const createdSlug = result.data?.slug || slug;
     dispatch(setFormSlug(createdSlug));
-    console.log(result);
 
     router.replace(`/create?slug=${createdSlug}`);
     return createdSlug;
@@ -271,7 +273,9 @@ export function TopBar() {
         settings,
       });
       const savedSlug = response.data.form?.slug || slug;
-      dispatch(setFormSlug(savedSlug));
+      console.log(response.data.form?.slug );
+      
+      dispatch(setFormSlug(savedSlug)); 
       router.replace(`/create?slug=${savedSlug}`);
       return savedSlug;
     } catch (error) {

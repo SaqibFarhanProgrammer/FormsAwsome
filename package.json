@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "check": "pnpm lint && pnpm format:check",
+    "check": "pnpm lint && pnpm format:check"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
