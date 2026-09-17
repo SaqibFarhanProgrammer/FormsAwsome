@@ -11,8 +11,6 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "check": "pnpm lint && pnpm format:check",
-      "worker": "tsx core/services/bullMQ/worker.ts"
-
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -21,7 +19,6 @@
     "@tabler/icons-react": "^3.46.0",
     "axios": "^1.19.0",
     "bcryptjs": "^3.0.3",
-    "bullmq": "^6.1.2",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.11.0",
     "clsx": "^2.1.1",
@@ -30,7 +27,6 @@
     "dayjs": "^1.11.23",
     "framer-motion": "^13.1.0",
     "geoip-lite": "^2.0.3",
-    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.32.0",
@@ -69,6 +65,7 @@
     "eslint-plugin-unused-imports": "^4.4.1",
     "prettier": "^3.9.6",
     "tailwindcss": "^4",
+    "tsx": "^4.23.13",
     "typescript": "^5.8.3"
   },
   "packageManager": "pnpm@11.5.0"

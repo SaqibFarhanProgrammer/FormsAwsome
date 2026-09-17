@@ -1,5 +1,6 @@
 allowBuilds:
   core-js: false
+  esbuild: false
   msgpackr-extract: false
   sharp: false
   unrs-resolver: false
