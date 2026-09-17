@@ -23,9 +23,7 @@ import {
   formIdentifierSchema,
   submissionDataSchema,
 } from "@/core/schemas/submission.schema";
-import { getUserIP, getUserIPFromServer } from "@/lib/auth/rateLimit";
-import { GenerateVisitoriD } from "@/features/form-builder/utils/VisitorIdGenerator";
-import axios from "axios";
+import { getUserIPFromServer } from "@/lib/auth/rateLimit";
 
 type IncomingField = {
   id: string;
@@ -912,10 +910,8 @@ async function findOwnedForm(formIdOrSlug: string, userId: string) {
 
   return form;
 }
-export async function TrackFormViews(slug: string) {
+export async function TrackFormViews(slug: string, visitorId: string) {
   const cookieStore = await cookies();
-
-  let visitorId = cookieStore.get("VisitorId")?.value;
 
   if (!visitorId) {
     return;
@@ -935,6 +931,8 @@ export async function TrackFormViews(slug: string) {
     const totalViews = await redis.incr(formViewKey);
 
     console.log("New view:", totalViews);
+
+    // Phase 2
   } else {
     console.log("Already viewed within 24h");
   }

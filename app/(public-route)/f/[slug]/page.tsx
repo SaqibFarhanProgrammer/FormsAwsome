@@ -1,5 +1,4 @@
-import { headers } from "next/headers";
-import { getPublicFormService, TrackFormViews } from "@/core/services/form/forms.service";
+import { getPublicFormService } from "@/core/services/form/forms.service";
 import FormUI from "@/features/form-builder/components/form-ui";
 import PublicFormCLientApiCall from "@/features/form-builder/components/PublicFormCLientApiCall";
 
@@ -11,7 +10,6 @@ export default async function FormPage({ params }: FormPageProps) {
   const { slug } = await params;
 
   const formData = await getPublicFormService(slug);
-  await TrackFormViews(slug);
 
   if (!formData) {
     return (
@@ -33,7 +31,7 @@ export default async function FormPage({ params }: FormPageProps) {
         submitUrl={`/api/f/${slug}`}
         hasSubmitted={Boolean(formData!.hasSubmitted)}
       />
-      <PublicFormCLientApiCall />
+      <PublicFormCLientApiCall slug={slug} />
     </main>
   );
 }

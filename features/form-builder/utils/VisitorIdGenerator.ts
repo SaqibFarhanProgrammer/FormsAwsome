@@ -1,4 +1,3 @@
-
 export function GenerateVisitoriD() {
   const radmonChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   return Array.from(

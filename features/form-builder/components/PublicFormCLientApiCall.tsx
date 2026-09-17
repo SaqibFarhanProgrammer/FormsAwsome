@@ -1,20 +1,20 @@
-  "use client";
-  import axios from "axios";
-  import React, { useEffect } from "react";
+"use client";
+import axios from "axios";
+import { useEffect } from "react";
 
-  function PublicFormCLientApiCall() {
-    async function CallApi() {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/forms/set-visitor-id-in-cookie`,
-      );
-
-    }
-
-    useEffect(() => {
-      CallApi();
-    }, []);
-
-    return null;
+function PublicFormCLientApiCall({ slug }: { slug: string }) {
+  async function CallApi() {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/forms/set-visitor-id-in-cookie`,
+      { slug },
+    );
   }
 
-  export default PublicFormCLientApiCall;
+  useEffect(() => {
+    CallApi();
+  }, []);
+
+  return null;
+}
+
+export default PublicFormCLientApiCall;

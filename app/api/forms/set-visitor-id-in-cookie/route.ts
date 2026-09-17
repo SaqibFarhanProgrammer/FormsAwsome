@@ -1,9 +1,16 @@
+import { TrackFormViews } from "@/core/services/form/forms.service";
 import { GenerateVisitoriD } from "@/features/form-builder/utils/VisitorIdGenerator";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     let visitorId = req.cookies.get("VisitorId")?.value;
+
+    const body = await req.json();
+
+    const slug = body.slug;
+
+    console.log(body.slug);
 
     const response = NextResponse.json({
       success: true,
@@ -21,6 +28,8 @@ export async function GET(req: NextRequest) {
         sameSite: "lax",
       });
     }
+
+    await TrackFormViews(slug, visitorId);
 
     return response;
   } catch (error) {
