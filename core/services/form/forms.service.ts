@@ -73,6 +73,7 @@ type PublicFormPayload = {
 const FORM_CACHE_TTL_SECONDS = 60 * 60 * 2;
 const FORM_SMALL_DATA_CACHE_TTL_SECONDS = 60 * 5;
 const FORM_SUBMISSION_IP_TTL_SECONDS = 60 * 60 * 6;
+const FORM_STATE_ANALYTICS_CACHE_TTL_SECONDS = 60 * 5;
 
 function getPublicFormCacheKey(slug: string) {
   return `public:form:${slug}`;
@@ -840,6 +841,46 @@ export async function getFormAnalyticsService(
   return result;
 }
 
+export async function getFormStateAnalyticsService(formIdOrSlug: string) {
+  if (!formIdentifierSchema.safeParse(formIdOrSlug).success) {
+    throw new AppError("Form ID or slug is required", 400);
+  }
+
+  const userId = await getUserIdFromToken();
+  await connectDB();
+
+  const form = await findOwnedForm(formIdOrSlug, userId.toString());
+  const cacheKey = `form:${form._id.toString()}:mongo-analytics:${userId.toString()}`;
+  const cachedAnalytics = await GetDataFromRedis(cacheKey);
+
+  if (cachedAnalytics) {
+    return JSON.parse(cachedAnalytics);
+  }
+
+  const [totalSubmissions, totalViews] = await Promise.all([
+    Submission.countDocuments({ formId: form._id }),
+    FormView.countDocuments({ formId: form._id }),
+  ]);
+
+  const result = {
+    totalSubmissions,
+    totalViews,
+    conversionRate: totalViews > 0 ? Math.round((totalSubmissions / totalViews) * 100) : 0,
+    avgTime: "—",
+    lastSubmission: "No submissions yet",
+    todaySubmissions: 0,
+    weekSubmissions: 0,
+  };
+
+  await SetDataToRedisWithTTL(
+    cacheKey,
+    JSON.stringify(result),
+    FORM_STATE_ANALYTICS_CACHE_TTL_SECONDS,
+  );
+
+  return result;
+}
+
 export async function getSubmissionService(submissionId: string) {
   if (!Types.ObjectId.isValid(submissionId)) {
     throw new AppError("Submission not found", 404);
@@ -911,8 +952,6 @@ export async function TrackFormViews(slug: string, visitorId: string) {
   const formViewKey = `formview:${slug}`;
   const formViewVisitorKey = `formview:${slug}:visitor:${visitorId}`;
 
-  console.log(slug.split("-")[1]);
-
   const FormViewIdSlug = slug.split("-")[1];
 
   const result = await redis.set(formViewVisitorKey, "1", {
@@ -920,7 +959,7 @@ export async function TrackFormViews(slug: string, visitorId: string) {
     NX: true,
   });
 
-  if (result === "OK") {
+  if (result !== "OK") {
     await redis.incr(formViewKey);
 
     const exitingFormView = await FormStatesModel.findOne({

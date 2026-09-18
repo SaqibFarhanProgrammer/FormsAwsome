@@ -61,6 +61,3 @@ formViewSchema.index({ formId: 1, ip: 1 }, { unique: true });
 
 export const FormView =
   mongoose.models.FormView || mongoose.model<FormViewType>("FormView", formViewSchema);
-
-export const FormViews =
-  mongoose.models.FormViews || mongoose.model<FormViewType>("FormViews", formViewSchema);

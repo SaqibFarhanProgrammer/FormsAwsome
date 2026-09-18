@@ -27,6 +27,16 @@ const emptyAnalytics: AnalyticsViewModel = {
   weekSubmissions: 0,
 };
 
+async function fetchFormAnalytics(slug: string): Promise<AnalyticsViewModel> {
+  const response = await axios.get(
+    `/api/forms/get-form-analytics?slug=${encodeURIComponent(slug)}`,
+  );
+  const rawData = response.data?.data || response.data || {};
+  console.log(response);
+
+  return { ...emptyAnalytics, ...rawData };
+}
+
 export function FormAnalytics({ slug }: { slug: string }) {
   const [analytics, setAnalytics] = useState<AnalyticsViewModel>(emptyAnalytics);
   const dispatch = useDispatch();
@@ -34,13 +44,9 @@ export function FormAnalytics({ slug }: { slug: string }) {
   useEffect(() => {
     let cancelled = false;
 
-    void axios
-      .get(`/api/forms/${slug}/analytics`)
-      .then((response) => {
-        if (cancelled) return;
-
-        const rawData = response.data?.data || response.data || {};
-        setAnalytics({ ...emptyAnalytics, ...rawData });
+    void fetchFormAnalytics(slug)
+      .then((data) => {
+        if (!cancelled) setAnalytics(data);
       })
       .catch((error: unknown) => {
         if (!cancelled) {
@@ -57,6 +63,8 @@ export function FormAnalytics({ slug }: { slug: string }) {
       cancelled = true;
     };
   }, [dispatch, slug]);
+
+  console.log(analytics);
 
   return <FormStats stats={analytics} />;
 }

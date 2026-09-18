@@ -8,9 +8,7 @@ import { getUserIP } from "@/lib/auth/rateLimit";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
-    const requestIp = getUserIP(request);
-
-    const data = await getPublicFormService(slug, { requestIp });
+    const data = await getPublicFormService(slug);
     return NextResponse.json(
       {
         success: true,

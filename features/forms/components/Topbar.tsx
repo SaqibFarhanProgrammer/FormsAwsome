@@ -230,7 +230,6 @@ export function TopBar() {
   const fields = useSelector(selectFormFields);
 
   console.log(slug);
-  
 
   const [isSaving, setIsSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -273,9 +272,9 @@ export function TopBar() {
         settings,
       });
       const savedSlug = response.data.form?.slug || slug;
-      console.log(response.data.form?.slug );
-      
-      dispatch(setFormSlug(savedSlug)); 
+      console.log(response.data.form?.slug);
+
+      dispatch(setFormSlug(savedSlug));
       router.replace(`/create?slug=${savedSlug}`);
       return savedSlug;
     } catch (error) {
