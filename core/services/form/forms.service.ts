@@ -959,7 +959,7 @@ export async function TrackFormViews(slug: string, visitorId: string) {
     NX: true,
   });
 
-  if (result !== "OK") {
+  if (result === "OK") {
     await redis.incr(formViewKey);
 
     const exitingFormView = await FormStatesModel.findOne({
