@@ -16,15 +16,13 @@ import { FormState } from "@/features/form-builder/types/form-builder.types";
 import { Form } from "@/features/form-builder/models/form-builder.model";
 import type { FormField } from "@/features/form-builder/models/form-builder.model";
 import { Types } from "mongoose";
-import { nanoid } from "@reduxjs/toolkit";
-import { createFormSchema, updateFormSchema } from "@/core/schemas/form.schema";
 import {
   analyticsQuerySchema,
   formIdentifierSchema,
   submissionDataSchema,
 } from "@/core/schemas/submission.schema";
 import { getUserIPFromServer } from "@/lib/auth/rateLimit";
-import { FormViewModel } from "@/features/form-builder/models/FormViews.models";
+import { FormStatesModel } from "@/features/submissions/models/FormStates.model";
 
 type IncomingField = {
   id: string;
@@ -904,8 +902,6 @@ async function findOwnedForm(formIdOrSlug: string, userId: string) {
   return form;
 }
 export async function TrackFormViews(slug: string, visitorId: string) {
-  const cookieStore = await cookies();
-
   if (!visitorId) {
     return;
   }
@@ -924,32 +920,18 @@ export async function TrackFormViews(slug: string, visitorId: string) {
     NX: true,
   });
 
-  const currentCount = await redis.get(formViewKey);
-  console.log(currentCount);
+  if (result === "OK") {
+    await redis.incr(formViewKey);
 
-  if (result !== "OK") {
-    const totalViews = await redis.incr(formViewKey);
-    console.log("New view:", totalViews);
-
-    // Phase 2
-
-    const exitingFormView = await FormViewModel.findOne({
-      formId: FormViewIdSlug,
+    const exitingFormView = await FormStatesModel.findOne({
+      formid: FormViewIdSlug,
     });
 
-    const newCount = exitingFormView.count + 1;
-    console.log(newCount);
+    const newCount = (exitingFormView?.totalViews ?? 0) + 1;
 
     if (exitingFormView) {
-      exitingFormView.count = newCount;
+      exitingFormView.totalViews = newCount;
       await exitingFormView.save();
-    }
-
-    if (!exitingFormView) {
-      await FormViewModel.create({
-        formId: FormViewIdSlug,
-        count: 1,
-      });
     }
   } else {
     console.log("Already viewed within 24h");

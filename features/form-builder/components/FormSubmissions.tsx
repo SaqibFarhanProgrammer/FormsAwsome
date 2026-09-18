@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useDispatch } from "react-redux";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ChevronDown, ChevronUp, Mail, User, Clock } from "lucide-react";
+import { showAlert } from "@/redux/features/global/alertSlice";
+import { getErrorMessage } from "@/utils/getErrorMessage";
+import type { FormType } from "../models/form-builder.model";
 
-interface Submission {
+export interface Submission {
   id: string;
   submittedBy: string;
   email: string;
@@ -15,11 +20,83 @@ interface Submission {
 }
 
 interface FormSubmissionsProps {
-  submissions: Submission[];
+  slug: string;
+  fields: FormType["fields"];
 }
 
-export function FormSubmissions({ submissions }: FormSubmissionsProps) {
+function toSubmissionViewModel(
+  submission: { id: string; data: Record<string, unknown>; createdAt: string },
+  fields: FormType["fields"],
+): Submission {
+  const fieldMap = new Map(fields.map((field) => [field.id, field]));
+  const values = Object.fromEntries(
+    Object.entries(submission.data || {}).map(([fieldId, value]) => {
+      const field = fieldMap.get(fieldId);
+      const label = field?.label || fieldId;
+      return [label, Array.isArray(value) ? value.join(", ") : String(value ?? "")];
+    }),
+  );
+
+  return {
+    id: submission.id,
+    submittedBy:
+      values.Name ||
+      values["Full Name"] ||
+      values["Full name"] ||
+      values.full_name ||
+      values.name ||
+      "Anonymous",
+    email: values.Email || values.email || "No email",
+    date: new Date(submission.createdAt || Date.now()).toLocaleString(),
+    status: "new",
+    values,
+  };
+}
+
+export function FormSubmissions({ slug, fields }: FormSubmissionsProps) {
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void axios
+      .get(`/api/forms/${slug}/submissions`)
+      .then((response) => {
+        if (cancelled) return;
+
+        const rawData = response.data?.data || response.data || [];
+        const items = Array.isArray(rawData) ? rawData : [];
+        setSubmissions(
+          items.map((item) =>
+            toSubmissionViewModel(
+              item as { id: string; data: Record<string, unknown>; createdAt: string },
+              fields,
+            ),
+          ),
+        );
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setSubmissions([]);
+          dispatch(
+            showAlert({
+              message: getErrorMessage(error, "Unable to load submissions"),
+              type: "danger",
+            }),
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dispatch, fields, slug]);
 
   return (
     <Card className="rounded-2xl border-border">
@@ -28,7 +105,13 @@ export function FormSubmissions({ submissions }: FormSubmissionsProps) {
         <p className="text-sm text-muted-foreground">All responses to this form.</p>
       </CardHeader>
       <CardContent className="space-y-3">
-        {(submissions || []).map((submission) => (
+        {isLoading && (
+          <p className="text-sm text-muted-foreground">Loading submissions...</p>
+        )}
+        {!isLoading && submissions.length === 0 && (
+          <p className="text-sm text-muted-foreground">No submissions yet.</p>
+        )}
+        {!isLoading && submissions.map((submission) => (
           <div
             key={submission.id}
             className={`rounded-xl border transition-all ${
