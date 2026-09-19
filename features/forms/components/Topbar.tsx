@@ -229,8 +229,6 @@ export function TopBar() {
   const settings = useSelector(selectFormSettings);
   const fields = useSelector(selectFormFields);
 
-  console.log(slug);
-
   const [isSaving, setIsSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);

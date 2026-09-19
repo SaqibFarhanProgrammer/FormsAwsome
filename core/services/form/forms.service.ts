@@ -152,7 +152,6 @@ function normalizeFields(fields: IncomingField[]) {
 
 export async function createFormService(request: NextRequest) {
   const body = await request.json();
-  console.log(body);
 
   const { title, description, slug, fields, settings } = body;
 
@@ -969,13 +968,9 @@ export async function TrackFormViews(slug: string, visitorId: string) {
   });
 
   if (result === "OK") {
-    console.log("chala");
-
     const exitingFormView = await FormStatesModel.findOne({
       formid: FormViewIdSlug,
     });
-
-    console.log(exitingFormView);
 
     const newCount = (exitingFormView?.totalViews ?? 0) + 1;
 

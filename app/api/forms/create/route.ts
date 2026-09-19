@@ -6,7 +6,6 @@ import { createFormService } from "@/core/services/form/forms.service";
 export async function POST(request: NextRequest) {
   try {
     const data = await createFormService(request);
-    console.log("chalal");
 
     return NextResponse.json(
       {

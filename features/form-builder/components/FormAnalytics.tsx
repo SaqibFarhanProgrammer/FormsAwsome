@@ -64,7 +64,5 @@ export function FormAnalytics({ slug }: { slug: string }) {
     };
   }, [dispatch, slug]);
 
-  console.log(analytics);
-
   return <FormStats stats={analytics} />;
 }
