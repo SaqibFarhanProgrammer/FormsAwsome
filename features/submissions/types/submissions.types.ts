@@ -9,5 +9,5 @@ export type SubmissionType = {
   formId: mongoose.Types.ObjectId | string; // Allow string for flexibility
   formVersion: number;
   data: Record<string, unknown>;
-  meta: SubmissionMeta;
+  // meta: SubmissionMeta; for v2
 };

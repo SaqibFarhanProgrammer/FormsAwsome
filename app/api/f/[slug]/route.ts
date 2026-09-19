@@ -33,19 +33,8 @@ export async function POST(
     const { slug } = await params;
     const userAgent = request.headers.get("user-agent") || "";
     const parser = new UAParser(userAgent);
-    const result = parser.getResult();
 
-    const data = await submitFormService(slug, await request.json(), {
-      ip: getUserIP(request),
-      userAgent,
-      region: request.headers.get("x-vercel-ip-country-region") || undefined,
-      country: request.headers.get("x-vercel-ip-country") || undefined,
-      countryCode: request.headers.get("x-vercel-ip-country") || undefined,
-      city: request.headers.get("x-vercel-ip-city") || undefined,
-      browser: result.browser.name || undefined,
-      os: result.os.name || undefined,
-      device: result.device.type || "unknown",
-    });
+    const data = await submitFormService(slug, await request.json(), getUserIP(request));
 
     return NextResponse.json(
       { success: true, message: "Form submitted successfully", data },

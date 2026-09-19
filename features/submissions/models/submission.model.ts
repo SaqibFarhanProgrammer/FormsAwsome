@@ -18,10 +18,12 @@ const submissionSchema = new mongoose.Schema<SubmissionType>(
       required: true,
       default: {},
     },
-    meta: {
-      ip: { type: String },
-      userAgent: { type: String },
-    },
+    // meta: {
+    //   ip: { type: String },
+    //   userAgent: { type: String },
+    // },
+
+    // we store per submition meta in v2
   },
   {
     timestamps: true, // createdAt & updatedAt

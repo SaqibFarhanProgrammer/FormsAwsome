@@ -588,17 +588,18 @@ export async function getPublicFormService(slug: string): Promise<PublicFormPayl
 export async function submitFormService(
   slug: string,
   data: Record<string, unknown>,
-  meta: {
-    ip?: string;
-    userAgent?: string;
-    region?: string;
-    country?: string;
-    countryCode?: string;
-    city?: string;
-    browser?: string;
-    os?: string;
-    device?: string;
-  } = {},
+  ip: string | undefined,
+  // meta: {
+  //   ip?: string;
+  //   userAgent?: string;
+  //   region?: string;
+  //   country?: string;
+  //   countryCode?: string;
+  //   city?: string;
+  //   browser?: string;
+  //   os?: string;
+  //   device?: string;
+  // } = {},
 ) {
   const parsedData = submissionDataSchema.safeParse(data);
   if (!slug || !parsedData.success) {
@@ -606,15 +607,15 @@ export async function submitFormService(
   }
   data = parsedData.data;
 
-  const normalizedIp = meta.ip?.trim();
+  const normalizedIp = ip?.trim();
   const ipSubmissionKey = normalizedIp ? getFormSubmissionKey(slug, normalizedIp) : null;
 
-  if (ipSubmissionKey) {
-    const existingSubmission = await GetDataFromRedis(ipSubmissionKey);
-    if (existingSubmission) {
-      throw new AppError("You have already submitted the form.", 409);
-    }
-  }
+  // if (ipSubmissionKey) {
+  //   const existingSubmission = await GetDataFromRedis(ipSubmissionKey);
+  //   if (existingSubmission) {
+  //     throw new AppError("You have already submitted the form.", 409);
+  //   }
+  // }
 
   await connectDB();
   const form = await Form.findOne({ slug });
@@ -658,8 +659,17 @@ export async function submitFormService(
     formId: form._id,
     formVersion: form.version,
     data,
-    meta,
   });
+
+  console.log(ip);
+
+  const res = await FormStatesModel.findOne({ formid: form._id });
+
+  const newState = res && res.totalSubmissions + 1;
+  res.totalSubmissions = newState;
+  res.save();
+
+  console.log(res);
 
   const ownerId = form.userId.toString();
   await Promise.all([
@@ -667,26 +677,24 @@ export async function submitFormService(
     DeleteDataFromRedis(getFormAnalyticsCacheKey(form._id.toString(), ownerId, {})),
   ]);
 
-  const formViewPayload = {
-    formId: form._id,
-    ip: normalizedIp,
-    name: typeof data.name === "string" ? data.name.trim() : undefined,
-    email: typeof data.email === "string" ? data.email.trim() : undefined,
-    region: meta.region || undefined,
-    country: meta.country || undefined,
-    countryCode: meta.countryCode || undefined,
-    city: meta.city || undefined,
-    device: meta.device || "unknown",
-    browser: meta.browser || undefined,
-    os: meta.os || undefined,
-    userAgent: meta.userAgent || undefined,
-  };
+  // const formViewPayload = {
+  //   formId: form._id,
+  //   ip: normalizedIp,
+  //   name: typeof data.name === "string" ? data.name.trim() : undefined,
+  //   email: typeof data.email === "string" ? data.email.trim() : undefined,
+  //   region: meta.region || undefined,
+  //   country: meta.country || undefined,
+  //   countryCode: meta.countryCode || undefined,
+  //   city: meta.city || undefined,
+  //   device: meta.device || "unknown",
+  //   browser: meta.browser || undefined,
+  //   os: meta.os || undefined,
+  //   userAgent: meta.userAgent || undefined,
+  // };
 
   const existingView = normalizedIp
     ? await FormView.findOne({ formId: form._id, ip: normalizedIp }).lean()
     : null;
-
-  await FormView.create(formViewPayload);
 
   if (ipSubmissionKey) {
     await SetDataToRedisWithTTL(
@@ -949,7 +957,8 @@ export async function TrackFormViews(slug: string, visitorId: string) {
 
   const redis = await ConnectionToRedis();
 
-  const formViewKey = `formview:${slug}`;
+  const IsVisitorExits = await redis.get(`formview:${slug}:visitor:${visitorId}`);
+
   const formViewVisitorKey = `formview:${slug}:visitor:${visitorId}`;
 
   const FormViewIdSlug = slug.split("-")[1];
@@ -960,11 +969,13 @@ export async function TrackFormViews(slug: string, visitorId: string) {
   });
 
   if (result === "OK") {
-    await redis.incr(formViewKey);
+    console.log("chala");
 
     const exitingFormView = await FormStatesModel.findOne({
       formid: FormViewIdSlug,
     });
+
+    console.log(exitingFormView);
 
     const newCount = (exitingFormView?.totalViews ?? 0) + 1;
 
