@@ -51,6 +51,8 @@ These items prevent an optimization from making a data leak or stale response fa
 - Replace browser-side `axios` calls with a small typed `fetch` client. Keep server-only HTTP calls explicit and avoid shipping unnecessary client helpers.
 - Load Recharts only on analytics routes and use `next/dynamic` for chart components when the page can render without them immediately.
 - Load `jspdf` only when the user presses Export, using a dynamic import inside the event handler or a dynamically loaded export component.
+- Keep route-specific dynamic imports in `components/lazy/LazyComponents.tsx`; use the shared shadcn `Skeleton` fallback so loading UI stays consistent.
+- Lazy-load dashboard submissions, profile panels, and settings tabs independently. Keep server data fetching outside the lazy registry.
 - Keep `framer-motion` limited to surfaces that need it. Do not import it in shared layouts or above-the-fold routes unless the animation is visible there.
 - Audit duplicate and unused dependencies with `pnpm exec depcheck` or an equivalent review before removing packages.
 

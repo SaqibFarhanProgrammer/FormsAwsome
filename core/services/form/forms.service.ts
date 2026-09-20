@@ -664,9 +664,20 @@ export async function submitFormService(
 
   const res = await FormStatesModel.findOne({ formid: form._id });
 
-  const newState = res && res.totalSubmissions + 1;
-  res.totalSubmissions = newState;
-  res.save();
+  let newFormStatesModelLEY = res;
+
+  if (!res) {
+    const newFormStatesModel = await FormStatesModel.create({
+      formid: form._id,
+      totalSubmissions: 1,
+    });
+
+    newFormStatesModelLEY = newFormStatesModel;
+  }
+
+  const newState = newFormStatesModelLEY && newFormStatesModelLEY.totalSubmissions + 1;
+  newFormStatesModelLEY.totalSubmissions = newState;
+  newFormStatesModelLEY.save();
 
   console.log(res);
 
