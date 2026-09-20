@@ -1,10 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
 import { AnalyticsOverview } from "./AnalyticsOverview";
-import { DeviceChart } from "./DeviceChart";
-import { FormsPerformanceChart } from "./FormsPerformanceChart";
-import { SubmissionsChart } from "./SubmissionsChart";
-import { ViewsChart } from "./ViewsChart";
+import { AnalyticsChartSkeleton } from "./AnalyticsChartSkeleton";
+
+const DeviceChart = dynamic(() => import("./DeviceChart").then((module) => module.DeviceChart), {
+  loading: () => <AnalyticsChartSkeleton />,
+});
+const FormsPerformanceChart = dynamic(
+  () => import("./FormsPerformanceChart").then((module) => module.FormsPerformanceChart),
+  { loading: () => <AnalyticsChartSkeleton /> },
+);
+const SubmissionsChart = dynamic(
+  () => import("./SubmissionsChart").then((module) => module.SubmissionsChart),
+  { loading: () => <AnalyticsChartSkeleton /> },
+);
+const ViewsChart = dynamic(() => import("./ViewsChart").then((module) => module.ViewsChart), {
+  loading: () => <AnalyticsChartSkeleton />,
+});
 
 export function AnalyticsClient() {
   return (
