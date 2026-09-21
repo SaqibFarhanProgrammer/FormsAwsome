@@ -100,14 +100,14 @@ export function FormBuilder() {
       <TopBar />
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex min-w-0 flex-1 overflow-hidden">
         {/* Left Sidebar - Click to Add Fields */}
         <div className="w-64 shrink-0 border-r border-border bg-card overflow-y-auto">
           <ElementsSidebar onAddField={handleAddField} />
         </div>
 
         {/* Center Canvas */}
-        <div className="flex-1 min-w-0 overflow-y-auto bg-muted/20">
+        <div className="min-w-0 flex-1 overflow-y-auto bg-muted/20">
           <FormCanvas
             selectedFieldId={selectedFieldId}
             onSelectField={handleSelectField}

@@ -119,11 +119,30 @@
 
 @layer base {
   * {
+    box-sizing: border-box;
     @apply border-border outline-ring/50;
   }
+
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
+  }
+
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    overflow-wrap: anywhere;
   }
+
+  button,
+  input,
+  textarea,
+  select {
+    min-width: 0;
+  }
+
   html {
     @apply font-sans;
   }
