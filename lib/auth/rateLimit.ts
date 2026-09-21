@@ -3,7 +3,7 @@ import { ConnectionToRedis } from "@/lib/redis/redis";
 import { headers } from "next/headers";
 
 export const AUTH_RATE_LIMIT = 5;
-export const AUTH_RATE_LIMIT_WINDOW_SECONDS = 30 * 60;
+export const AUTH_RATE_LIMIT_WINDOW_SECONDS = 60 * 60 * 2;
 
 export type RateLimitOptions = {
   name: string;

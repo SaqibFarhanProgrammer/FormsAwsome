@@ -70,7 +70,7 @@ type PublicFormPayload = {
   hasSubmitted: boolean;
 };
 
-const FORM_CACHE_TTL_SECONDS = 60 * 60 * 2;
+const FORM_CACHE_TTL_SECONDS = 60 * 5;
 const FORM_SMALL_DATA_CACHE_TTL_SECONDS = 60 * 5;
 const FORM_SUBMISSION_IP_TTL_SECONDS = 60 * 60 * 6;
 const FORM_STATE_ANALYTICS_CACHE_TTL_SECONDS = 60 * 5;

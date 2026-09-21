@@ -64,7 +64,7 @@ export async function GetProfileService() {
 
   const profileData = serializeProfileData(user);
 
-  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(profileData), 3600);
+  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(profileData), 60 * 5);
 
   return profileData;
 }
