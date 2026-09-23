@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { Fragment, type CSSProperties, type ReactNode } from "react";
 import { Check, Loader2, X } from "lucide-react";
 import type { FormData } from "../../models/FormData";
 import type { TemplateForm } from "./form-template.utils";
@@ -26,6 +26,38 @@ export interface TemplateUIProps {
   submitUrl: string;
   className?: string;
   hasSubmitted?: boolean;
+}
+
+export function FormDescription({
+  description,
+  className,
+}: {
+  description?: string;
+  className?: string;
+}) {
+  const lines =
+    description
+      ?.split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean) ?? [];
+
+  if (lines.length === 0) return null;
+
+  return (
+    <div className={className}>
+      {lines.map((line, index) => (
+        <Fragment key={`${line}-${index}`}>
+          <span className="block">{line}</span>
+          {index < lines.length - 1 && (
+            <>
+              <br />
+              <span className="block h-2" aria-hidden="true" />
+            </>
+          )}
+        </Fragment>
+      ))}
+    </div>
+  );
 }
 
 /* ==========================================

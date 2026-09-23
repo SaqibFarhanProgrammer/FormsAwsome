@@ -4,18 +4,14 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Plus, AlertCircle, Type } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, useStore } from "react-redux";
 import axios from "axios";
 import { useState, useCallback } from "react";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { showAlert } from "@/redux/features/global/alertSlice";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  selectFormFields,
-  selectFormTitle,
-  selectFormDescription,
-  selectFormSettings,
-} from "@/redux/features/form-builder/form.selectors";
+import { selectFormFields } from "@/redux/features/form-builder/form.selectors";
+import type { RootState } from "@/redux/store";
 import { FormMeta } from "./FormMeta";
 import { FormFieldItem } from "./FormFieldItem";
 import { reorderFields } from "@/redux/features/form-builder/form.slice";
@@ -33,9 +29,7 @@ interface FormCanvasProps {
  *
  * Redux Subscriptions:
  * - fields (via selectFormFields) - used to render field list
- * - formTitle (via selectFormTitle) - needed for save API call
- * - formDescription (via selectFormDescription) - needed for save API call
- * - formSettings (via selectFormSettings) - needed for save API call
+ * - form metadata is read from the store only when Save is clicked
  *
  * Note: FormMeta is rendered as a separate component that manages
  * its own narrow subscriptions to formTitle and formDescription.
@@ -47,11 +41,7 @@ interface FormCanvasProps {
  */
 export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: FormCanvasProps) {
   const dispatch = useDispatch();
-
-  // Subscribe only to data needed for save functionality
-  const title = useSelector(selectFormTitle);
-  const description = useSelector(selectFormDescription);
-  const settings = useSelector(selectFormSettings);
+  const store = useStore<RootState>();
 
   // Subscribe only to fields for rendering the list
   const fields = useSelector(selectFormFields);
@@ -96,6 +86,7 @@ export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: Fo
     setUiError("");
 
     try {
+      const { formTitle: title, formDescription: description, settings } = store.getState().form;
       const res = await axios.put(`/api/forms/${slug}`, {
         title,
         description,
@@ -123,7 +114,7 @@ export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: Fo
     } finally {
       setIsSaving(false);
     }
-  }, [slug, title, description, fields, settings, dispatch, router]);
+  }, [slug, fields, dispatch, router, store]);
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">

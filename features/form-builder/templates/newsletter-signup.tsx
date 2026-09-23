@@ -1,7 +1,13 @@
 "use client";
 
 import { useTemplateForm } from "../utils/form-template.utils";
-import { type UITheme, type TemplateUIProps, Frame, SubmitBar } from "../utils/ui.utils";
+import {
+  type UITheme,
+  type TemplateUIProps,
+  FormDescription,
+  Frame,
+  SubmitBar,
+} from "../utils/ui.utils";
 import { Field } from "./form-field";
 import { Mail } from "lucide-react";
 
@@ -32,9 +38,10 @@ export function NewsletterSignupUI(props: TemplateUIProps) {
           <h1 className="text-3xl font-bold tracking-tight text-slate-950">
             {props.formData.title}
           </h1>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-600">
-            {props.formData.description || "Get useful updates and ideas delivered to your inbox."}
-          </p>
+          <FormDescription
+            description={props.formData.description}
+            className="mt-3 max-w-md space-y-3 text-sm leading-relaxed text-slate-600"
+          />
         </div>
       }
     >

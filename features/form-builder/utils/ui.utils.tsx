@@ -1,5 +1,6 @@
 export {
   cls,
+  FormDescription,
   SubmitBar,
   StatusCard,
   Frame,

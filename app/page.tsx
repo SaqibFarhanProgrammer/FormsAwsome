@@ -1,4 +1,3 @@
-import Form_embed from "@/components/Form_embed";
 import { FeaturesGrid } from "@/components/landing-page/FeaturesGrid";
 import { CTAFooter } from "@/components/landing-page/Footer";
 import { HeroSection } from "@/components/landing-page/Hero";
@@ -12,7 +11,6 @@ export default async function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <Form_embed />
       <HeroSection />
       <SocialProof />
       <FeaturesGrid />

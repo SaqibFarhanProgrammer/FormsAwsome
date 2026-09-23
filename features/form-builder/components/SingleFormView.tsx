@@ -7,11 +7,14 @@ import { FormAnalytics } from "./FormAnalytics";
 import { FormActions } from "./FormActions";
 import { FormPreview } from "./FormPreview";
 import { FormFieldsList } from "./FormFieldsList";
+import { FormDeveloperTab } from "./FormDeveloperTab";
 import type { FormType } from "../models/form-builder.model";
 import { FormSubmissions } from "./FormSubmissions";
 
 export function SingleFormView({ formData }: { formData: FormType }) {
-  const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields">("preview");
+  const [activeTab, setActiveTab] = useState<"preview" | "submissions" | "fields" | "developer">(
+    "preview",
+  );
   const router = useRouter();
 
   return (
@@ -29,6 +32,7 @@ export function SingleFormView({ formData }: { formData: FormType }) {
                   label: "Submissions",
                 },
                 { id: "fields" as const, label: "Fields" },
+                { id: "developer" as const, label: "Developer" },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -49,6 +53,7 @@ export function SingleFormView({ formData }: { formData: FormType }) {
               <FormSubmissions slug={formData.slug} fields={formData.fields} />
             </div>
             {activeTab === "fields" && <FormFieldsList fields={formData.fields} />}
+            {activeTab === "developer" && <FormDeveloperTab formData={formData} />}
           </div>
 
           <div className="space-y-4">
