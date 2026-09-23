@@ -11,14 +11,6 @@ interface StatItem {
   icon?: ReactNode;
 }
 
-const defaultStats: StatItem[] = [
-  { value: "232", trend: "(420 New)", label: "Total Users" },
-  { value: "87", trend: "(31 New)", label: "Total Agents" },
-  { value: "22", trend: "(2 New)", label: "Total Categories" },
-  { value: "18", trend: "(6 Recent)", label: "Total Articles" },
-  { value: "3.8k", trend: "(1237 New)", label: "Total Subscriber" },
-];
-
 interface StateCardProps {
   className?: string;
   title?: string;
@@ -31,7 +23,7 @@ export function StateCard({
   className,
   title = "Quick Overview",
   subtitle = "This is all over platform stats generated",
-  stats: items = defaultStats,
+  stats: items = [],
   compact = false,
 }: StateCardProps) {
   if (compact) {

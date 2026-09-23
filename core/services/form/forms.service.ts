@@ -74,6 +74,7 @@ const FORM_CACHE_TTL_SECONDS = 60 * 5;
 const FORM_SMALL_DATA_CACHE_TTL_SECONDS = 60 * 5;
 const FORM_SUBMISSION_IP_TTL_SECONDS = 60 * 60 * 6;
 const FORM_STATE_ANALYTICS_CACHE_TTL_SECONDS = 60 * 5;
+const DASHBOARD_STATS_CACHE_TTL_SECONDS = 60 * 10;
 
 function getPublicFormCacheKey(slug: string) {
   return `public:form:${slug}`;
@@ -93,6 +94,66 @@ function getFormAnalyticsCacheKey(
   filters: { startDate?: string; endDate?: string },
 ) {
   return `form:${formId}:analytics:${userId}:${filters.startDate ?? ""}:${filters.endDate ?? ""}`;
+}
+
+export type DashboardStats = {
+  totalForms: number;
+  totalSubmissions: number;
+  todaySubmissions: number;
+  totalViews: number;
+  lastMonthViews: number;
+};
+
+export async function getDashboardStatsService(): Promise<DashboardStats> {
+  const userId = (await getUserIdFromToken()).toString();
+  const cacheKey = `dashboard:stats:v2:${userId}`;
+  const cachedStats = await GetDataFromRedis(cacheKey);
+
+  if (cachedStats) {
+    const parsedStats = JSON.parse(cachedStats) as Partial<DashboardStats>;
+    return {
+      totalForms: parsedStats.totalForms ?? 0,
+      totalSubmissions: parsedStats.totalSubmissions ?? 0,
+      todaySubmissions: parsedStats.todaySubmissions ?? 0,
+      totalViews: parsedStats.totalViews ?? 0,
+      lastMonthViews: parsedStats.lastMonthViews ?? 0,
+    };
+  }
+
+  await connectDB();
+  const forms = await Form.find({ userId }).select("_id").lean();
+  const formIds = forms.map((form) => form._id);
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const [totalSubmissions, todaySubmissions, totalViews, lastMonthViews] = await Promise.all([
+    formIds.length ? Submission.countDocuments({ formId: { $in: formIds } }) : 0,
+    formIds.length
+      ? Submission.countDocuments({
+          formId: { $in: formIds },
+          createdAt: { $gte: startOfToday },
+        })
+      : 0,
+    formIds.length ? FormView.countDocuments({ formId: { $in: formIds } }) : 0,
+    formIds.length
+      ? FormView.countDocuments({
+          formId: { $in: formIds },
+          createdAt: { $gte: startOfLastMonth, $lt: startOfThisMonth },
+        })
+      : 0,
+  ]);
+
+  const stats = {
+    totalForms: forms.length,
+    totalSubmissions,
+    todaySubmissions,
+    totalViews,
+    lastMonthViews,
+  };
+  await SetDataToRedisWithTTL(cacheKey, JSON.stringify(stats), DASHBOARD_STATS_CACHE_TTL_SECONDS);
+  return stats;
 }
 
 async function recordUniqueFormView(formId: string, requestIp?: string) {
