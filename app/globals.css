@@ -159,11 +159,11 @@
 .shimmer-text {
   background: linear-gradient(
     90deg,
-    #7061EE 0%,      /* Purple */
-    #957FEE 25%,     /* Light Purple */
-    #DEC1F1 50%,     /* Lavender */
-    #E5CFFD 75%,     /* Light Lavender */
-    #7061EE 100%     /* Purple again for smooth loop */
+    #7061ee 0%,
+    /* Purple */ #957fee 25%,
+    /* Light Purple */ #dec1f1 50%,
+    /* Lavender */ #e5cffd 75%,
+    /* Light Lavender */ #7061ee 100% /* Purple again for smooth loop */
   );
   background-size: 200% auto;
   -webkit-background-clip: text;

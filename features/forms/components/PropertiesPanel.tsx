@@ -294,11 +294,22 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
           <h3 className="text-sm font-semibold">Form Settings</h3>
           <div className="flex items-center gap-1">
             {!aiChatOpen && (
-              <Button variant="ghost" size="sm" className="h-8 rounded-lg px-2 text-xs text-primary" onClick={onOpenAi}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 rounded-lg px-2 text-xs text-primary"
+                onClick={onOpenAi}
+              >
                 AI
               </Button>
             )}
-            <Button variant="ghost" size="sm" className="h-8 w-8 rounded-lg p-0" onClick={onClose} aria-label="Close properties">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 rounded-lg p-0"
+              onClick={onClose}
+              aria-label="Close properties"
+            >
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
@@ -333,11 +344,22 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
         </div>
         <div className="flex items-center gap-1">
           {!aiChatOpen && (
-            <Button variant="ghost" size="sm" className="h-8 rounded-lg px-2 text-xs text-primary" onClick={onOpenAi}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 rounded-lg px-2 text-xs text-primary"
+              onClick={onOpenAi}
+            >
               AI
             </Button>
           )}
-          <Button variant="ghost" size="sm" className="h-8 w-8 rounded-lg p-0" onClick={onClose} aria-label="Close properties">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 rounded-lg p-0"
+            onClick={onClose}
+            aria-label="Close properties"
+          >
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>

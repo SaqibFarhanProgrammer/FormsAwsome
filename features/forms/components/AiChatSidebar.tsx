@@ -49,7 +49,7 @@ export function AiChatSidebar({ isOpen, onCollapse, onSendMessage }: AiChatSideb
         isOpen ? "w-96 opacity-100" : "pointer-events-none w-0 translate-x-3 opacity-0"
       }`}
     >
-      <div className="flex items-center justify-between px-4 py-">
+      <div className="flex items-center justify-between px-4 py-2">
         <Button
           variant="ghost"
           size="icon"
@@ -70,12 +70,11 @@ export function AiChatSidebar({ isOpen, onCollapse, onSendMessage }: AiChatSideb
             strokeLinejoin="round"
           >
             <rect width="18" height="18" x="3" y="3" rx="3" />
-            <path d="M15 3v18" />
-            <path d="m10 15 3-3-3-3" />
+            <path d="M9 3v18" />
+            <path d="m14 9 3 3-3 3" />
           </svg>
         </Button>
       </div>
-
       <AiChatMessages messages={messages} />
       {messages.length === 0 && <AiChatSuggestions suggestions={suggestions} onSelect={setDraft} />}
       <AiChatInput
