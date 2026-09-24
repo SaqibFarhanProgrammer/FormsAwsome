@@ -1,9 +1,14 @@
 import { geminiai } from "@/features/Ai-Form-Generator/Ai.service";
 import { AppError } from "@/lib/auth/appError";
+import { NextRequest } from "next/server";
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
-    const result = await geminiai("hello");
+    const body = await request.json();
+
+    const { prompt } = body;
+
+    const result = await geminiai(prompt);
 
     return Response.json({ ok: true, result });
   } catch (error) {
