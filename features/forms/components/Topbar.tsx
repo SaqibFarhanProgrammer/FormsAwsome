@@ -496,8 +496,8 @@ export function TopBar() {
           variant="secondary"
           className={`rounded-lg text-xs border ${
             isPublished || shareUrl
-              ? "bg-emerald-50 text-emerald-700 border-emerald-200/60"
-              : "bg-amber-50 text-amber-700 border-amber-200/50"
+              ? "bg-background text-emerald-700 border-emerald-200/60"
+              : "bg-background text-amber-700 border-amber-200/50"
           }`}
         >
           {isPublished || shareUrl ? "Published" : "Draft"}

@@ -69,7 +69,7 @@ export function StateCard({
   return (
     <div
       className={cn(
-        "relative rounded-2xl hue-rotate-130 saturate-150 sa overflow-hidden p-6 sm:p-8",
+        "relative rounded-2xl hue-rotate-130  saturate-100 sa overflow-hidden p-6 sm:p-8",
         className,
       )}
       style={{
@@ -81,8 +81,6 @@ export function StateCard({
       }}
     >
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black to-transparent" />
-
-      <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
 
       <div className="relative z-10">
         '
