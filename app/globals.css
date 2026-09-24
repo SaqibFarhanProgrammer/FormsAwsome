@@ -147,3 +147,28 @@
     @apply font-sans;
   }
 }
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #7061EE 0%,      /* Purple */
+    #957FEE 25%,     /* Light Purple */
+    #DEC1F1 50%,     /* Lavender */
+    #E5CFFD 75%,     /* Light Lavender */
+    #7061EE 100%     /* Purple again for smooth loop */
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer 4s linear infinite;
+}

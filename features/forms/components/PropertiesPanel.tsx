@@ -61,6 +61,8 @@ import { showAlert } from "@/redux/features/global/alertSlice";
 
 interface PropertiesPanelProps {
   onClose: () => void;
+  onOpenAi: () => void;
+  aiChatOpen: boolean;
 }
 
 const TEMPLATE_OPTIONS: Array<{
@@ -254,7 +256,7 @@ function getGeneratedPlaceholder(field: NonNullable<ReturnType<typeof selectSele
   }
 }
 
-export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
+export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPanelProps) {
   const dispatch = useDispatch();
 
   const selectedField = useSelector(selectSelectedField);
@@ -290,9 +292,16 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold">Form Settings</h3>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg" onClick={onClose}>
-            <ChevronRight className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center gap-1">
+            {!aiChatOpen && (
+              <Button variant="ghost" size="sm" className="h-8 rounded-lg px-2 text-xs text-primary" onClick={onOpenAi}>
+                AI
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" className="h-8 w-8 rounded-lg p-0" onClick={onClose} aria-label="Close properties">
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
         <div className="flex items-center gap-2 text-muted-foreground">
           <Settings className="w-4 h-4" />
@@ -322,9 +331,16 @@ export function PropertiesPanel({ onClose }: PropertiesPanelProps) {
             {selectedField.label || "Untitled Field"}
           </h3>
         </div>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg" onClick={onClose}>
-          <ChevronRight className="w-4 h-4" />
-        </Button>
+        <div className="flex items-center gap-1">
+          {!aiChatOpen && (
+            <Button variant="ghost" size="sm" className="h-8 rounded-lg px-2 text-xs text-primary" onClick={onOpenAi}>
+              AI
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" className="h-8 w-8 rounded-lg p-0" onClick={onClose} aria-label="Close properties">
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-5">

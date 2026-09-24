@@ -13,44 +13,22 @@ import { PropertiesPanel } from "./PropertiesPanel";
 import { TopBar } from "./Topbar";
 import { FormCanvas } from "./FormCanvas";
 import { ElementsSidebar } from "./ElementsSidebar";
+import { AiChatSidebar } from "./AiChatSidebar";
 import {
   selectFormSlug,
   selectSelectedFieldId,
 } from "@/redux/features/form-builder/form.selectors";
 
-/**
- * FormBuilder Component
- *
- * Main orchestrator for the form building interface.
- *
- * Redux Subscriptions:
- * - formSlug (via selectFormSlug) - used to sync URL slug with Redux state
- * - selectedFieldId (via selectSelectedFieldId) - passed to FormCanvas for highlighting
- *
- * All other form state subscriptions are handled by child components:
- * - TopBar: subscribes to title, description, slug, settings, fields
- * - FormCanvas: subscribes to fields, title, description, settings
- * - FormMeta (inside FormCanvas): subscribes to title, description
- * - PropertiesPanel: subscribes to selectedFieldId, selectedField, fields, settings
- *
- * This separation means:
- * - FormBuilder only re-renders when slug or selectedFieldId changes
- * - Each child component only re-renders when its specific data changes
- * - Changing form title only affects FormMeta and TopBar, not FormCanvas list
- * - Changing a field only affects that field item, not form metadata
- */
 export function FormBuilder() {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
-  // Only subscribe to formSlug and selectedFieldId
   const formSlug = useSelector(selectFormSlug);
   const selectedFieldId = useSelector(selectSelectedFieldId);
 
-  // Local UI state
   const [propertiesOpen, setPropertiesOpen] = useState(false);
+  const [aiChatOpen, setAiChatOpen] = useState(true);
 
-  // Sync URL slug with Redux state
   useEffect(() => {
     const slug = searchParams.get("slug");
 
@@ -59,7 +37,6 @@ export function FormBuilder() {
     }
   }, [formSlug, searchParams, dispatch]);
 
-  // Memoize callbacks to avoid unnecessary re-renders of child components
   const handleAddField = useCallback(
     (type: string, label: string) => {
       dispatch(
@@ -121,8 +98,16 @@ export function FormBuilder() {
             propertiesOpen ? "w-80" : "w-0 opacity-0 overflow-hidden"
           }`}
         >
-          {propertiesOpen && <PropertiesPanel onClose={handleCloseProperties} />}
+          {propertiesOpen && (
+            <PropertiesPanel
+              onClose={handleCloseProperties}
+              onOpenAi={() => setAiChatOpen(true)}
+              aiChatOpen={aiChatOpen}
+            />
+          )}
         </div>
+
+        <AiChatSidebar isOpen={aiChatOpen} onCollapse={() => setAiChatOpen(false)} />
       </div>
     </div>
   );
