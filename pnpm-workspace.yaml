@@ -1,6 +1,8 @@
 allowBuilds:
+  "@google/genai": false
   core-js: false
   esbuild: false
   msgpackr-extract: false
+  protobufjs: false
   sharp: false
   unrs-resolver: false
