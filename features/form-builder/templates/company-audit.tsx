@@ -28,7 +28,7 @@ export function CompanyAuditUI(props: TemplateUIProps) {
             🛡️
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tighter text-slate-900">
               {props.formData.title}
             </h1>
             {props.formData.description && (

@@ -40,7 +40,7 @@ export function MinimalFormTemplate(props: TemplateUIProps) {
               <CardDescription className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                 {props.formData.templateType || "Form template"}
               </CardDescription>
-              <CardTitle className="mt-2 text-3xl font-bold tracking-tight text-black">
+              <CardTitle className="mt-2 text-3xl font-bold tracking-tighter text-black">
                 {props.formData.title}
               </CardTitle>
               {props.formData.description && (

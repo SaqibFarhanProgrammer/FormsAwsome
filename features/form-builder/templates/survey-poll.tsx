@@ -45,7 +45,7 @@ export function SurveyPollUI(props: TemplateUIProps) {
               style={{ width: `${pct}%` }}
             />
           </div>
-          <h1 className="mt-5 text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="mt-5 text-2xl font-bold tracking-tighter text-slate-900">
             {props.formData.title}
           </h1>
           {props.formData.description && (

@@ -136,7 +136,7 @@ export default function RegisterForm() {
           </div>
 
           <div className="mb-8 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight text-[#1a1a1a]">
+            <h1 className="text-2xl font-semibold tracking-tighter text-[#1a1a1a]">
               Hi! Welcome to FormsAwesome
             </h1>
           </div>

@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Plus, AlertCircle, Type } from "lucide-react";
+import { Plus, AlertCircle } from "lucide-react";
 import { useDispatch, useSelector, useStore } from "react-redux";
 import axios from "axios";
 import { useState, useCallback } from "react";
@@ -118,7 +118,6 @@ export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: Fo
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
-      {/* Form metadata section - renders as separate component with own subscriptions */}
       <FormMeta />
 
       {uiError && (
@@ -132,12 +131,11 @@ export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: Fo
         <CardContent className="p-4 space-y-3 min-h-[400px]">
           {fields.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-              <div className="w-16 h-16 rounded-2xl bg-muted/80 flex items-center justify-center ring-1 ring-border/50">
-                <Type className="w-7 h-7 text-muted-foreground/60" />
-              </div>
               <div className="space-y-1">
-                <p className="text-base font-medium text-foreground">Start Building Your Form</p>
-                <p className="text-sm text-muted-foreground max-w-[280px]">
+                <p className="text-2xl pt-10 font-medium text-foreground">
+                  Start Building Your Form
+                </p>
+                <p className="text-sm text-foreground max-w-[280px]">
                   Click elements from the left sidebar to add them here
                 </p>
               </div>

@@ -29,7 +29,7 @@ export function JobApplicationUI(props: TemplateUIProps) {
             <span className="text-slate-300">/</span>
             <span className="text-slate-400">Applications reviewed weekly</span>
           </div>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="mt-3 text-3xl font-bold tracking-tighter text-slate-900">
             {props.formData.title}
           </h1>
           {props.formData.description && (

@@ -29,7 +29,7 @@ export function QuizTestUI(props: TemplateUIProps) {
           <span className="mb-3 inline-block rounded-full bg-black px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white">
             Quiz mode
           </span>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-3xl font-bold tracking-tighter text-slate-900">
             {props.formData.title}
           </h1>
           {props.formData.description && (

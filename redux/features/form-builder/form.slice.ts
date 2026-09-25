@@ -35,9 +35,12 @@ export interface FormFieldType {
   type: string;
   label: string;
   placeholder?: string;
+  helperText?: string;
   defaultValue?: string | number | boolean;
   required: boolean;
   options?: string[];
+  min?: number | null;
+  max?: number | null;
   formType?: FormTemplateType;
   uiType?: FormUiType;
   order: number;
@@ -67,6 +70,22 @@ interface FormState {
   isPublished: boolean;
   settings: FormSettings;
   isDirty: boolean;
+}
+
+export interface FormDataPayload {
+  title: string;
+  description: string;
+  fields: Array<{
+    type: string;
+    label: string;
+    placeholder: string;
+    helperText: string;
+    required: boolean;
+    options: string[];
+    min: number | null;
+    max: number | null;
+  }>;
+  settings: Pick<FormSettings, "submitButtonText" | "successMessage">;
 }
 
 const initialState: FormState = {
@@ -171,6 +190,23 @@ const formSlice = createSlice({
       }
       state.isDirty = true;
     },
+    setFormData: (state, action: PayloadAction<FormDataPayload>) => {
+      state.fields = action.payload.fields.map((field, index) => ({
+        ...field,
+        id: nanoid(),
+        formType: FormTemplateType.DEFAULT_CONTACT_FORM,
+        uiType: FormUiType.DEFAULT,
+        order: index,
+      }));
+      state.selectedFieldId = null;
+      state.formTitle = action.payload.title;
+      state.formDescription = action.payload.description;
+      state.settings = {
+        ...initialState.settings,
+        ...action.payload.settings,
+      };
+      state.isDirty = true;
+    },
     setFormSlug: (state, action: PayloadAction<string | null>) => {
       state.formSlug = action.payload;
     },
@@ -206,6 +242,7 @@ export const {
   updateField,
   setFormTemplateType,
   updateFormMeta,
+  setFormData,
   setFormSlug,
   setFormPublished,
   updateFormSettings,

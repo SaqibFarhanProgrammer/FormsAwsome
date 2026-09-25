@@ -117,7 +117,7 @@ export function LoginForm() {
       </div>
 
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight text-[#1a1a1a]">Welcome Back!</h1>
+        <h1 className="text-2xl font-semibold tracking-tighter text-[#1a1a1a]">Welcome Back!</h1>
       </div>
 
       {appError && (

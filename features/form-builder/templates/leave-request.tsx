@@ -24,7 +24,7 @@ export function LeaveRequestUI(props: TemplateUIProps) {
       grid
       header={
         <div className="mb-6 sm:col-span-2">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tighter text-slate-900">
             {props.formData.title}
           </h1>
           {props.formData.description && (

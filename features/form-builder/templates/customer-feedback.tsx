@@ -29,7 +29,7 @@ export function CustomerFeedbackUI(props: TemplateUIProps) {
       maxW="max-w-xl"
       header={
         <div className="mb-8 space-y-6">
-          <h1 className="max-w-lg text-4xl font-bold leading-[1.08] tracking-tight text-neutral-800">
+          <h1 className="max-w-lg text-4xl font-bold leading-[1.08] tracking-tighter text-neutral-800">
             {props.formData.title}
           </h1>
           <FormDescription

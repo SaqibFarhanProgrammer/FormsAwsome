@@ -31,7 +31,7 @@ export function ExpenseReimbursementUI(props: TemplateUIProps) {
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-black">
                 Finance · Claims
               </p>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+              <h1 className="mt-1 text-2xl font-bold tracking-tighter text-slate-900">
                 {props.formData.title}
               </h1>
               {props.formData.description && (

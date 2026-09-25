@@ -19,7 +19,7 @@ export default function PreviewPage() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
           Form template preview
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+        <h1 className="mt-2 text-3xl font-bold tracking-tighter text-slate-900 sm:text-4xl">
           All form templates
         </h1>
         <p className="mt-2 text-sm text-slate-600">

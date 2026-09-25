@@ -114,7 +114,7 @@ export function StateCard({
               </div>
 
               <div className="mt-1">
-                <span className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                <span className="text-3xl font-bold tracking-tighter text-foreground sm:text-4xl">
                   {stat.value}
                 </span>
               </div>

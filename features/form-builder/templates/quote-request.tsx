@@ -29,7 +29,7 @@ export function QuoteRequestUI(props: TemplateUIProps) {
         <div className="mb-6 border-b border-slate-100 pb-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              <h1 className="text-2xl font-bold tracking-tighter text-slate-900">
                 {props.formData.title}
               </h1>
               {props.formData.description && (

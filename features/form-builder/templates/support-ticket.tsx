@@ -24,7 +24,7 @@ export function SupportTicketUI(props: TemplateUIProps) {
       maxW="max-w-3xl"
       header={
         <div className="mb-16 text-center">
-          <h1 className="text-4xl font-bold leading-tight tracking-tight text-neutral-800">
+          <h1 className="text-4xl font-bold leading-tight tracking-tighter text-neutral-800">
             {props.formData.title || "Contact support"}
           </h1>
           {props.formData.description && (

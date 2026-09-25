@@ -31,7 +31,7 @@ export function EmployeeCheckinUI(props: TemplateUIProps) {
       header={
         <div className="mb-6 rounded-2xl bg-black p-5 text-white">
           <p className="text-xs font-medium text-white/70">{today}</p>
-          <h1 className="mt-0.5 text-xl font-bold tracking-tight">
+          <h1 className="mt-0.5 text-xl font-bold tracking-tighter">
             Good morning 👋 {props.formData.title}
           </h1>
           {props.formData.description && (

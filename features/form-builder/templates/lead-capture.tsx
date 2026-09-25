@@ -28,7 +28,7 @@ export function LeadCaptureUI(props: TemplateUIProps) {
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-black">
             Free quote · No commitment
           </span>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
+          <h1 className="mt-3 text-3xl font-bold tracking-tighter text-slate-950">
             {props.formData.title}
           </h1>
           {props.formData.description && (

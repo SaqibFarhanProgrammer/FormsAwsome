@@ -56,7 +56,7 @@ export function ElementsSidebar({ onAddField }: ElementsSidebarProps) {
             <Button
               key={element.type}
               variant="ghost"
-              className="w-full justify-start gap-3 h-11 rounded-xl text-sm font-normal hover:bg-primary/5 hover:text-primary transition-colors"
+              className="w-full justify-start gap-1 h-9 rounded-xl text-sm font-normal hover:bg-primary/5 hover:text-primary transition-colors"
               onClick={() => onAddField(element.type, element.label)}
             >
               <div className="w-8 h-8 rounded-lg  flex items-center justify-center flex-shrink-0">

@@ -25,7 +25,7 @@ export function ContactFormUI(props: TemplateUIProps) {
         ) : (
           <>
             <header className="mb-10 max-w-2xl">
-              <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+              <h1 className="text-4xl font-bold tracking-tighter text-slate-900 sm:text-5xl">
                 {props.formData.title}
               </h1>
               <div className="mt-8 space-y-5 text-[15px] italic leading-relaxed text-slate-600">

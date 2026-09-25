@@ -32,7 +32,7 @@ export function NdaAgreementUI(props: TemplateUIProps) {
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
             Confidential · Legal Document
           </p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="mt-3 text-3xl font-bold tracking-tighter text-slate-900">
             {props.formData.title}
           </h1>
           <FormDescription

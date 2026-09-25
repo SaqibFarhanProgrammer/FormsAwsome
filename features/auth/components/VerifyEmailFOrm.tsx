@@ -160,7 +160,9 @@ export function VerifyEmailForm() {
 
       {/* Heading */}
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight text-[#1a1a1a]">Verify your email</h1>
+        <h1 className="text-2xl font-semibold tracking-tighter text-[#1a1a1a]">
+          Verify your email
+        </h1>
         <p className="mt-2 text-sm leading-relaxed text-[#666]">
           We sent a verification code to <span className="font-medium text-[#1a1a1a]">{email}</span>
           . Enter the 6-digit code below to confirm your account. If you do not see the email, check

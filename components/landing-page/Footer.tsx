@@ -61,7 +61,7 @@ export function CTAFooter() {
       {/* CTA Section */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tighter mb-4">
             Ready to build your first form?
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">

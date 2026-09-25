@@ -26,7 +26,7 @@ export function CourseEvaluationUI(props: TemplateUIProps) {
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-black text-2xl text-white">
             🎓
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tighter text-slate-900">
             {props.formData.title}
           </h1>
           {props.formData.description && (

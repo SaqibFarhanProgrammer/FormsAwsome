@@ -556,7 +556,7 @@ function Frame({
 function DefaultHeader({ formData, theme }: { formData: FormData; theme: UITheme }) {
   return (
     <div className="mb-6">
-      <h1 className={`font-semibold tracking-tight text-slate-900 ${theme.title}`}>{formData.title}</h1>
+      <h1 className={`font-semibold tracking-tighter text-slate-900 ${theme.title}`}>{formData.title}</h1>
       {formData.description && <p className={`mt-1.5 leading-relaxed text-slate-500 ${theme.desc}`}>{formData.description}</p>}
     </div>
   );
@@ -579,7 +579,7 @@ export function ContactFormUI(props: TemplateUIProps) {
       header={
         <div className="mb-8">
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Contact us</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <h1 className="text-3xl font-semibold tracking-tighter text-slate-900">{props.formData.title}</h1>
           {props.formData.description && <p className="mt-2 text-sm leading-relaxed text-slate-500">{props.formData.description}</p>}
         </div>
       } />
@@ -608,7 +608,7 @@ export function LeadCaptureUI(props: TemplateUIProps) {
           <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-blue-600/20 blur-3xl" />
           <div className="relative">
             <span className="mb-4 inline-block rounded-full bg-sky-400/15 px-3 py-1 text-xs font-semibold text-sky-300 ring-1 ring-sky-400/30">Free quote · No commitment</span>
-            <h1 className="text-3xl font-bold leading-tight tracking-tight">{props.formData.title}</h1>
+            <h1 className="text-3xl font-bold leading-tight tracking-tighter">{props.formData.title}</h1>
             {props.formData.description && <p className="mt-3 text-sm leading-relaxed text-slate-300">{props.formData.description}</p>}
             <ul className="mt-8 space-y-3 text-sm text-slate-200">
               {["Response within 1 business day", "Tailored pricing for your project", "Free 30-min consultation call"].map((t) => (
@@ -665,7 +665,7 @@ export function CustomerFeedbackUI(props: TemplateUIProps) {
       header={
         <div className="mb-6 border-b border-amber-100 bg-gradient-to-r from-amber-400 to-orange-400 px-8 py-6 text-white">
           <div className="mb-2 flex gap-1 text-lg">{"😍 🙂 😐 🙁 😤".split(" ").map((e, i) => <span key={i} className="transition hover:scale-125">{e}</span>)}</div>
-          <h1 className="text-2xl font-bold tracking-tight">{props.formData.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tighter">{props.formData.title}</h1>
           {props.formData.description && <p className="mt-1 text-sm text-amber-50">{props.formData.description}</p>}
         </div>
       }>
@@ -702,7 +702,7 @@ export function EventRegistrationUI(props: TemplateUIProps) {
               <span className="text-xl font-black leading-none">🎟️</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">{props.formData.title}</h1>
+              <h1 className="text-xl font-bold tracking-tighter">{props.formData.title}</h1>
               {props.formData.description && <p className="mt-0.5 text-xs text-orange-100">{props.formData.description}</p>}
             </div>
           </div>
@@ -746,7 +746,7 @@ export function NewsletterSignupUI(props: TemplateUIProps) {
       header={
         <div className="mb-5 text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-lime-100 text-2xl">✉️</div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
           {props.formData.description && <p className="mt-1.5 text-sm text-slate-500">{props.formData.description}</p>}
         </div>
       } />
@@ -771,7 +771,7 @@ export function EmployeeCheckinUI(props: TemplateUIProps) {
       header={
         <div className="mb-6 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 p-5 text-white">
           <p className="text-xs font-medium text-cyan-100">{today}</p>
-          <h1 className="mt-0.5 text-xl font-bold tracking-tight">Good morning 👋 {props.formData.title}</h1>
+          <h1 className="mt-0.5 text-xl font-bold tracking-tighter">Good morning 👋 {props.formData.title}</h1>
           {props.formData.description && <p className="mt-1 text-xs text-cyan-50/90">{props.formData.description}</p>}
         </div>
       } />
@@ -798,7 +798,7 @@ export function WorkflowRequestUI(props: TemplateUIProps) {
             <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-600">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-500" /> NEW REQUEST
             </span>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+            <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
             {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
           </div>
         </div>
@@ -824,7 +824,7 @@ export function CompanyAuditUI(props: TemplateUIProps) {
         <div className="mb-6 flex items-center gap-4 border-b border-slate-100 pb-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-100 text-2xl">🛡️</div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+            <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
             {props.formData.description && <p className="mt-0.5 text-sm text-slate-500">{props.formData.description}</p>}
           </div>
         </div>
@@ -852,7 +852,7 @@ export function JobApplicationUI(props: TemplateUIProps) {
             <span className="text-slate-300">/</span>
             <span className="text-slate-400">Applications reviewed weekly</span>
           </div>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <h1 className="mt-3 text-3xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
           {props.formData.description && <p className="mt-2 text-sm text-slate-500">{props.formData.description}</p>}
         </div>
       } />
@@ -875,7 +875,7 @@ export function LeaveRequestUI(props: TemplateUIProps) {
     <Frame {...props} theme={theme} form={form} grid
       header={
         <div className="mb-6 sm:col-span-2">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
           {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
           <div className="mt-4 flex flex-wrap gap-2">
             {[["Annual", "12 days left"], ["Sick", "7 days left"], ["Casual", "5 days left"]].map(([k, v]) => (
@@ -906,7 +906,7 @@ export function EmployeeOnboardingUI(props: TemplateUIProps) {
       header={
         <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 p-6 text-white">
           <p className="text-3xl">🎉</p>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight">Welcome to the team!</h1>
+          <h1 className="mt-2 text-2xl font-bold tracking-tighter">Welcome to the team!</h1>
           <p className="mt-1 text-sm text-teal-50">{props.formData.description}</p>
         </div>
       } />
@@ -937,7 +937,7 @@ export function ProductOrderUI(props: TemplateUIProps) {
           {done ? <StatusCard form={form} formData={props.formData} hasSubmitted={props.hasSubmitted} /> : (
             <>
               <div className="mb-6">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+                <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
                 {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
               </div>
               <div className="space-y-4">
@@ -984,7 +984,7 @@ export function QuoteRequestUI(props: TemplateUIProps) {
         <div className="mb-6 border-b border-slate-100 pb-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+              <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
               {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
             </div>
             {budget !== null && budget !== undefined && (
@@ -1031,7 +1031,7 @@ export function SupportTicketUI(props: TemplateUIProps) {
             ) : (
               <>
                 <div className="mb-6">
-                  <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+                  <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
                   {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
                 </div>
                 <div className="space-y-4">
@@ -1066,7 +1066,7 @@ export function AppointmentBookingUI(props: TemplateUIProps) {
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-pink-500">
             <span>📅</span> Pick a date & time — we'll confirm instantly
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
           {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
         </div>
       } />
@@ -1102,7 +1102,7 @@ export function SurveyPollUI(props: TemplateUIProps) {
           <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
             <div className="h-full rounded-full bg-green-500 transition-all duration-500" style={{ width: `${pct}%` }} />
           </div>
-          <h1 className="mt-5 text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <h1 className="mt-5 text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
           {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
         </div>
       } />
@@ -1125,7 +1125,7 @@ export function CourseEvaluationUI(props: TemplateUIProps) {
       header={
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-100 text-2xl">🎓</div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
           {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
         </div>
       } />
@@ -1151,7 +1151,7 @@ export function QuizTestUI(props: TemplateUIProps) {
       <div className="mx-auto w-full max-w-2xl">
         <div className="mb-6 text-center">
           <span className="mb-3 inline-block rounded-full bg-purple-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-purple-700">Quiz mode</span>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <h1 className="text-3xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
           {props.formData.description && <p className="mt-2 text-sm text-slate-500">{props.formData.description}</p>}
         </div>
         {done ? (
@@ -1200,7 +1200,7 @@ export function NdaAgreementUI(props: TemplateUIProps) {
       header={
         <div className="mb-8 text-center">
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Confidential · Legal Document</p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+          <h1 className="mt-3 text-3xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
           <div className="mx-auto mt-5 max-w-md border-y border-slate-200 py-4 text-left text-xs leading-relaxed text-slate-500">
             This Non-Disclosure Agreement ("Agreement") is entered into by and between the undersigned parties
             for the purpose of protecting confidential information shared during the course of business. By
@@ -1232,7 +1232,7 @@ export function ExpenseReimbursementUI(props: TemplateUIProps) {
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-600">Finance · Claims</p>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">{props.formData.title}</h1>
+              <h1 className="mt-1 text-2xl font-bold tracking-tighter text-slate-900">{props.formData.title}</h1>
               {props.formData.description && <p className="mt-1 text-sm text-slate-500">{props.formData.description}</p>}
             </div>
             {amount !== null && amount !== undefined && amount !== "" && (

@@ -54,7 +54,7 @@ export function CanvasField({ field, isOverlay, required }: CanvasFieldProps) {
       } bg-background`}
     >
       <div className="p-4 flex items-start gap-3">
-        <div className="mt-1 p-1 rounded-md text-muted-foreground">
+        <div className="mt-1 p-1 rounded-md text-foreground">
           <Icon className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0 space-y-2">

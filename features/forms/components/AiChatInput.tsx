@@ -9,9 +9,10 @@ interface AiChatInputProps {
   value: string;
   onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  disabled?: boolean;
 }
 
-export function AiChatInput({ value, onChange, onSubmit }: AiChatInputProps) {
+export function AiChatInput({ value, onChange, onSubmit, disabled = false }: AiChatInputProps) {
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -29,6 +30,7 @@ export function AiChatInput({ value, onChange, onSubmit }: AiChatInputProps) {
           value={value}
           onChange={onChange}
           onKeyDown={handleKeyDown}
+          disabled={disabled}
           placeholder="Ask anything about your form..."
           className="min-h-16 resize-none border-0 bg-transparent px-3 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 shadow-none focus-visible:ring-0"
           aria-label="Message the form"
@@ -37,7 +39,7 @@ export function AiChatInput({ value, onChange, onSubmit }: AiChatInputProps) {
           <Button
             type="submit"
             size="icon-sm"
-            disabled={!value.trim()}
+            disabled={disabled || !value.trim()}
             className="rounded-full text-white hover:bg-white disabled:bg-neutral-700 disabled:text-neutral-500"
             aria-label="Send message"
           >

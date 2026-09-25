@@ -30,7 +30,7 @@ export function BillingSettings() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <p className="text-3xl font-bold tracking-tight">
+            <p className="text-3xl font-bold tracking-tighter">
               $29<span className="text-lg font-normal text-muted-foreground">/mo</span>
             </p>
             <p className="text-sm text-muted-foreground mt-1">Next billing: March 15, 2026</p>

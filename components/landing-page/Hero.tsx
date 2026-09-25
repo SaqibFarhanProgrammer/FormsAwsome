@@ -14,7 +14,7 @@ export function HeroSection() {
               Now with AI-powered form generation
             </div>
 
-            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight leading-[1.1]">
+            <h1 className="text-5xl sm:text-6xl font-bold tracking-tighter leading-[1.1]">
               Build forms that <span className="text-primary">convert</span>
             </h1>
 

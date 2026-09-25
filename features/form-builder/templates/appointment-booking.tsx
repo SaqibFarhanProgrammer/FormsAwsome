@@ -28,7 +28,7 @@ export function AppointmentBookingUI(props: TemplateUIProps) {
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-black">
             <span>📅</span> Pick a date &amp; time — we&apos;ll confirm instantly
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tighter text-slate-900">
             {props.formData.title}
           </h1>
           {props.formData.description && (

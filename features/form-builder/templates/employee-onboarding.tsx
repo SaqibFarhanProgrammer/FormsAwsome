@@ -23,7 +23,7 @@ export function EmployeeOnboardingUI(props: TemplateUIProps) {
       maxW="max-w-xl"
       header={
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold leading-tight tracking-tight text-neutral-800">
+          <h1 className="text-4xl font-bold leading-tight tracking-tighter text-neutral-800">
             {props.formData.title}
           </h1>
           {props.formData.description && (

@@ -26,7 +26,7 @@ export function HowItWorks() {
     <section id="how-it-works" className="py-24 px-6 bg-muted/30">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tighter mb-4">
             Build your first form in 3 simple steps
           </h2>
           <p className="text-lg text-muted-foreground">

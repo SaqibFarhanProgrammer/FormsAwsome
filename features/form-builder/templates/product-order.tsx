@@ -35,7 +35,7 @@ export function ProductOrderUI(props: TemplateUIProps) {
           ) : (
             <>
               <div className="mb-6">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                <h1 className="text-2xl font-bold tracking-tighter text-slate-900">
                   {props.formData.title}
                 </h1>
                 {props.formData.description && (

@@ -35,7 +35,7 @@ export function NewsletterSignupUI(props: TemplateUIProps) {
           <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-black text-white">
             <Mail className="h-5 w-5" aria-hidden="true" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-950">
+          <h1 className="text-3xl font-bold tracking-tighter text-slate-950">
             {props.formData.title}
           </h1>
           <FormDescription

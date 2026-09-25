@@ -291,7 +291,7 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
     return (
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold">Form Settings</h3>
+          <h3 className="text-sm font-medium text-foreground">Form Settings</h3>
           <div className="flex items-center gap-1">
             {!aiChatOpen && (
               <Button
@@ -314,7 +314,7 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
             </Button>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
+        <div className="flex items-center gap-2 text-foreground">
           <Settings className="w-4 h-4" />
           <p className="text-xs">Configure what respondents see after submitting.</p>
         </div>
@@ -335,10 +335,10 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
     <div className="p-4">
       <div className="mb-4 flex items-start justify-between gap-3 border-b border-border pb-3">
         <div>
-          <p className="text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+          <p className="text-[15px] font-medium capitalize tracking-tighter text-foreground">
             Field Properties
           </p>
-          <h3 className="mt-1 text-[23px] font-bold text-foreground">
+          <h3 className="mt-1 text-lg font-medium text-foreground">
             {selectedField.label || "Untitled Field"}
           </h3>
         </div>
@@ -367,16 +367,13 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
 
       <div className="space-y-5">
         <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-          <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+          <p className="mb-3 text-xs font-normal capitalize text-foreground">
             Selected Field Settings
           </p>
 
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label
-                htmlFor="label"
-                className="text-[13px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
-              >
+              <Label htmlFor="label" className="text-xs font-normal capitalize text-foreground">
                 Label
               </Label>
               <Input
@@ -391,7 +388,7 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
               <div className="space-y-2">
                 <Label
                   htmlFor="placeholder"
-                  className="text-[13px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                  className="text-xs font-normal capitalize text-foreground"
                 >
                   Placeholder
                 </Label>
@@ -409,12 +406,8 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
 
             <div className="flex items-center justify-between rounded-xl border border-border bg-background p-2.5">
               <div className="space-y-0.5">
-                <Label className="text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-                  Required
-                </Label>
-                <p className="text-[10px] text-muted-foreground">
-                  Respondents must fill this field
-                </p>
+                <Label className="text-xs font-normal capitalize text-foreground">Required</Label>
+                <p className="text-[10px] text-foreground">Respondents must fill this field</p>
               </div>
               <Switch
                 checked={selectedField.required}
@@ -428,7 +421,7 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
               <div className="space-y-2">
                 <Label
                   htmlFor="default-value"
-                  className="text-[13px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                  className="text-xs font-normal capitalize text-foreground"
                 >
                   Default Value
                 </Label>
@@ -448,9 +441,7 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
             {["select", "checkbox", "radio"].includes(selectedField.type) && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                    Options
-                  </p>
+                  <p className="text-xs font-normal capitalize text-foreground">Options</p>
                 </div>
 
                 <div className="space-y-2">
@@ -468,7 +459,7 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-9 w-9 rounded-lg p-0 text-muted-foreground hover:text-destructive"
+                        className="h-9 w-9 rounded-lg p-0 text-foreground hover:text-destructive"
                         onClick={() =>
                           handleUpdateField(selectedField.id, {
                             options: (selectedField.options ?? []).filter((_, i) => i !== index),
@@ -499,13 +490,11 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-          <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-            Form Settings
-          </p>
+          <p className="mb-3 text-xs font-normal capitalize text-foreground">Form Settings</p>
 
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label className="text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+              <Label className="text-xs font-normal capitalize text-foreground">
                 Form Template
               </Label>
               <button
@@ -530,9 +519,9 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
                   })()}
                   {TEMPLATE_OPTIONS.find((option) => option.value === selectedTemplate)?.title}
                 </span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-foreground" />
               </button>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[11px] text-foreground">
                 This template will be used for the complete form.
               </p>
             </div>
@@ -568,7 +557,7 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
         <div className="space-y-2 pt-2">
           <Button
             variant="default"
-            className="w-full rounded-xl bg-primary text-[13px] font-semibold"
+            className="w-full rounded-xl bg-primary text-[13px] font-medium"
             onClick={() =>
               dispatch(
                 showAlert({
@@ -618,13 +607,14 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
             >
               <div className="flex items-start justify-between border-b border-border px-6 py-5">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
-                    Form appearance
-                  </p>
-                  <h2 id="template-picker-title" className="mt-1 text-xl font-bold text-foreground">
+                  <p className="text-xs font-normal capitalize text-primary">Form appearance</p>
+                  <h2
+                    id="template-picker-title"
+                    className="mt-1 text-lg font-medium text-foreground"
+                  >
                     Choose a form template
                   </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
+                  <p className="mt-1 text-sm text-foreground">
                     Pick a visual style. Your fields and settings will stay unchanged.
                   </p>
                 </div>
@@ -662,8 +652,10 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
                         >
                           <Icon className="h-5 w-5" />
                         </div>
-                        <span className="text-sm font-bold text-foreground">{template.title}</span>
-                        <span className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        <span className="text-sm font-medium text-foreground">
+                          {template.title}
+                        </span>
+                        <span className="mt-1 text-xs leading-relaxed text-foreground">
                           {template.description}
                         </span>
                         {isSelected && (
@@ -699,9 +691,7 @@ function FormSettingInput({
 }) {
   return (
     <div className="space-y-2">
-      <Label className="text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-        {label}
-      </Label>
+      <Label className="text-xs font-normal capitalize text-foreground">{label}</Label>
       <Input
         type={type}
         value={value}
@@ -733,10 +723,7 @@ function FormSettingsPanel({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label
-          htmlFor="form-title"
-          className="text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground"
-        >
+        <Label htmlFor="form-title" className="text-xs font-normal capitalize text-foreground">
           Form title
         </Label>
         <Input
@@ -750,7 +737,7 @@ function FormSettingsPanel({
       <div className="space-y-2">
         <Label
           htmlFor="form-description"
-          className="text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground"
+          className="text-xs font-normal capitalize text-foreground"
         >
           Form description
         </Label>
@@ -811,13 +798,13 @@ function FormShareCard({ slug }: { slug: string }) {
   return (
     <Card className="rounded-xl border-border bg-muted/30">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-sm font-bold text-foreground">
+        <CardTitle className="flex items-center gap-2 text-sm font-medium text-foreground">
           <Share2 className="w-4 h-4 text-primary" />
           Share Form
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <p className="break-all text-center text-xs text-muted-foreground">{url}</p>
+        <p className="break-all text-center text-xs text-foreground">{url}</p>
         <div className="grid grid-cols-3 gap-2">
           <Button variant="outline" size="sm" className="gap-1.5 px-2 text-xs" onClick={copyUrl}>
             <Copy className="h-3.5 w-3.5" />

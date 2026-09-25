@@ -102,7 +102,7 @@ export function FormsGrid({ forms }: { forms: any[] }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold tracking-tight">My Forms</h2>
+        <h2 className="text-lg font-semibold tracking-tighter">My Forms</h2>
         <button className="h-8 px-3 rounded-lg border border-border bg-background text-sm font-medium hover:bg-accent transition-colors">
           View All
         </button>

@@ -38,7 +38,7 @@ export function Navbar() {
               <path d="m14.5 4-5 16" />
             </svg>
           </div>
-          <span className="font-semibold text-lg tracking-tight">FormBuilder</span>
+          <span className="font-semibold text-lg tracking-tighter">FormBuilder</span>
         </div>
 
         {/* Desktop Nav */}

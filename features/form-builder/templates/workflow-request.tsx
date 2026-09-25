@@ -27,7 +27,7 @@ export function WorkflowRequestUI(props: TemplateUIProps) {
             <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-black px-3 py-1 text-xs font-bold text-white">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> NEW REQUEST
             </span>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tighter text-slate-900">
               {props.formData.title}
             </h1>
             {props.formData.description && (

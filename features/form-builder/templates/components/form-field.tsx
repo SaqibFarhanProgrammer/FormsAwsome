@@ -362,7 +362,7 @@ function Field({
 function DefaultHeader({ formData, theme }: { formData: FormData; theme: UITheme }) {
   return (
     <div className="mb-6">
-      <h1 className={`font-semibold tracking-tight text-slate-900 ${theme.title}`}>
+      <h1 className={`font-semibold tracking-tighter text-slate-900 ${theme.title}`}>
         {formData.title}
       </h1>
       {formData.description && (
