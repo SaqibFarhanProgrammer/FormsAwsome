@@ -1,38 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FormsAwesome
 
-## Getting Started
+<p align="center">
+  <img src="https://ik.imagekit.io/mmyzvdovbv/Untitled%20design%20%281%29.png" alt="FormsAwesome form builder" width="100%" />
+</p>
 
-First, run the development server:
+<p align="center">
+  Build, publish, and understand forms from one focused workspace.
+</p>
+
+FormsAwesome is a full-stack form platform for creating polished forms without hand-coding every field and submission flow. It combines a drag-and-drop builder, AI-assisted form creation, public shareable URLs, submission management, and analytics in a single Next.js application.
+
+## What it includes
+
+- **Visual form builder** with reusable field templates, drag-and-drop editing, live properties, preview, and publish actions.
+- **AI form assistance** for generating and refining form structures with Gemini-powered services.
+- **Public forms** available through stable shareable URLs such as `/f/[slug]`.
+- **Submission management** with form-specific and workspace-level views.
+- **Analytics** for form activity, views, and response trends.
+- **Authentication** with email verification, protected routes, cookies, and optional Google OAuth support.
+- **Workspace services** for MongoDB, Redis rate limiting and caching, email delivery, and Cloudinary profile media.
+- **Embeddable form support** for placing published forms in other experiences.
+
+## Technology
+
+- [Next.js 16](https://nextjs.org/) with the App Router
+- React 19 and TypeScript
+- Tailwind CSS and reusable UI primitives
+- Redux Toolkit for client-side form builder state
+- MongoDB with Mongoose
+- Redis for caching and rate limiting
+- Zod, React Hook Form, and Axios
+- Recharts for analytics visualizations
+- Gemini and AI SDK integrations
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20 or newer
+- pnpm 11 or newer
+- A MongoDB database
+- Redis, Gemini, and SMTP credentials for the related features
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/SaqibFarhanProgrammer/FormsAwsome.git
+cd FormsAwsome
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create a local `.env.local` file and configure the services used by your environment:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+MONGODB_URI=
+REDIS_URL=
+REDIS_DB_URL=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+ACCESS_TOKEN_SECRET=
+REFRESH_TOKEN_SECRET=
+VERIFICATION_TOKEN_SECRET=
 
-## Learn More
+GEMINI_API_KEY=
 
-To learn more about Next.js, take a look at the following resources:
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+GOOGLE_CLIENT_KEY=
+GOOGLE_SECRET_KEY=
+GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
 
-## Deploy on Vercel
+Start the development server:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-# FormsAwsome
+## Useful scripts
+
+```bash
+pnpm dev          # Start the development server
+pnpm build        # Create a production build
+pnpm start        # Run the production build
+pnpm lint         # Run ESLint
+pnpm format:check # Check Prettier formatting
+pnpm check        # Run lint and formatting checks
+```
+
+## Product flow
+
+```text
+Sign up or sign in
+        |
+        v
+Create a form -> Add and configure fields -> Save draft
+        |
+        v
+Publish -> Share /f/[slug] or embed -> Collect submissions
+        |
+        v
+Review responses and analytics
+```
+
+## Project structure
+
+```text
+app/          Routes, pages, layouts, and API handlers
+components/   Shared UI and reusable visual components
+core/         Database connections and server-side services
+features/     Feature-owned components, models, services, and types
+lib/          Shared authentication, Redis, and utility helpers
+providers/    Application providers
+public/       Static fonts, images, and icons
+redux/        Redux store and feature slices
+tests/        Unit and integration tests
+```
+
+Feature code lives under `features/<feature>/`, while business rules and database orchestration belong in `core/services/`. Public forms are rendered at `/f/[slug]`, and their public API lives under `/api/f/[slug]`.
+
+## Deployment
+
+FormsAwesome can be deployed as a standard Next.js application on platforms such as Vercel or any Node.js hosting provider that supports Next.js. Add the production environment variables in the hosting provider, set `NEXT_PUBLIC_APP_URL` to the deployed origin, and run:
+
+```bash
+pnpm build
+pnpm start
+```
+
+Keep all secrets server-side. Do not commit `.env.local`, database credentials, API keys, or generated build output.
+
+## Contributing
+
+1. Create a focused branch from `main`.
+2. Keep changes inside the owning feature or shared layer.
+3. Run `pnpm check` before opening a pull request.
+4. Include a clear description of behavior changes and any required environment variables.
+
+## License
+
+This project is currently private. Contact the repository owner before redistributing or using the code outside the project.
