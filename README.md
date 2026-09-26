@@ -1,7 +1,7 @@
 # FormsAwesome
 
 <p align="center">
-  <img src="https://ik.imagekit.io/mmyzvdovbv/Untitled%20design%20%281%29.png" alt="FormsAwesome form builder" width="100%" />
+  <img src="https://ik.imagekit.io/mmyzvdovbv/Untitled%20design%20(1).png?updatedAt=1790327501887" alt="FormsAwesome form builder" width="100%" />
 </p>
 
 <p align="center">
