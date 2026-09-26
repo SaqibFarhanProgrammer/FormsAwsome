@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const AI_RATE_LIMIT = 3;
 const AI_RATE_LIMIT_WINDOW_SECONDS = 60 * 60 * 24;
-const HISTORY_TTL_SECONDS = 60 * 60 * 24 * 30;
+const HISTORY_TTL_SECONDS = 60 * 10;
 
 function getHistoryKey(userId: string) {
   return `ai:history:${userId}`;
