@@ -476,7 +476,7 @@ export function TopBar() {
   };
 
   return (
-    <div className="h-10 border-b border-border bg-card flex items-center justify-between px-6 flex-shrink-0">
+    <div className="h-10  bg-background flex items-center justify-between px-6 flex-shrink-0">
       <div className="flex items-center gap-4">
         <Link href="/all-forms">
           <Button

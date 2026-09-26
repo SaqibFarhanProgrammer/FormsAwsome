@@ -1,0 +1,1 @@
+first bro pelase use chat hsitry for only 10 mins ok dotn store the chat ghsitry for days ok stor ein minits ok and aslo pelase rate limti jo ki hai ai genrate uskoa p kamkaro uski limi 12 hr karook 14 hr emin ap 3 messga sd akr sak tehok rbo shsi akrdo isko ok

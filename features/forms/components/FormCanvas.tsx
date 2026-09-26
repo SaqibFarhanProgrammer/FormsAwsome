@@ -117,7 +117,7 @@ export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: Fo
   }, [slug, fields, dispatch, router, store]);
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
+    <div className="max-w-2xl bg-background mx-auto py-8 px-4 space-y-6">
       <FormMeta />
 
       {uiError && (
@@ -127,7 +127,7 @@ export function FormCanvas({ selectedFieldId, onSelectField, onRemoveField }: Fo
         </div>
       )}
 
-      <Card className="rounded-2xl border-2 border-dashed border-border/60 bg-card/30 shadow-none">
+      <Card className="rounded-2xl border-2 border-dashed border-border/60 bg-background shadow-none">
         <CardContent className="p-4 space-y-3 min-h-[400px]">
           {fields.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">

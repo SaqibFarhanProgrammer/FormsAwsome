@@ -43,7 +43,7 @@ interface ElementsSidebarProps {
 
 export function ElementsSidebar({ onAddField }: ElementsSidebarProps) {
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4 bg-background">
       <div>
         <h3 className="text-sm font-semibold">Form Elements</h3>
         <p className="text-xs text-muted-foreground mt-0.5">Click to add to canvas</p>

@@ -29,7 +29,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable}  ${InterFont.variable} font-inter  h-full antialiased`}
       cz-shortcut-listen="true"
     >
-      <body className="min-h-full flex flex-col" cz-shortcut-listen="true">
+      <body className="min-h-full bg-background flex flex-col" cz-shortcut-listen="true">
         <ThemeInitializer />
         <ReduxProvider>
           <GlobalAlert />

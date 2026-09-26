@@ -289,7 +289,7 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
 
   if (!selectedField) {
     return (
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 bg-background">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-medium text-foreground">Form Settings</h3>
           <div className="flex items-center gap-1">
@@ -333,7 +333,7 @@ export function PropertiesPanel({ onClose, onOpenAi, aiChatOpen }: PropertiesPan
 
   return (
     <div className="p-4">
-      <div className="mb-4 flex items-start justify-between gap-3 border-b border-border pb-3">
+      <div className="mb-4 flex items-start bg-background justify-between gap-3 border-b border-border pb-3">
         <div>
           <p className="text-[15px] font-medium capitalize tracking-tighter text-foreground">
             Field Properties

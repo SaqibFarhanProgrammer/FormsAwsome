@@ -79,12 +79,12 @@ export function FormBuilder() {
       {/* Main Content */}
       <div className="flex min-w-0 flex-1 overflow-hidden">
         {/* Left Sidebar - Click to Add Fields */}
-        <div className="w-64 shrink-0 border-r border-border bg-card overflow-y-auto">
+        <div className="w-64 shrink-0  border-border bg-background overflow-y-auto">
           <ElementsSidebar onAddField={handleAddField} />
         </div>
 
         {/* Center Canvas */}
-        <div className="min-w-0 flex-1 overflow-y-auto bg-muted/20">
+        <div className="min-w-0 flex-1 overflow-y-auto bg-background">
           <FormCanvas
             selectedFieldId={selectedFieldId}
             onSelectField={handleSelectField}
@@ -94,7 +94,7 @@ export function FormBuilder() {
 
         {/* Right Sidebar - Properties (Collapsible) */}
         <div
-          className={`shrink-0 border-l border-border bg-card overflow-y-auto transition-all duration-300 ${
+          className={`shrink-0 bo bg-background overflow-y-auto transition-all duration-300 ${
             propertiesOpen ? "w-80" : "w-0 opacity-0 overflow-hidden"
           }`}
         >

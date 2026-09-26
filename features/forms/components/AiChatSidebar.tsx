@@ -79,10 +79,16 @@ export function AiChatSidebar({ isOpen, onCollapse, onSendMessage }: AiChatSideb
       setLoading(true);
       setDraft("");
 
-      const response = await axios.post("/api/ai", {
-        prompt: message,
-        currentForm,
-      });
+      const response = await axios.post(
+        "/api/ai",
+        {
+          prompt: message,
+          currentForm,
+        },
+        {
+          timeout: 60_000, // 1 minute
+        },
+      );
 
       if (typeof response.data.remaining === "number") {
         setRemainingRequests(response.data.remaining);
@@ -117,7 +123,7 @@ export function AiChatSidebar({ isOpen, onCollapse, onSendMessage }: AiChatSideb
   return (
     <aside
       aria-hidden={!isOpen}
-      className={`flex h-[95vh] shrink-0 flex-col overflow-hidden border-l border-neutral-800 bg-neutral-950 transition-[width,opacity,transform] duration-300 ease-in-out ${
+      className={`flex h-[95vh] shrink-0 flex-col overflow-hidden border-l border-neutral-800 bg-background transition-[width,opacity,transform] duration-300 ease-in-out ${
         isOpen ? "w-96 opacity-100" : "pointer-events-none w-0 translate-x-3 opacity-0"
       }`}
     >

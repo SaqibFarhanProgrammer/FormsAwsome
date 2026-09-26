@@ -25,7 +25,7 @@ export function FormMeta() {
   const description = useSelector(selectFormDescription);
 
   return (
-    <Card className="rounded-2xl border-border shadow-sm">
+    <Card className="rounded-2xl bg-background ">
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           <div className="space-y-3 flex-1">
