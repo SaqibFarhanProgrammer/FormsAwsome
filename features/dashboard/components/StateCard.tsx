@@ -80,8 +80,6 @@ export function StateCard({
         backgroundPosition: "center",
       }}
     >
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black to-transparent" />
-
       <div className="relative z-10">
         '
         <div className="mb-5">

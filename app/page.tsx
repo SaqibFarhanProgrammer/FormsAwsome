@@ -8,7 +8,6 @@ import { SocialProof } from "@/components/landing-page/SociaProof";
 import { Testimonials } from "@/components/landing-page/Testimonials";
 
 export default async function LandingPage() {
-  
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />

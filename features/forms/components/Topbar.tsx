@@ -222,6 +222,7 @@ const TEMPLATE_OPTIONS: Array<{
  * - formFields (via selectFormFields) - used in createForm
  * - formCreate.isLoading (via custom selector) - shows loading state
  */
+
 export function TopBar() {
   const title = useSelector(selectFormTitle);
   const description = useSelector(selectFormDescription);
@@ -476,7 +477,7 @@ export function TopBar() {
   };
 
   return (
-    <div className="h-10  bg-background flex items-center justify-between px-6 flex-shrink-0">
+    <div className="h-14 bg-background flex items-center justify-between px-6 flex-shrink-0">
       <div className="flex items-center gap-4">
         <Link href="/all-forms">
           <Button
@@ -504,7 +505,8 @@ export function TopBar() {
         </Badge>
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* Buttons container - moved slightly up with -translate-y-1 */}
+      <div className="flex items-center gap-2 -translate-y-1">
         <Button variant="outline" size="sm" className="rounded-xl gap-2" onClick={handlePreview}>
           <Eye className="w-4 h-4" />
           Preview
