@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import GradientButton from "@/components/ui/GradientButton";
 import { Badge } from "@/components/ui/Badge";
 import {
   ArrowLeft,
@@ -507,6 +508,7 @@ export function TopBar() {
 
       {/* Buttons container - moved slightly up with -translate-y-1 */}
       <div className="flex items-center gap-2 -translate-y-1">
+        <GradientButton />
         <Button variant="outline" size="sm" className="rounded-xl gap-2" onClick={handlePreview}>
           <Eye className="w-4 h-4" />
           Preview
